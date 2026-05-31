@@ -1,0 +1,12 @@
+# Fichiers d'outils de build
+/target/
+/build/
+/.gradle/
+
+# Fichiers d'IntelliJ IDEA
+/.idea/
+*.iml
+*.iws
+
+# Fichiers système
+.DS_Store
