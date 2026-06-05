@@ -27,8 +27,11 @@ public class ActionMenuListener implements Listener {
         Component titleComponent = event.getView().title();
         String titleStr = PlainTextComponentSerializer.plainText().serialize(titleComponent);
 
-        if (!titleStr.startsWith("Action : ")) return;
-
+        boolean isBotcMenu = titleStr.startsWith("Action : ")
+                || titleStr.equals("Menu Principal du Conteur")
+                || titleStr.equals("Registre du Tribunal")
+                || titleStr.equals("Nommer un suspect");
+        if (!isBotcMenu) return;
         event.setCancelled(true);
 
         ItemStack clickedItem = event.getCurrentItem();

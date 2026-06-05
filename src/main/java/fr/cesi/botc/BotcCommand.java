@@ -107,8 +107,8 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
         }
 
         // ==========================================
-// COMMANDE : /botc shownames (Affiche les pseudos de tout le monde)
-// ==========================================
+        // COMMANDE : /botc shownames (Affiche les pseudos de tout le monde)
+        // ==========================================
         if (args[0].equalsIgnoreCase("shownames")) {
             org.bukkit.scoreboard.Team nightTeam = Bukkit.getScoreboardManager().getMainScoreboard().getTeam("botc_night");
 
@@ -122,9 +122,9 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
             return true;
         }
 
-// ==========================================
-// COMMANDE : /botc hidenames (Cache les pseudos de tout le monde)
-// ==========================================
+        // ==========================================
+        // COMMANDE : /botc hidenames (Cache les pseudos de tout le monde)
+        // ==========================================
         if (args[0].equalsIgnoreCase("hidenames")) {
             org.bukkit.scoreboard.Team nightTeam = Bukkit.getScoreboardManager().getMainScoreboard().getTeam("botc_night");
 
@@ -144,29 +144,30 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
         }
 
         // ==========================================
-// CONFIGURATION DES CHAMBRES (Avec sauvegarde de l'orientation)
-// ==========================================
+        // CONFIGURATION DES CHAMBRES (Avec sauvegarde de l'orientation)
+        // ==========================================
         if (args[0].equalsIgnoreCase("addroom")) {
             List<String> rooms = main.getConfig().getStringList("rooms");
 
-            org.bukkit.block.Block targetBlock = player.getTargetBlockExact(5);
-            if (targetBlock == null || targetBlock.getType().isAir()) {
-                player.sendMessage(Component.text("Erreur : Tu dois regarder le bloc précis où la tête sera posée !", NamedTextColor.RED));
-                return true;
-            }
+            // --- LE CHANGEMENT COMPLET ---
+            // Au lieu de regarder un bloc au loin, on prend le bloc exact où se trouve la TÊTE du Conteur !
+            org.bukkit.Location eyeLoc = player.getEyeLocation();
 
             // On calcule la direction cardinale (OUEST, EST, NORD, SUD) vers laquelle regarde le Conteur
             org.bukkit.block.BlockFace facing = player.getFacing();
 
-            org.bukkit.Location loc = targetBlock.getLocation();
-            // On ajoute la direction à la fin de la chaîne de texte
-            String locStr = loc.getWorld().getName() + "," + loc.getBlockX() + "," + loc.getBlockY() + "," + loc.getBlockZ() + "," + facing.name();
+            // On stocke les coordonnées sous forme de blocs d'entiers (getBlockX, getBlockY, getBlockZ)
+            String locStr = eyeLoc.getWorld().getName() + ","
+                    + eyeLoc.getBlockX() + ","
+                    + eyeLoc.getBlockY() + ","
+                    + eyeLoc.getBlockZ() + ","
+                    + facing.name();
 
             rooms.add(locStr);
             main.getConfig().set("rooms", rooms);
             main.saveConfig();
 
-            player.sendMessage(Component.text("Emplacement Chambre #" + rooms.size() + " (" + facing.name() + ") enregistré !", NamedTextColor.GREEN));
+            player.sendMessage(Component.text("Emplacement Chambre #" + rooms.size() + " enregistré pile à la hauteur de ta tête (Y=" + eyeLoc.getBlockY() + ") !", NamedTextColor.GREEN));
             return true;
         }
 
@@ -177,24 +178,50 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
             return true;
         }
 
-        // GESTION DES CHAMBRES : TEST VISUEL (PARTICULES)
+        // GESTION DES CHAMBRES : TEST VISUEL (PARTICULES QUANTIQUE CYCLIQUE)
         if (args[0].equalsIgnoreCase("showrooms")) {
             List<String> rooms = main.getConfig().getStringList("rooms");
-            player.sendMessage(Component.text("Affichage des " + rooms.size() + " portes de chambres pendant 10 secondes...", NamedTextColor.YELLOW));
-
-            // On fait apparaître des particules de lueur sur chaque emplacement de tête configuré
-            for (String roomStr : rooms) {
-                String[] parts = roomStr.split(",");
-                org.bukkit.World w = Bukkit.getWorld(parts[0]);
-                double x = Double.parseDouble(parts[1]);
-                double y = Double.parseDouble(parts[2]);
-                double z = Double.parseDouble(parts[3]);
-
-                if (w != null) {
-                    // Centre de bloc (+0.5) pour que la particule apparaisse pile sur la tête/porte
-                    w.spawnParticle(org.bukkit.Particle.HAPPY_VILLAGER, new org.bukkit.Location(w, x + 0.5, y + 0.5, z + 0.5), 20, 0.2, 0.2, 0.2, 0.0);
-                }
+            if (rooms.isEmpty()) {
+                player.sendMessage(Component.text("Erreur : Aucune chambre enregistrée.", NamedTextColor.RED));
+                return true;
             }
+
+            player.sendMessage(Component.text("Affichage des " + rooms.size() + " emplacements de chambres pendant 10 secondes...", NamedTextColor.YELLOW));
+
+            // On lance un compteur asynchrone qui va s'exécuter toutes les secondes
+            new org.bukkit.scheduler.BukkitRunnable() {
+                int secondsPassed = 0;
+
+                @Override
+                public void run() {
+                    // Arrêt automatique au bout de 10 secondes
+                    if (secondsPassed >= 10) {
+                        player.sendMessage(Component.text("Fin de l'affichage des chambres.", NamedTextColor.GRAY));
+                        this.cancel(); // Coupe le timer
+                        return;
+                    }
+
+                    // Apparition des particules pour ce cycle
+                    for (String roomStr : rooms) {
+                        String[] parts = roomStr.split(",");
+                        org.bukkit.World w = Bukkit.getWorld(parts[0]);
+                        if (w == null) continue;
+
+                        double x = Double.parseDouble(parts[1]);
+                        double y = Double.parseDouble(parts[2]);
+                        double z = Double.parseDouble(parts[3]);
+
+                        // On descend la quantité à 5 particules par seconde (au lieu de 20 d'un coup)
+                        // pour que ce soit fluide et très propre visuellement
+                        w.spawnParticle(org.bukkit.Particle.HAPPY_VILLAGER,
+                                new org.bukkit.Location(w, x + 0.5, y + 0.5, z + 0.5),
+                                5, 0.1, 0.1, 0.1, 0.0);
+                    }
+
+                    secondsPassed++;
+                }
+            }.runTaskTimer(main, 0L, 20L); // 20L = 20 ticks = 1 seconde en jeu.
+
             return true;
         }
 
@@ -356,14 +383,43 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
                 return true;
             }
 
-            org.bukkit.scoreboard.Team nightTeam = Bukkit.getScoreboardManager().getMainScoreboard().getTeam("botc_night");
+            // --- INITIALISATION DU GROUPE VOCAL SIMPLE VOICE CHAT ---
+            de.maxhenkel.voicechat.api.VoicechatServerApi voiceApi = null;
+            de.maxhenkel.voicechat.api.Group tribunalGroup = null;
+
+            if (main.getVoicechatPlugin() != null && main.getVoicechatPlugin().getVoicechatApi() != null) {
+                voiceApi = main.getVoicechatPlugin().getVoicechatApi();
+
+                // On build le salon du Tribunal (Non persistant = s'autodétruit quand il est vide)
+                tribunalGroup = voiceApi.groupBuilder()
+                        .setName("🏛️ Tribunal")
+                        .setPersistent(false)
+                        .setType(de.maxhenkel.voicechat.api.Group.Type.NORMAL) // Tout le monde s'entend, peu importe la distance
+                        .build();
+
+                // On y ajoute immédiatement le Conteur (le joueur qui tape la commande) pour qu'il puisse animer
+                de.maxhenkel.voicechat.api.VoicechatConnection adminConnection = voiceApi.getConnectionOf(player.getUniqueId());
+                if (adminConnection != null) {
+                    adminConnection.setGroup(tribunalGroup);
+                }
+            }
+
+            // --- GESTION DU SCOREBOARD POUR LES COLLISIONS ---
+            org.bukkit.scoreboard.Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
+            org.bukkit.scoreboard.Team chairTeam = scoreboard.getTeam("botc_chairs");
+            // Si l'équipe de chaises n'existe pas, on la crée et on coupe les collisions
+            if (chairTeam == null) {
+                chairTeam = scoreboard.registerNewTeam("botc_chairs");
+                chairTeam.setOption(org.bukkit.scoreboard.Team.Option.COLLISION_RULE, org.bukkit.scoreboard.Team.OptionStatus.NEVER);
+            }
+
+            org.bukkit.scoreboard.Team nightTeam = scoreboard.getTeam("botc_night");
 
             int index = 0;
             for (Player p : Bukkit.getOnlinePlayers()) {
                 if (p.isOp()) continue;
                 if (index >= chairsStr.size()) break;
 
-                // RETRAIT DE L'ÉQUIPE -> ON RE-AFFICHE LES NAMETAGS POUR LE TRIBUNAL !
                 if (nightTeam != null && nightTeam.hasEntry(p.getName())) {
                     nightTeam.removeEntry(p.getName());
                 }
@@ -375,25 +431,38 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
                     double y = Double.parseDouble(parts[2]);
                     double z = Double.parseDouble(parts[3]);
                     float yaw = Float.parseFloat(parts[4]);
-                    org.bukkit.Location chairLoc = new org.bukkit.Location(w, x, y, z, yaw, 0);
 
-                    // On téléporte le joueur à l'emplacement de la chaise
+                    org.bukkit.Location chairLoc = new org.bukkit.Location(w, x, y, z, yaw, 0);
+                    org.bukkit.Location horseLoc = chairLoc.clone().add(0, -1.5, 0); // La position 1,5 bloc plus bas
+
                     p.teleport(chairLoc);
 
-                    // On fait apparaître un wagon (Minecart) à la place de l'ArmorStand
-                    org.bukkit.entity.minecart.RideableMinecart chair = w.spawn(chairLoc, org.bukkit.entity.minecart.RideableMinecart.class, minecart -> {
-                        minecart.setGravity(false);
-                        minecart.setSilent(true);
-                        minecart.setInvulnerable(true);
-                        minecart.addScoreboardTag("botc_chair");
+                    // 1. On spawn le cheval à l'air libre (chairLoc) pour éviter le snap automatique vers le haut
+                    org.bukkit.entity.Horse chair = w.spawn(chairLoc, org.bukkit.entity.Horse.class, horse -> {
+                        horse.setGravity(false);
+                        horse.setSilent(true);
+                        horse.setInvulnerable(true);
+                        horse.setAI(false);
+                        horse.setTamed(true);
+                        horse.setPersistent(false); // S'efface tout seul si le serveur redémarre !
+                        horse.addScoreboardTag("botc_chair");
 
-                        // On demande à la console d'appliquer l'effet vanilla au wagon via son UUID unique
-                        // Le "true" à la fin cache les particules de potion
-                        String cmd = "execute as " + minecart.getUniqueId() + " run effect give @s invisibility infinite 1 true";
-                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
+                        horse.addPotionEffect(new org.bukkit.potion.PotionEffect(
+                                org.bukkit.potion.PotionEffectType.INVISIBILITY,
+                                Integer.MAX_VALUE,
+                                0,
+                                false,
+                                false
+                        ));
                     });
 
-                    // On assoit le joueur dans le wagon
+                    // 2. On FORCE le cheval à descendre dans le bloc en le téléportant juste après son spawn
+                    chair.teleport(horseLoc);
+
+                    // 3. On ajoute le cheval dans l'équipe sans collision
+                    chairTeam.addEntry(chair.getUniqueId().toString());
+
+                    // 4. On assoit le joueur
                     chair.addPassenger(p);
                     index++;
                 }
