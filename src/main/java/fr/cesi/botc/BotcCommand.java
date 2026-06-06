@@ -123,6 +123,45 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
         }
 
         // ==========================================
+        // ⚖️ COMMANDE : /botc order (Affiche l'ordre du cercle pour le MJ)
+        // ==========================================
+        if (args[0].equalsIgnoreCase("order")) {
+            if (!main.isSeatsAssigned()) {
+                player.sendMessage(Component.text("🚨 L'ordre n'est pas encore généré ! Lance d'abord un /botc assis pour créer le cercle de cette game.", NamedTextColor.RED));
+                return true;
+            }
+
+            player.sendMessage(Component.text("=== 🔄 ORDRE DU CERCLE DE JEU (Du siège 1 à X) ===", NamedTextColor.DARK_PURPLE).decorate(TextDecoration.BOLD));
+
+            // On récupère et trie les joueurs selon leur index de chaise
+            java.util.List<BotcPlayer> orderedPlayers = new java.util.ArrayList<>(main.getPlayersMap().values());
+            orderedPlayers.removeIf(bp -> bp.getChairIndex() == -1);
+            orderedPlayers.sort(java.util.Comparator.comparingInt(BotcPlayer::getChairIndex));
+
+            if (orderedPlayers.isEmpty()) {
+                player.sendMessage(Component.text("Aucun joueur n'est assis sur une chaise actuellement.", NamedTextColor.GRAY));
+                return true;
+            }
+
+            for (BotcPlayer bp : orderedPlayers) {
+                // On prépare le tag de vie (Vert si vivant, Rouge 💀 si mort)
+                Component statusTag = bp.isAlive()
+                        ? Component.text("[VIVANT]", NamedTextColor.GREEN)
+                        : Component.text("[MORT 💀]", NamedTextColor.RED);
+
+                // On affiche la ligne : Siège #1 : Pseudo | [VIVANT] | Rôle : Diablotin
+                player.sendMessage(Component.text("🪑 Siège #" + (bp.getChairIndex() + 1) + " : ", NamedTextColor.GOLD)
+                        .append(Component.text(bp.getPlayerName(), NamedTextColor.AQUA).decorate(TextDecoration.BOLD))
+                        .append(Component.text(" | ", NamedTextColor.GRAY))
+                        .append(statusTag)
+                        .append(Component.text(" | Rôle : ", NamedTextColor.GRAY))
+                        .append(Component.text(bp.getDisplayedRole(), NamedTextColor.LIGHT_PURPLE)));
+            }
+            player.sendMessage(Component.text("--------------------------------------------------", NamedTextColor.GRAY));
+            return true;
+        }
+
+        // ==========================================
         // COMMANDE : /botc hidenames (Cache les pseudos de tout le monde)
         // ==========================================
         if (args[0].equalsIgnoreCase("hidenames")) {
@@ -274,12 +313,31 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
         // COMMANDE /botc debout (Libération + Masquage des NameTags)
         // ==========================================
         if (args[0].equalsIgnoreCase("debout")) {
-            Bukkit.broadcast(Component.text("[BOTC] Le conseil est terminé, vous pouvez vous lever.", NamedTextColor.GREEN));
-
             org.bukkit.scoreboard.Team nightTeam = Bukkit.getScoreboardManager().getMainScoreboard().getTeam("botc_night");
 
+            // --- DÉCONNEXION DU GROUPE VOCAL (VERSION DIAGNOSTIC) ---
+            if (main.getVoicechatPlugin() != null && main.getVoicechatPlugin().getVoicechatApi() != null) {
+                de.maxhenkel.voicechat.api.VoicechatServerApi voiceApi = main.getVoicechatPlugin().getVoicechatApi();
+
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    de.maxhenkel.voicechat.api.VoicechatConnection connection = voiceApi.getConnectionOf(p.getUniqueId());
+                    if (connection != null) {
+                        connection.setGroup(null); // Quitte le groupe
+                    }
+                }
+            }
+
+            net.kyori.adventure.title.Title deboutTitle = net.kyori.adventure.title.Title.title(
+                    Component.text("! LEVEZ-VOUS !", NamedTextColor.GREEN).decorate(TextDecoration.BOLD),
+                    Component.text("Vous pouvez quitter votre siège.", NamedTextColor.GRAY)
+            );
+
             for (Player p : Bukkit.getOnlinePlayers()) {
+                p.showTitle(deboutTitle);
+                p.playSound(p.getLocation(), org.bukkit.Sound.ENTITY_HORSE_GALLOP, 0.5f, 1.2f); // Bruit de pas légers
+
                 if (p.isOp()) continue;
+
                 // Si le joueur est dans un véhicule tagué "botc_chair"
                 if (p.getVehicle() != null && p.getVehicle().getScoreboardTags().contains("botc_chair")) {
                     org.bukkit.entity.Entity chair = p.getVehicle();
@@ -291,10 +349,136 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
                     nightTeam.addEntry(p.getName());
                 }
             }
+
+            Bukkit.broadcast(Component.text("[BOTC] Le conseil est terminé, vous pouvez vous lever.", NamedTextColor.GREEN));
             return true;
         }
 
+        if (args[0].equalsIgnoreCase("mort")) {
+            if (!player.isOp()) return true;
 
+            net.kyori.adventure.title.Title title = net.kyori.adventure.title.Title.title(
+                    Component.text("💀 ANNONCE DES MORTS 💀", NamedTextColor.RED).decorate(TextDecoration.BOLD),
+                    Component.text("Écoutez attentivement le Conteur...", NamedTextColor.GRAY)
+            );
+
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                p.showTitle(title);
+                // Un bruit d'éclair lointain pour l'ambiance sombre
+                p.playSound(p.getLocation(), org.bukkit.Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 0.8f, 0.8f);
+            }
+
+            Bukkit.broadcast(Component.text("=============================================", NamedTextColor.RED));
+            Bukkit.broadcast(Component.text("[BOTC] Silence ! Le Conteur va annoncer les victimes de la nuit.", NamedTextColor.DARK_RED).decorate(TextDecoration.BOLD));
+            Bukkit.broadcast(Component.text("=============================================", NamedTextColor.RED));
+            return true;
+        }
+
+        if (args[0].equalsIgnoreCase("tempslibre")) {
+            if (!player.isOp()) return true;
+
+            net.kyori.adventure.title.Title title = net.kyori.adventure.title.Title.title(
+                    Component.text("🗣️ TEMPS LIBRE 🗣️", NamedTextColor.GREEN).decorate(TextDecoration.BOLD),
+                    Component.text("Dispersez-vous et complotez en secret !", NamedTextColor.GRAY)
+            );
+
+            // On force tout le monde à se lever pour qu'ils puissent courir partout
+            player.performCommand("botc debout");
+
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                p.showTitle(title);
+                // Un petit jingle de début de journée léger
+                p.playSound(p.getLocation(), org.bukkit.Sound.BLOCK_NOTE_BLOCK_CHIME, 0.7f, 1.2f);
+            }
+
+            Bukkit.broadcast(Component.text("=============================================", NamedTextColor.GREEN));
+            Bukkit.broadcast(Component.text("[BOTC] Le temps libre est déclaré. Les discussions privées sont autorisées !", NamedTextColor.DARK_GREEN).decorate(TextDecoration.BOLD));
+            Bukkit.broadcast(Component.text("=============================================", NamedTextColor.GREEN));
+            return true;
+        }
+
+        if (args[0].equalsIgnoreCase("conseil")) {
+            if (!player.isOp()) return true;
+
+            // 1. Préparation de l'affichage à l'écran
+            net.kyori.adventure.title.Title title = net.kyori.adventure.title.Title.title(
+                    Component.text("⚖️ LE CONSEIL COMMENCE ⚖️", NamedTextColor.GOLD).decorate(TextDecoration.BOLD),
+                    Component.text("Retournez au tribunal ! Fin du temps libre.", NamedTextColor.GRAY)
+            );
+
+            // 2. Récupération de la position du Tribunal sauvegardée
+            org.bukkit.Location tribunalLoc = null;
+            if (main.getConfig().contains("tribunal.x")) {
+                String worldName = main.getConfig().getString("tribunal.world");
+                if (worldName != null) {
+                    org.bukkit.World world = Bukkit.getWorld(worldName);
+                    double tx = main.getConfig().getDouble("tribunal.x");
+                    double ty = main.getConfig().getDouble("tribunal.y");
+                    double tz = main.getConfig().getDouble("tribunal.z");
+                    if (world != null) tribunalLoc = new org.bukkit.Location(world, tx, ty, tz);
+                }
+            }
+
+            final org.bukkit.Location finalTribunal = tribunalLoc;
+
+            // Sécurité si le Conteur a oublié le /botc settribunal
+            if (finalTribunal == null) {
+                player.sendMessage(Component.text("Erreur : Le tribunal n'est pas configuré ! (/botc settribunal)", NamedTextColor.RED));
+                return true;
+            }
+
+            // 3. Activation des effets et de la boussole pour TOUS les joueurs
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                p.showTitle(title);
+                p.playSound(p.getLocation(), org.bukkit.Sound.BLOCK_BELL_USE, 1.0f, 1.0f);
+
+                // Lancement du GPS de retour au Conseil
+                new org.bukkit.scheduler.BukkitRunnable() {
+                    int ticks = 0;
+                    @Override
+                    public void run() {
+                        if (ticks > 40 || !p.isOnline()) { this.cancel(); return; }
+
+                        org.bukkit.Location pLoc = p.getLocation();
+                        double distance = pLoc.distance(finalTribunal);
+
+                        // Quand le joueur arrive à moins de 3 blocs du centre
+                        if (distance < 3.0) {
+                            p.sendActionBar(Component.text("✦ Vous êtes arrivé à votre siège ✦", NamedTextColor.GREEN).decorate(TextDecoration.BOLD));
+                            p.playSound(p.getLocation(), org.bukkit.Sound.UI_TOAST_CHALLENGE_COMPLETE, 0.4f, 1.5f);
+                            this.cancel();
+                            return;
+                        }
+
+                        // Affichage de la distance dans la barre d'action
+                        p.sendActionBar(Component.text("➔ Retour au Conseil : ", NamedTextColor.GOLD)
+                                .append(Component.text((int) distance + "m", NamedTextColor.YELLOW).decorate(TextDecoration.BOLD)));
+
+                        // Calcul du vecteur directionnel pour les particules de lueur
+                        org.bukkit.util.Vector direction = finalTribunal.toVector().subtract(pLoc.toVector()).normalize();
+                        org.bukkit.Location arrowStart = p.getEyeLocation().add(p.getLocation().getDirection().multiply(1.2));
+
+                        for (double d = 0; d < 1.0; d += 0.35) {
+                            org.bukkit.Location particlePoint = arrowStart.clone().add(direction.clone().multiply(d));
+                            p.spawnParticle(org.bukkit.Particle.GLOW, particlePoint, 1, 0, 0, 0, 0);
+                        }
+
+                        // Petit tintement d'améthyste régulier
+                        if (ticks % 4 == 0) {
+                            p.playSound(p.getEyeLocation(), org.bukkit.Sound.BLOCK_AMETHYST_BLOCK_CHIME, 0.15f, 1.4f);
+                        }
+                        ticks++;
+                    }
+                }.runTaskTimer(main, 0L, 10L);
+            }
+
+            // 4. Message global dans le chat (Parfaitement adapté au Conseil)
+            Bukkit.broadcast(Component.text("=============================================", NamedTextColor.GOLD));
+            Bukkit.broadcast(Component.text("[BOTC] Le Conseil est ouvert ! Suivez les flèches pour regagner immédiatement le tribunal.", NamedTextColor.YELLOW).decorate(TextDecoration.BOLD));
+            Bukkit.broadcast(Component.text("=============================================", NamedTextColor.GOLD));
+
+            return true;
+        }
 
         // ==========================================
         // COMMANDE /botc nuit (Version Animation Ciel + Marche Libre)
@@ -348,7 +532,7 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
 
             new org.bukkit.scheduler.BukkitRunnable() {
                 long currentTime = player.getWorld().getTime(); // On part de l'heure de la nuit (18000)
-                final long targetTime = 30000; // Matin du jour suivant (24000 + 1000)
+                final long targetTime = 30000; // Matin du jour suivant
 
                 @Override
                 public void run() {
@@ -383,31 +567,65 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
                 return true;
             }
 
-            // --- INITIALISATION DU GROUPE VOCAL SIMPLE VOICE CHAT ---
-            de.maxhenkel.voicechat.api.VoicechatServerApi voiceApi = null;
-            de.maxhenkel.voicechat.api.Group tribunalGroup = null;
+            // --- 🌟 ALGORITHME DE RÉPARTITION FIXE ET UNIQUE 🌟 ---
+            // Si c'est le premier "/botc assis" depuis le reset, on mélange et on fixe les places !
+            if (!main.isSeatsAssigned()) {
+                List<BotcPlayer> joueursAAsseoir = new ArrayList<>();
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    if (!p.isOp()) {
+                        BotcPlayer bp = main.getPlayersMap().get(p.getUniqueId());
+                        if (bp != null) joueursAAsseoir.add(bp);
+                    }
+                }
 
-            if (main.getVoicechatPlugin() != null && main.getVoicechatPlugin().getVoicechatApi() != null) {
-                voiceApi = main.getVoicechatPlugin().getVoicechatApi();
+                // On mélange Aléatoirement l'ordre des joueurs
+                java.util.Collections.shuffle(joueursAAsseoir);
 
-                // On build le salon du Tribunal (Non persistant = s'autodétruit quand il est vide)
-                tribunalGroup = voiceApi.groupBuilder()
-                        .setName("🏛️ Tribunal")
-                        .setPersistent(false)
-                        .setType(de.maxhenkel.voicechat.api.Group.Type.NORMAL) // Tout le monde s'entend, peu importe la distance
-                        .build();
-
-                // On y ajoute immédiatement le Conteur (le joueur qui tape la commande) pour qu'il puisse animer
-                de.maxhenkel.voicechat.api.VoicechatConnection adminConnection = voiceApi.getConnectionOf(player.getUniqueId());
-                if (adminConnection != null) {
-                    adminConnection.setGroup(tribunalGroup);
+                // On leur attribue définitivement un numéro de chaise pour TOUTE la game
+                for (int i = 0; i < joueursAAsseoir.size(); i++) {
+                    joueursAAsseoir.get(i).setChairIndex(i);
+                }
+                main.setSeatsAssigned(true); // C'est verrouillé jusqu'au prochain /botc reset !
+            }
+            // Sécurité : Si un joueur s'est connecté en retard (mid-game), on lui donne une chaise vide restante
+            else {
+                List<Integer> chaisesPrises = new ArrayList<>();
+                for (BotcPlayer bp : main.getPlayersMap().values()) {
+                    if (bp.getChairIndex() != -1) chaisesPrises.add(bp.getChairIndex());
+                }
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    if (p.isOp()) continue;
+                    BotcPlayer bp = main.getPlayersMap().get(p.getUniqueId());
+                    if (bp != null && bp.getChairIndex() == -1) {
+                        for (int i = 0; i < chairsStr.size(); i++) {
+                            if (!chaisesPrises.contains(i)) {
+                                bp.setChairIndex(i);
+                                chaisesPrises.add(i);
+                                break;
+                            }
+                        }
+                    }
                 }
             }
 
-            // --- GESTION DU SCOREBOARD POUR LES COLLISIONS ---
+            // --- INITIALISATION DU GROUPE VOCAL SIMPLE VOICE CHAT ---
+            if (main.getVoicechatPlugin() != null && main.getVoicechatPlugin().getVoicechatApi() != null) {
+                de.maxhenkel.voicechat.api.VoicechatServerApi voiceApi = main.getVoicechatPlugin().getVoicechatApi();
+                de.maxhenkel.voicechat.api.Group tribunalGroup = voiceApi.groupBuilder()
+                        .setName("🏛️ Tribunal")
+                        .setPersistent(false)
+                        .setType(de.maxhenkel.voicechat.api.Group.Type.NORMAL)
+                        .build();
+
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    de.maxhenkel.voicechat.api.VoicechatConnection connection = voiceApi.getConnectionOf(p.getUniqueId());
+                    if (connection != null) connection.setGroup(tribunalGroup);
+                }
+            }
+
+            // --- PLACEMENT PHYSIQUE SUR LES CHAISES FIXES ---
             org.bukkit.scoreboard.Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
             org.bukkit.scoreboard.Team chairTeam = scoreboard.getTeam("botc_chairs");
-            // Si l'équipe de chaises n'existe pas, on la crée et on coupe les collisions
             if (chairTeam == null) {
                 chairTeam = scoreboard.registerNewTeam("botc_chairs");
                 chairTeam.setOption(org.bukkit.scoreboard.Team.Option.COLLISION_RULE, org.bukkit.scoreboard.Team.OptionStatus.NEVER);
@@ -415,16 +633,28 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
 
             org.bukkit.scoreboard.Team nightTeam = scoreboard.getTeam("botc_night");
 
-            int index = 0;
+            net.kyori.adventure.title.Title assisTitle = net.kyori.adventure.title.Title.title(
+                    Component.text("🪑 TOUT LE MONDE ASSIS 🪑", NamedTextColor.GOLD).decorate(TextDecoration.BOLD),
+                    Component.text("Le Tribunal est en séance. Silence dans les rangs.", NamedTextColor.GRAY)
+            );
+
             for (Player p : Bukkit.getOnlinePlayers()) {
+                p.showTitle(assisTitle);
+                p.playSound(p.getLocation(), org.bukkit.Sound.ITEM_ARMOR_EQUIP_NETHERITE, 1.0f, 0.5f);
+
                 if (p.isOp()) continue;
-                if (index >= chairsStr.size()) break;
+
+                BotcPlayer bp = main.getPlayersMap().get(p.getUniqueId());
+                if (bp == null || bp.getChairIndex() == -1) continue;
+
+                int indexChaise = bp.getChairIndex();
+                if (indexChaise >= chairsStr.size()) continue; // Sécurité si pas assez de chaises physiques
 
                 if (nightTeam != null && nightTeam.hasEntry(p.getName())) {
                     nightTeam.removeEntry(p.getName());
                 }
 
-                String[] parts = chairsStr.get(index).split(",");
+                String[] parts = chairsStr.get(indexChaise).split(",");
                 org.bukkit.World w = Bukkit.getWorld(parts[0]);
                 if (w != null) {
                     double x = Double.parseDouble(parts[1]);
@@ -433,42 +663,28 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
                     float yaw = Float.parseFloat(parts[4]);
 
                     org.bukkit.Location chairLoc = new org.bukkit.Location(w, x, y, z, yaw, 0);
-                    org.bukkit.Location horseLoc = chairLoc.clone().add(0, -1.5, 0); // La position 1,5 bloc plus bas
+                    org.bukkit.Location horseLoc = chairLoc.clone().add(0, -1.5, 0);
 
                     p.teleport(chairLoc);
 
-                    // 1. On spawn le cheval à l'air libre (chairLoc) pour éviter le snap automatique vers le haut
                     org.bukkit.entity.Horse chair = w.spawn(chairLoc, org.bukkit.entity.Horse.class, horse -> {
                         horse.setGravity(false);
                         horse.setSilent(true);
                         horse.setInvulnerable(true);
                         horse.setAI(false);
                         horse.setTamed(true);
-                        horse.setPersistent(false); // S'efface tout seul si le serveur redémarre !
+                        horse.setPersistent(false);
                         horse.addScoreboardTag("botc_chair");
-
-                        horse.addPotionEffect(new org.bukkit.potion.PotionEffect(
-                                org.bukkit.potion.PotionEffectType.INVISIBILITY,
-                                Integer.MAX_VALUE,
-                                0,
-                                false,
-                                false
-                        ));
+                        horse.addPotionEffect(new org.bukkit.potion.PotionEffect(org.bukkit.potion.PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 0, false, false));
                     });
 
-                    // 2. On FORCE le cheval à descendre dans le bloc en le téléportant juste après son spawn
                     chair.teleport(horseLoc);
-
-                    // 3. On ajoute le cheval dans l'équipe sans collision
                     chairTeam.addEntry(chair.getUniqueId().toString());
-
-                    // 4. On assoit le joueur
                     chair.addPassenger(p);
-                    index++;
                 }
             }
 
-            Bukkit.broadcast(Component.text("[BOTC] Le tribunal commence. Tout le monde est assis et identifié !", NamedTextColor.GOLD));
+            Bukkit.broadcast(Component.text("[BOTC] Le tribunal commence. Tout le monde est assis à sa place attribuée !", NamedTextColor.GOLD));
             return true;
         }
 
@@ -480,12 +696,11 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
             }
 
             if (args[0].equalsIgnoreCase("reset")) {
-                // On nettoie les variables de la partie en cours
-                main.getConfig().set("chairs", new ArrayList<String>()); // Optionnel : si tu veux replacer les chaises
-                // On NE supprime PAS "rooms", comme ça tu n'as pas à re-configurer les portes du château à chaque partie !
-                main.saveConfig();
+                // 1. On appelle la vraie méthode qui réanime tout le monde et clean les BossBars
+                main.resetGame();
 
-                player.sendMessage(Component.text("✓ Partie réinitialisée. Les chambres restent sauvegardées pour le château !", NamedTextColor.GREEN));
+                // 2. On évite de vider "chairs" pour ne pas avoir à re-sélectionner les sièges du village !
+                player.sendMessage(Component.text("✓ La partie a été réinitialisée ! Tous les joueurs sont de nouveau vivants et prêts. Placement des joueurs réinitialisés", NamedTextColor.GREEN));
                 return true;
             }
 
@@ -564,8 +779,12 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
                 if ("showrooms".startsWith(input)) completions.add("showrooms");
                 if ("setplayerdeath".startsWith(input)) completions.add("setplayerdeath");
                 if ("settribunal".startsWith(input)) completions.add("settribunal");
-                if ("shownames".startsWith(input)) completions.add("shownames"); // <--- ICI
-                if ("hidenames".startsWith(input)) completions.add("hidenames"); // <--- ICI
+                if ("shownames".startsWith(input)) completions.add("shownames");
+                if ("hidenames".startsWith(input)) completions.add("hidenames");
+                if ("mort".startsWith(input)) completions.add("mort");
+                if ("tempslibre".startsWith(input)) completions.add("tempslibre");
+                if ("conseil".startsWith(input)) completions.add("conseil");
+                if ("order".startsWith(input)) completions.add("order");
             }
             return completions;
         }
@@ -587,10 +806,15 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
     private void lancerMecaniquesNuit(Player player) {
         org.bukkit.scoreboard.Team nightTeam = Bukkit.getScoreboardManager().getMainScoreboard().getTeam("botc_night");
         List<String> roomsStr = main.getConfig().getStringList("rooms");
-
+        // 1. Ambiance de terreur et titre pour tout le monde
+        net.kyori.adventure.title.Title nightTitle = net.kyori.adventure.title.Title.title(
+                Component.text("🌙 LA NUIT TOMBE 🌙", NamedTextColor.BLUE).decorate(TextDecoration.BOLD),
+                Component.text("Fermez les yeux... Le démon s'éveille.", NamedTextColor.GRAY)
+        );
         // 1. Ambiance de terreur pour tout le monde
         for (Player p : Bukkit.getOnlinePlayers()) {
             if (nightTeam != null) nightTeam.addEntry(p.getName());
+            p.showTitle(nightTitle);
             p.playSound(p.getLocation(), org.bukkit.Sound.AMBIENT_CAVE, 1.5f, 0.5f);
             p.playSound(p.getLocation(), org.bukkit.Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 0.8f, 0.2f);
             p.spawnParticle(org.bukkit.Particle.LARGE_SMOKE, p.getLocation().add(0, 1, 0), 20, 0.5, 0.5, 0.5, 0.0);
@@ -614,23 +838,20 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
 
                 org.bukkit.block.Block block = wRoom.getBlockAt(bx, by, bz);
 
-                // 1. On pose d'abord le bloc de tête
+                // 🌟 LE FIX CLÉ : On force le bloc à devenir de l'AIR pour détruire l'ancienne tête et vider le cache client !
+                block.setType(org.bukkit.Material.AIR);
+
+                // Maintenant on peut poser la nouvelle tête, elle s'actualisera à coup sûr
                 block.setType(org.bukkit.Material.PLAYER_HEAD);
 
-                // 2. CORRECTION DE L'ORIENTATION : On applique la direction sauvegardée
-                if (roomParts.length > 4) { // On vérifie si la direction existe dans la config
+                if (roomParts.length > 4) {
                     try {
                         org.bukkit.block.BlockFace facing = org.bukkit.block.BlockFace.valueOf(roomParts[4]);
-
-                        // On récupère le BlockData du bloc qu'on vient de poser
                         if (block.getBlockData() instanceof org.bukkit.block.data.Rotatable rotatable) {
-                            // On lui applique la rotation (Nord, Sud, Est, Ouest...)
                             rotatable.setRotation(facing);
                             block.setBlockData(rotatable);
                         }
-                    } catch (IllegalArgumentException e) {
-                        // Sécurité au cas où le texte de la config serait corrompu
-                    }
+                    } catch (IllegalArgumentException ignored) {}
                 }
 
                 // 3. On applique la texture du joueur (comme avant)
@@ -687,11 +908,14 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
 
         org.bukkit.Location tribunalLoc = null;
         if (main.getConfig().contains("tribunal.x")) {
-            org.bukkit.World world = Bukkit.getWorld(main.getConfig().getString("tribunal.world"));
-            double tx = main.getConfig().getDouble("tribunal.x");
-            double ty = main.getConfig().getDouble("tribunal.y");
-            double tz = main.getConfig().getDouble("tribunal.z");
-            if (world != null) tribunalLoc = new org.bukkit.Location(world, tx, ty, tz);
+            String worldName = main.getConfig().getString("tribunal.world");
+            if (worldName != null) {
+                org.bukkit.World world = Bukkit.getWorld(worldName);
+                double tx = main.getConfig().getDouble("tribunal.x");
+                double ty = main.getConfig().getDouble("tribunal.y");
+                double tz = main.getConfig().getDouble("tribunal.z");
+                if (world != null) tribunalLoc = new org.bukkit.Location(world, tx, ty, tz);
+            }
         }
 
         final org.bukkit.Location finalTribunal = tribunalLoc;
@@ -700,10 +924,18 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
             player.sendMessage(Component.text("Erreur : Le tribunal n'est pas configuré ! (/botc settribunal)", NamedTextColor.RED));
             return;
         }
-
+        // Titre du réveil
+        net.kyori.adventure.title.Title wakeTitle = net.kyori.adventure.title.Title.title(
+                Component.text("🌅 LE RÉVEIL 🌅", NamedTextColor.YELLOW).decorate(TextDecoration.BOLD),
+                Component.text("Regagnez le Tribunal pour le Conseil.", NamedTextColor.LIGHT_PURPLE)
+        );
         for (Player p : Bukkit.getOnlinePlayers()) {
 
-            if (nightTeam != null) nightTeam.addEntry(p.getName());
+            if (nightTeam != null && nightTeam.hasEntry(p.getName())) {
+                nightTeam.removeEntry(p.getName());
+            }
+
+            p.showTitle(wakeTitle);
             p.playSound(p.getLocation(), org.bukkit.Sound.UI_TOAST_CHALLENGE_COMPLETE, 0.5f, 1.0f);
 
             new org.bukkit.scheduler.BukkitRunnable() {

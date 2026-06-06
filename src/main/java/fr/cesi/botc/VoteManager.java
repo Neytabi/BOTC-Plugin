@@ -37,20 +37,20 @@ public class VoteManager {
 
         // 2. Création du bouton cliquable
         Component boutonOui = Component.text("[CLIQUER ICI POUR VOTER OUI]", NamedTextColor.GREEN)
-                .decorate(TextDecoration.BOLD) // <-- On utilise .decorate à la place de .bold
+                .decorate(TextDecoration.BOLD)
                 .clickEvent(ClickEvent.runCommand("/botc voteoui"));
 
         Bukkit.broadcast(Component.text("Si vous voulez l'executer, ").append(boutonOui));
         Bukkit.broadcast(Component.text("Vous avez 10 secondes pour voter.", NamedTextColor.GRAY));
         Bukkit.broadcast(Component.text("---------------------------------------------", NamedTextColor.GOLD));
 
-        // 3. Le Timer de fin de vote (Tâche asynchrone Minecraft / Scheduler)
+        // 3. Le Timer de fin de vote (10 secondes)
         new BukkitRunnable() {
             @Override
             public void run() {
                 endVote();
             }
-        }.runTaskLater(main, 20 * 10L); // 20 ticks = 1 seconde. Donc 20 * 20 = 20 secondes.
+        }.runTaskLater(main, 20 * 10L); // 20 ticks * 10 = 10 secondes.
     }
 
     public void registerVote(Player player) {
@@ -76,7 +76,15 @@ public class VoteManager {
 
         // Enregistrement du vote
         voters.add(player.getUniqueId());
-        player.sendMessage(Component.text("Ton vote OUI a ete pris en compte !", NamedTextColor.GREEN));
+
+        // --- LA CORRECTION EST ICI ---
+        // Si c'est un fantôme qui vote, on lui retire son jeton TOUT DE SUITE
+        if (!voterBotc.isAlive()) {
+            voterBotc.setGhostVote(false);
+            player.sendMessage(Component.text("[BOTC] 👻 Jeton consommé ! Tu as utilisé ton unique vote de fantôme.", NamedTextColor.RED));
+        } else {
+            player.sendMessage(Component.text("Ton vote OUI a ete pris en compte !", NamedTextColor.GREEN));
+        }
 
         // Annonce publique anonymisée (pour l'ambiance)
         Bukkit.broadcast(Component.text("[VOTE] " + player.getName() + " a voté OUI ! (Total : " + voters.size() + " voix)", NamedTextColor.GRAY));
@@ -91,17 +99,7 @@ public class VoteManager {
         Bukkit.broadcast(Component.text("Conteur, a toi de trancher si la majorite est atteinte !", NamedTextColor.LIGHT_PURPLE));
         Bukkit.broadcast(Component.text("---------------------------------------------", NamedTextColor.GOLD));
 
-        // Consommation des jetons de vote pour les morts qui ont voté OUI
-        for (UUID uuid : voters) {
-            BotcPlayer bp = main.getPlayersMap().get(uuid);
-            if (bp != null && !bp.isAlive()) {
-                bp.setGhostVote(false); // Il perd son jeton !
-                Player p = Bukkit.getPlayer(uuid);
-                if (p != null) {
-                    p.sendMessage(Component.text("[BOTC] Tu as utilise ton unique jeton de vote de fantome.", NamedTextColor.RED));
-                }
-            }
-        }
+        // NOTE : Plus besoin de la boucle ici, les jetons ont déjà été retirés en direct lors du clic !
 
         // Réinitialisation du manager
         this.voteInProgress = false;

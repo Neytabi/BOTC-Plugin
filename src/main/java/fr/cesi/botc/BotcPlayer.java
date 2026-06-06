@@ -7,6 +7,10 @@ public class BotcPlayer {
     private final String playerName;
     private boolean isAlive;
     private boolean ghostVote;
+    private int chairIndex = -1;
+
+    public int getChairIndex() { return chairIndex; }
+    public void setChairIndex(int index) { this.chairIndex = index; }
 
     // --- NOUVEAU SYSTÈME DE RÔLES ---
     private String realRole = "Citadin (Sans rôle)";

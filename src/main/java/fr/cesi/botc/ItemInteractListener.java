@@ -43,7 +43,7 @@ public class ItemInteractListener implements Listener {
                 String name = PlainTextComponentSerializer.plainText().serialize(item.getItemMeta().displayName());
                 if (name.contains("Registre du Tribunal")) {
                     event.setCancelled(true);
-                    new PlayerRegistryView().openRegistryMenu(player);
+                    new PlayerRegistryView().openRegistryMenu(player, main);
                 }
             }
         }

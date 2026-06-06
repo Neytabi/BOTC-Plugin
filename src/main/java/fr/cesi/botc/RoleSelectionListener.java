@@ -73,11 +73,24 @@ public class RoleSelectionListener implements Listener {
     }
 
     private void sendSecretRoleMessage(Player target, String roleName, String description) {
+        // 🌟 AJOUT : On affiche la BossBar permanente en haut de son écran !
+        main.rafraichirRoleBossBar(target, roleName);
+        net.kyori.adventure.title.Title roleTitle = net.kyori.adventure.title.Title.title(
+                Component.text("🎭 TON RÔLE SECRET 🎭", NamedTextColor.LIGHT_PURPLE).decorate(TextDecoration.BOLD),
+                Component.text("Tu es le : " + roleName, NamedTextColor.GOLD).decorate(TextDecoration.BOLD)
+        );
+
+        // On balance le flash visuel au milieu de son écran
+        target.showTitle(roleTitle);
+
+        // --- 2. CONSERVATION DES INFOS DANS LE CHAT (Pour relecture) ---
         target.sendMessage(Component.text("=====================================", NamedTextColor.DARK_RED));
         target.sendMessage(Component.text("TON RÔLE SECRET A ÉTÉ ATTRIBUÉ !", NamedTextColor.GOLD).decorate(TextDecoration.BOLD));
         target.sendMessage(Component.text("Tu es le : ", NamedTextColor.WHITE).append(Component.text(roleName, NamedTextColor.GREEN).decorate(TextDecoration.BOLD)));
         target.sendMessage(Component.text("Effet : " + description, NamedTextColor.GRAY));
         target.sendMessage(Component.text("=====================================", NamedTextColor.DARK_RED));
+
+        // Ton bruit de table d'enchantement mystique (parfait pour l'ambiance)
         target.playSound(target.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.0f, 0.8f);
     }
 }

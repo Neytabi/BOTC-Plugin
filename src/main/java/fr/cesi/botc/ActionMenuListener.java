@@ -115,7 +115,7 @@ public class ActionMenuListener implements Listener {
                     }
                 }
 
-                // 3. FRAIPPE DE L'ÉCLAIR (Selon config locale ou sur la tête)
+                // 3. FRAPPE DE L'ÉCLAIR (Selon config locale ou sur la tête)
                 String lightMode = main.getConfig().getString("lightning.mode", "player");
 
                 if (lightMode.equalsIgnoreCase("local") && main.getConfig().contains("lightning.x")) {
@@ -135,6 +135,24 @@ public class ActionMenuListener implements Listener {
                 pTarget.getInventory().setHelmet(new ItemStack(Material.BARRIER));
                 pTarget.getWorld().spawnParticle(org.bukkit.Particle.LARGE_SMOKE, pTarget.getLocation().add(0, 1, 0), 30, 0.5, 0.5, 0.5, 0.05);
                 pTarget.setGameMode(org.bukkit.GameMode.ADVENTURE);
+
+                // --- 🌟 AJOUT : NOTIFICATION THÉÂTRALE DU MORT (Title + Son + Chat) 🌟 ---
+                net.kyori.adventure.title.Title deathTitle = net.kyori.adventure.title.Title.title(
+                        Component.text("💀 TU ES MORT 💀", NamedTextColor.DARK_RED).decorate(TextDecoration.BOLD),
+                        Component.text("Tu deviens un fantôme. Il te reste 1 ultime vote.", NamedTextColor.GRAY)
+                );
+                pTarget.showTitle(deathTitle);
+
+                // Râle du Wither ralentit pour donner un effet terrifiant
+                pTarget.playSound(pTarget.getLocation(), org.bukkit.Sound.ENTITY_WITHER_DEATH, 0.8f, 0.5f);
+
+                // Guide de survie du fantôme dans le chat
+                pTarget.sendMessage(Component.text("=============================================", NamedTextColor.DARK_RED));
+                pTarget.sendMessage(Component.text("👻 BIENVENUE DANS L'AU-DELÀ", NamedTextColor.RED).decorate(TextDecoration.BOLD));
+                pTarget.sendMessage(Component.text("• Tu n'as plus de rôle actif et tu ne peux plus nommer de suspect.", NamedTextColor.GRAY));
+                pTarget.sendMessage(Component.text("• Ton bouton de vote dans ton Registre reste actif pour UN SEUL vote.", NamedTextColor.YELLOW));
+                pTarget.sendMessage(Component.text("=============================================", NamedTextColor.DARK_RED));
+                // --------------------------------------------------------------------------
 
                 // 5. RETOUR AUTOMATIQUE RASSIS SUR SA CHAISE APRÈS 1.5 SECONDE (30 ticks)
                 if (ancienneChamberChair != null && ancienneChamberChair.isValid()) {

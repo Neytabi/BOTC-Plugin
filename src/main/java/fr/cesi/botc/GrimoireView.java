@@ -32,6 +32,10 @@ public class GrimoireView {
         for (UUID uuid : main.getPlayersMap().keySet()) {
             if (slot >= 54) break; // Sécurité pour ne pas dépasser la taille du coffre
 
+            // --- LA CORRECTION EST ICI ---
+            // Si le joueur derrière cet UUID est OP (le Conteur), on l'ignore !
+            if (Bukkit.getOfflinePlayer(uuid).isOp()) continue;
+
             BotcPlayer botcPlayer = main.getPlayersMap().get(uuid);
             ItemStack item = createPlayerHead(botcPlayer);
 
@@ -70,7 +74,8 @@ public class GrimoireView {
                     lore.add(Component.text("Jeton de vote : UTILISÉ", NamedTextColor.GRAY));
                 }
             }
-            // À la place de l'ancienne ligne de rôle, mets ce bloc de conditions :
+
+            // Gestion du rôle (Ivrogne ou Normal)
             if (botcPlayer.getRealRole().equals("Ivrogne")) {
                 lore.add(Component.text("Rôle REEL : Ivrogne", NamedTextColor.GOLD).decorate(TextDecoration.BOLD));
                 lore.add(Component.text("Rôle AFFICHÉ au joueur : " + botcPlayer.getDisplayedRole(), NamedTextColor.YELLOW));

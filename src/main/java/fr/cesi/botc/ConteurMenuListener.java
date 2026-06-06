@@ -32,7 +32,19 @@ public class ConteurMenuListener implements Listener {
 
         Material type = clicked.getType();
 
-        if (type == Material.NETHER_STAR) {
+        if (type == Material.WITHER_SKELETON_SKULL) {
+            admin.closeInventory();
+            admin.performCommand("botc mort");
+        }
+        else if (type == Material.FEATHER) {
+            admin.closeInventory();
+            admin.performCommand("botc tempslibre");
+        }
+        else if (type == Material.BELL) {
+            admin.closeInventory();
+            admin.performCommand("botc conseil");
+        }
+        else if (type == Material.NETHER_STAR) {
             admin.closeInventory();
             // Ouvre ta GrimoireView existante (qui liste tous tes joueurs)
             new GrimoireView(main).openGrimoire(admin);
