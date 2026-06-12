@@ -8,6 +8,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -56,14 +57,91 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
         if (args[0].equalsIgnoreCase("settribunal")) {
             org.bukkit.Location loc = player.getLocation();
 
-            main.getConfig().set("tribunal.world", loc.getWorld().getName());
-            main.getConfig().set("tribunal.x", loc.getX());
-            main.getConfig().set("tribunal.y", loc.getY());
-            main.getConfig().set("tribunal.z", loc.getZ());
+            main.getConfig().set(main.getPresetPath("tribunal.world"), loc.getWorld().getName());
+            main.getConfig().set(main.getPresetPath("tribunal.x"), loc.getX());
+            main.getConfig().set(main.getPresetPath("tribunal.y"), loc.getY());
+            main.getConfig().set(main.getPresetPath("tribunal.z"), loc.getZ());
             main.saveConfig();
 
             player.sendMessage(Component.text("Le centre de la salle du conseil a été enregistré ici !", NamedTextColor.GREEN));
             return true;
+        }
+
+        // ==========================================
+        // 🗺️ GESTION DES PRESETS MULTI-MAPS (/botc preset ...)
+        // ==========================================
+        if (args[0].equalsIgnoreCase("preset")) {
+            if (args.length < 2) {
+                new PresetView(main).openPresetMenu(player);
+                return true;
+            }
+            String sub = args[1].toLowerCase();
+
+            // 1. LISTER LES PRESETS
+            if (sub.equals("list")) {
+                player.sendMessage(Component.text("=== 🗺️ LISTE DES MAPS / PRESETS ===", NamedTextColor.DARK_PURPLE).decorate(TextDecoration.BOLD));
+                String active = main.getActivePreset();
+
+                if (main.getConfig().getConfigurationSection("presets") == null) {
+                    player.sendMessage(Component.text("• " + active + " ", NamedTextColor.GREEN).append(Component.text("[ACTIF]", NamedTextColor.GOLD).decorate(TextDecoration.BOLD)));
+                    return true;
+                }
+
+                for (String key : main.getConfig().getConfigurationSection("presets").getKeys(false)) {
+                    if (key.equalsIgnoreCase(active)) {
+                        player.sendMessage(Component.text("• " + key + " ", NamedTextColor.GREEN).append(Component.text("[ACTIF]", NamedTextColor.GOLD).decorate(TextDecoration.BOLD)));
+                    } else {
+                        player.sendMessage(Component.text("• " + key, NamedTextColor.GRAY));
+                    }
+                }
+                return true;
+            }
+
+            if (args.length < 3) {
+                player.sendMessage(Component.text("Erreur : Veuillez spécifier un nom de preset.", NamedTextColor.RED));
+                return true;
+            }
+            String presetName = args[2].toLowerCase().replaceAll("[^a-z0-9_]", ""); // Sécurité d'écriture
+
+            // 2. CRÉER UN PRESET
+            if (sub.equals("create")) {
+                main.setActivePreset(presetName);
+                if (!main.getConfig().contains("presets." + presetName)) {
+                    main.getConfig().set("presets." + presetName + ".chairs", new ArrayList<String>());
+                    main.getConfig().set("presets." + presetName + ".rooms", new ArrayList<String>());
+                    main.saveConfig();
+                    player.sendMessage(Component.text("✓ Preset '" + presetName + "' créé avec succès et sélectionné !", NamedTextColor.GREEN));
+                } else {
+                    player.sendMessage(Component.text("Le preset '" + presetName + "' existe déjà. Basculement dessus effectué.", NamedTextColor.YELLOW));
+                }
+                return true;
+            }
+
+            // 3. SÉLECTIONNER UN PRESET
+            if (sub.equals("select")) {
+                if (!main.getConfig().contains("presets." + presetName) && !presetName.equals("default")) {
+                    player.sendMessage(Component.text("❌ Ce preset n'existe pas !", NamedTextColor.RED));
+                    return true;
+                }
+                main.setActivePreset(presetName);
+                player.sendMessage(Component.text("🗺️ Map changée ! Preset actif désormais : " + presetName, NamedTextColor.GREEN));
+                return true;
+            }
+
+            // 4. SUPPRIMER UN PRESET
+            if (sub.equals("delete")) {
+                if (presetName.equals("default")) {
+                    player.sendMessage(Component.text("Impossible de supprimer le preset par défaut.", NamedTextColor.RED));
+                    return true;
+                }
+                main.getConfig().set("presets." + presetName, null);
+                main.saveConfig();
+                if (main.getActivePreset().equalsIgnoreCase(presetName)) {
+                    main.setActivePreset("default");
+                }
+                player.sendMessage(Component.text("✓ Preset '" + presetName + "' définitivement supprimé.", NamedTextColor.GREEN));
+                return true;
+            }
         }
 
         // ==========================================
@@ -184,18 +262,12 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
 
         // ==========================================
         // CONFIGURATION DES CHAMBRES (Avec sauvegarde de l'orientation)
-        // ==========================================
+        // =========================================
         if (args[0].equalsIgnoreCase("addroom")) {
-            List<String> rooms = main.getConfig().getStringList("rooms");
-
-            // --- LE CHANGEMENT COMPLET ---
-            // Au lieu de regarder un bloc au loin, on prend le bloc exact où se trouve la TÊTE du Conteur !
+            List<String> rooms = main.getConfig().getStringList(main.getPresetPath("rooms"));
             org.bukkit.Location eyeLoc = player.getEyeLocation();
-
-            // On calcule la direction cardinale (OUEST, EST, NORD, SUD) vers laquelle regarde le Conteur
             org.bukkit.block.BlockFace facing = player.getFacing();
 
-            // On stocke les coordonnées sous forme de blocs d'entiers (getBlockX, getBlockY, getBlockZ)
             String locStr = eyeLoc.getWorld().getName() + ","
                     + eyeLoc.getBlockX() + ","
                     + eyeLoc.getBlockY() + ","
@@ -203,15 +275,15 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
                     + facing.name();
 
             rooms.add(locStr);
-            main.getConfig().set("rooms", rooms);
+            main.getConfig().set(main.getPresetPath("rooms"), rooms); // 🌟 CORRIGÉ ICI
             main.saveConfig();
 
-            player.sendMessage(Component.text("Emplacement Chambre #" + rooms.size() + " enregistré pile à la hauteur de ta tête (Y=" + eyeLoc.getBlockY() + ") !", NamedTextColor.GREEN));
+            player.sendMessage(Component.text("Emplacement Chambre #" + rooms.size() + " enregistré dans le preset '" + main.getActivePreset() + "' (Y=" + eyeLoc.getBlockY() + ") !", NamedTextColor.GREEN));
             return true;
         }
 
         if (args[0].equalsIgnoreCase("delrooms")) {
-            main.getConfig().set("rooms", new ArrayList<String>());
+            main.getConfig().set(main.getPresetPath("rooms"), new ArrayList<String>());
             main.saveConfig();
             player.sendMessage(Component.text("Toutes les chambres ont été effacées.", NamedTextColor.RED));
             return true;
@@ -219,7 +291,7 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
 
         // GESTION DES CHAMBRES : TEST VISUEL (PARTICULES QUANTIQUE CYCLIQUE)
         if (args[0].equalsIgnoreCase("showrooms")) {
-            List<String> rooms = main.getConfig().getStringList("rooms");
+            List<String> rooms = main.getConfig().getStringList(main.getPresetPath("rooms"));
             if (rooms.isEmpty()) {
                 player.sendMessage(Component.text("Erreur : Aucune chambre enregistrée.", NamedTextColor.RED));
                 return true;
@@ -268,13 +340,13 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
 
         // 1. AJOUTER UNE CHAISE
         if (args[0].equalsIgnoreCase("addchair")) {
-            List<String> chairs = main.getConfig().getStringList("chairs");
+            List<String> chairs = main.getConfig().getStringList(main.getPresetPath("chairs"));
             // On stocke sous format : monde,x,y,z,yaw
             org.bukkit.Location loc = player.getLocation();
             String locStr = player.getWorld().getName() + "," + loc.getX() + "," + loc.getY() + "," + loc.getZ() + "," + loc.getYaw();
 
             chairs.add(locStr);
-            main.getConfig().set("chairs", chairs);
+            main.getConfig().set(main.getPresetPath("chairs"), chairs);
             main.saveConfig();
 
             player.sendMessage(Component.text("Chaise #" + chairs.size() + " enregistree avec succes !", NamedTextColor.GREEN));
@@ -283,7 +355,7 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
 
         // 2. SUPPRIMER TOUTES LES CHAISES
         if (args[0].equalsIgnoreCase("delchairs")) {
-            main.getConfig().set("chairs", new ArrayList<String>());
+            main.getConfig().set(main.getPresetPath("chairs"), new ArrayList<String>());
             main.saveConfig();
             player.sendMessage(Component.text("Toutes les chaises ont ete supprimees de la configuration.", NamedTextColor.RED));
             return true;
@@ -291,7 +363,7 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
 
         // 3. AFFICHER LES CHAISES (VISUEL DE CONFIG)
         if (args[0].equalsIgnoreCase("showchairs")) {
-            List<String> chairs = main.getConfig().getStringList("chairs");
+            List<String> chairs = main.getConfig().getStringList(main.getPresetPath("chairs"));
             player.sendMessage(Component.text("Affichage des " + chairs.size() + " chaises pendant 10 secondes...", NamedTextColor.YELLOW));
 
             // On fait apparaître des flammes/particules sur chaque chaise
@@ -313,6 +385,7 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
         // COMMANDE /botc debout (Libération + Masquage des NameTags)
         // ==========================================
         if (args[0].equalsIgnoreCase("debout")) {
+            main.setCouncilOpen(false);
             org.bukkit.scoreboard.Team nightTeam = Bukkit.getScoreboardManager().getMainScoreboard().getTeam("botc_night");
 
             // --- DÉCONNEXION DU GROUPE VOCAL (VERSION DIAGNOSTIC) ---
@@ -396,10 +469,22 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
             Bukkit.broadcast(Component.text("=============================================", NamedTextColor.GREEN));
             return true;
         }
-
+        if (args[0].equalsIgnoreCase("grantparole") && args.length > 1) {
+            if (!player.isOp()) return true;
+            Player target = Bukkit.getPlayer(args[1]);
+            if (target != null) {
+                Bukkit.broadcast(Component.text("Silence ! Le Conteur accorde officiellement la parole à " + target.getName() + ".", NamedTextColor.GREEN).decorate(TextDecoration.BOLD));
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    p.playSound(p.getLocation(), org.bukkit.Sound.BLOCK_BELL_USE, 0.8f, 1.4f);
+                }
+            }
+            return true;
+        }
         if (args[0].equalsIgnoreCase("conseil")) {
             if (!player.isOp()) return true;
-
+            main.setCouncilOpen(true);
+            main.getHasNominatedToday().clear();
+            main.getHasBeenNominatedToday().clear();
             // 1. Préparation de l'affichage à l'écran
             net.kyori.adventure.title.Title title = net.kyori.adventure.title.Title.title(
                     Component.text("⚖️ LE CONSEIL COMMENCE ⚖️", NamedTextColor.GOLD).decorate(TextDecoration.BOLD),
@@ -408,13 +493,13 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
 
             // 2. Récupération de la position du Tribunal sauvegardée
             org.bukkit.Location tribunalLoc = null;
-            if (main.getConfig().contains("tribunal.x")) {
-                String worldName = main.getConfig().getString("tribunal.world");
+            if (main.getConfig().contains(main.getPresetPath("tribunal.x"))) {
+                String worldName = main.getConfig().getString(main.getPresetPath("tribunal.world"));
                 if (worldName != null) {
                     org.bukkit.World world = Bukkit.getWorld(worldName);
-                    double tx = main.getConfig().getDouble("tribunal.x");
-                    double ty = main.getConfig().getDouble("tribunal.y");
-                    double tz = main.getConfig().getDouble("tribunal.z");
+                    double tx = main.getConfig().getDouble(main.getPresetPath("tribunal.x"));
+                    double ty = main.getConfig().getDouble(main.getPresetPath("tribunal.y"));
+                    double tz = main.getConfig().getDouble(main.getPresetPath("tribunal.z"));
                     if (world != null) tribunalLoc = new org.bukkit.Location(world, tx, ty, tz);
                 }
             }
@@ -561,7 +646,7 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
         // 3. COMMANDE /botc assis (Le seul moment où on réactive les NameTags !)
         // ==========================================
         if (args[0].equalsIgnoreCase("assis")) {
-            List<String> chairsStr = main.getConfig().getStringList("chairs");
+            List<String> chairsStr = main.getConfig().getStringList(main.getPresetPath("chairs"));
             if (chairsStr.isEmpty()) {
                 player.sendMessage(Component.text("Erreur : Aucune chaise enregistrée.", NamedTextColor.RED));
                 return true;
@@ -577,17 +662,13 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
                         if (bp != null) joueursAAsseoir.add(bp);
                     }
                 }
-
-                // On mélange Aléatoirement l'ordre des joueurs
                 java.util.Collections.shuffle(joueursAAsseoir);
-
-                // On leur attribue définitivement un numéro de chaise pour TOUTE la game
                 for (int i = 0; i < joueursAAsseoir.size(); i++) {
                     joueursAAsseoir.get(i).setChairIndex(i);
                 }
-                main.setSeatsAssigned(true); // C'est verrouillé jusqu'au prochain /botc reset !
+                main.setSeatsAssigned(true);
             }
-            // Sécurité : Si un joueur s'est connecté en retard (mid-game), on lui donne une chaise vide restante
+            // Sécurité reconnexions et retardataires
             else {
                 List<Integer> chaisesPrises = new ArrayList<>();
                 for (BotcPlayer bp : main.getPlayersMap().values()) {
@@ -596,7 +677,7 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     if (p.isOp()) continue;
                     BotcPlayer bp = main.getPlayersMap().get(p.getUniqueId());
-                    if (bp != null && bp.getChairIndex() == -1) {
+                    if (bp != null && bp.getChairIndex() == -1) { // 🌟 N'attribue une place que s'il n'en a pas
                         for (int i = 0; i < chairsStr.size(); i++) {
                             if (!chaisesPrises.contains(i)) {
                                 bp.setChairIndex(i);
@@ -663,7 +744,7 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
                     float yaw = Float.parseFloat(parts[4]);
 
                     org.bukkit.Location chairLoc = new org.bukkit.Location(w, x, y, z, yaw, 0);
-                    org.bukkit.Location horseLoc = chairLoc.clone().add(0, -1.5, 0);
+                    org.bukkit.Location horseLoc = chairLoc.clone().add(0, -1.0, 0);
 
                     p.teleport(chairLoc);
 
@@ -696,50 +777,50 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
             }
 
             if (args[0].equalsIgnoreCase("reset")) {
-                // 1. On appelle la vraie méthode qui réanime tout le monde et clean les BossBars
+                // Cette méthode gère déjà la réanimation globale, le nettoyage visuel
+                // et la distribution des bons livres uniques (Grimoire / Registre)
                 main.resetGame();
 
-                // 2. On évite de vider "chairs" pour ne pas avoir à re-sélectionner les sièges du village !
-                player.sendMessage(Component.text("✓ La partie a été réinitialisée ! Tous les joueurs sont de nouveau vivants et prêts. Placement des joueurs réinitialisés", NamedTextColor.GREEN));
+                player.sendMessage(Component.text("✓ La partie a été réinitialisée ! Tous les inventaires ont été synchronisés avec les objets de connexion.", NamedTextColor.GREEN));
                 return true;
             }
 
+            // 🔄 REMPLACE TOUT LE BLOC "if (args[0].equalsIgnoreCase("setplayerdeath"))" PAR CELUI-CI :
             if (args[0].equalsIgnoreCase("setplayerdeath")) {
                 org.bukkit.Location loc = player.getLocation();
 
-                main.getConfig().set("death.world", loc.getWorld().getName());
-                main.getConfig().set("death.x", loc.getX());
-                main.getConfig().set("death.y", loc.getY());
-                main.getConfig().set("death.z", loc.getZ());
-                main.getConfig().set("death.yaw", loc.getYaw());
-                main.getConfig().set("death.pitch", loc.getPitch());
+                main.getConfig().set(main.getPresetPath("death.world"), loc.getWorld().getName());
+                main.getConfig().set(main.getPresetPath("death.x"), loc.getX());
+                main.getConfig().set(main.getPresetPath("death.y"), loc.getY());
+                main.getConfig().set(main.getPresetPath("death.z"), loc.getZ());
+                main.getConfig().set(main.getPresetPath("death.yaw"), loc.getYaw());
+                main.getConfig().set(main.getPresetPath("death.pitch"), loc.getPitch());
                 main.saveConfig();
 
-                player.sendMessage(Component.text("L'emplacement d'exécution des morts a été enregistré ici !", NamedTextColor.GREEN));
+                player.sendMessage(Component.text("L'emplacement d'exécution des morts a été enregistré ici pour le preset actif !", NamedTextColor.GREEN));
                 return true;
             }
 
-            // 2. NOUVELLE COMMANDE : /botc setlightning <player/local>
+            // 🔄 REMPLACE TOUT LE BLOC "if (args[0].equalsIgnoreCase("setlightning") ...)" PAR CELUI-CI :
             if (args[0].equalsIgnoreCase("setlightning") && args.length > 1) {
                 String mode = args[1].toLowerCase();
 
                 if (mode.equals("player")) {
-                    main.getConfig().set("lightning.mode", "player");
+                    main.getConfig().set(main.getPresetPath("lightning.mode"), "player");
                     main.saveConfig();
-                    player.sendMessage(Component.text("L'eclair tombera desormais sur le joueur mort.", NamedTextColor.GREEN));
+                    player.sendMessage(Component.text("L'éclair tombera désormais sur le joueur mort.", NamedTextColor.GREEN));
                     return true;
                 }
 
                 if (mode.equals("local")) {
-                    // On enregistre le mode ET la position actuelle du Conteur
-                    main.getConfig().set("lightning.mode", "local");
-                    main.getConfig().set("lightning.world", player.getWorld().getName());
-                    main.getConfig().set("lightning.x", player.getLocation().getX());
-                    main.getConfig().set("lightning.y", player.getLocation().getY());
-                    main.getConfig().set("lightning.z", player.getLocation().getZ());
+                    main.getConfig().set(main.getPresetPath("lightning.mode"), "local");
+                    main.getConfig().set(main.getPresetPath("lightning.world"), player.getWorld().getName());
+                    main.getConfig().set(main.getPresetPath("lightning.x"), player.getLocation().getX());
+                    main.getConfig().set(main.getPresetPath("lightning.y"), player.getLocation().getY());
+                    main.getConfig().set(main.getPresetPath("lightning.z"), player.getLocation().getZ());
                     main.saveConfig();
 
-                    player.sendMessage(Component.text("L'eclair tombera desormais a ta position actuelle (Tribunal).", NamedTextColor.GREEN));
+                    player.sendMessage(Component.text("L'éclair tombera désormais à ta position actuelle de tribunal sur cette map.", NamedTextColor.GREEN));
                     return true;
                 }
 
@@ -785,6 +866,28 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
                 if ("tempslibre".startsWith(input)) completions.add("tempslibre");
                 if ("conseil".startsWith(input)) completions.add("conseil");
                 if ("order".startsWith(input)) completions.add("order");
+                // --- DANS LE BLOC args.length == 1 ---
+                if ("preset".startsWith(input)) completions.add("preset");
+
+                // --- AJOUTE CES DEUX BLOCS EN BAS DE LA MÉTHODE ---
+                if (args.length == 2 && args[0].equalsIgnoreCase("preset") && sender.isOp()) {
+                    String inputSub = args[1].toLowerCase();
+                    if ("create".startsWith(inputSub)) completions.add("create");
+                    if ("select".startsWith(inputSub)) completions.add("select");
+                    if ("list".startsWith(inputSub)) completions.add("list");
+                    if ("delete".startsWith(inputSub)) completions.add("delete");
+                    return completions;
+                }
+
+                if (args.length == 3 && args[0].equalsIgnoreCase("preset") && sender.isOp()) {
+                    String inputPreset = args[2].toLowerCase();
+                    if (main.getConfig().getConfigurationSection("presets") != null) {
+                        for (String key : main.getConfig().getConfigurationSection("presets").getKeys(false)) {
+                            if (key.startsWith(inputPreset)) completions.add(key);
+                        }
+                    }
+                    return completions;
+                }
             }
             return completions;
         }
@@ -805,13 +908,13 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
 
     private void lancerMecaniquesNuit(Player player) {
         org.bukkit.scoreboard.Team nightTeam = Bukkit.getScoreboardManager().getMainScoreboard().getTeam("botc_night");
-        List<String> roomsStr = main.getConfig().getStringList("rooms");
-        // 1. Ambiance de terreur et titre pour tout le monde
+        List<String> roomsStr = main.getConfig().getStringList(main.getPresetPath("rooms"));
+
         net.kyori.adventure.title.Title nightTitle = net.kyori.adventure.title.Title.title(
                 Component.text("🌙 LA NUIT TOMBE 🌙", NamedTextColor.BLUE).decorate(TextDecoration.BOLD),
                 Component.text("Fermez les yeux... Le démon s'éveille.", NamedTextColor.GRAY)
         );
-        // 1. Ambiance de terreur pour tout le monde
+
         for (Player p : Bukkit.getOnlinePlayers()) {
             if (nightTeam != null) nightTeam.addEntry(p.getName());
             p.showTitle(nightTitle);
@@ -820,13 +923,15 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
             p.spawnParticle(org.bukkit.Particle.LARGE_SMOKE, p.getLocation().add(0, 1, 0), 20, 0.5, 0.5, 0.5, 0.0);
         }
 
-        // 2. Attribution des chambres et des boussoles basée sur l'index des joueurs connectés
-        int index = 0;
-
+        // 🌟 CORRECTION LOGIQUE : On attribue les chambres selon le CHAIR INDEX fixe de la game !
         for (Player p : Bukkit.getOnlinePlayers()) {
             if (p.isOp()) continue;
-            // Sécurité : si on a plus de joueurs que de chambres configurées
-            if (index >= roomsStr.size()) break;
+
+            BotcPlayer bp = main.getPlayersMap().get(p.getUniqueId());
+            if (bp == null || bp.getChairIndex() == -1) continue;
+
+            int index = bp.getChairIndex(); // Récupère le numéro de siège fixe (0, 1, 2...)
+            if (index >= roomsStr.size()) break; // Sécurité si pas assez de chambres configurées
 
             String[] roomParts = roomsStr.get(index).split(",");
             org.bukkit.World wRoom = Bukkit.getWorld(roomParts[0]);
@@ -838,10 +943,8 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
 
                 org.bukkit.block.Block block = wRoom.getBlockAt(bx, by, bz);
 
-                // 🌟 LE FIX CLÉ : On force le bloc à devenir de l'AIR pour détruire l'ancienne tête et vider le cache client !
+                // On force le nettoyage du cache visuel
                 block.setType(org.bukkit.Material.AIR);
-
-                // Maintenant on peut poser la nouvelle tête, elle s'actualisera à coup sûr
                 block.setType(org.bukkit.Material.PLAYER_HEAD);
 
                 if (roomParts.length > 4) {
@@ -854,20 +957,25 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
                     } catch (IllegalArgumentException ignored) {}
                 }
 
-                // 3. On applique la texture du joueur (comme avant)
-                if (block.getState() instanceof org.bukkit.block.Skull skullState) {
-                    skullState.setOwningPlayer(p);
-                    skullState.update();
-                }
+                // 🌟 CORRECTION VISUELLE : Attribution du skin décalée d'un tick pour éviter Steve/Alex
+                final Player targetPlayer = p;
+                new org.bukkit.scheduler.BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        if (block.getState() instanceof org.bukkit.block.Skull skullState) {
+                            skullState.setOwningPlayer(targetPlayer);
+                            skullState.update(true, false); // Le true force l'envoi du paquet de skin aux clients
+                        }
+                    }
+                }.runTaskLater(main, 1L); // Délai d'un tick minuscule mais indispensable
 
                 final org.bukkit.Location targetRoomLoc = block.getLocation().add(0.5, 0, 0.5);
 
-
-                // B. Message privé au joueur
+                // Message privé basé sur le vrai numéro de chambre aligné à la chaise
                 p.sendMessage(Component.text("➔ La nuit tombe ! Rejoins vite tes quartiers : ", NamedTextColor.RED)
                         .append(Component.text("Chambre #" + (index + 1), NamedTextColor.YELLOW).decorate(TextDecoration.BOLD)));
 
-                // C. Lancement du GPS Boussole 3D (inchangé, mais cible désormais garantie)
+                // Lancement du GPS Boussole 3D towards targeted room
                 new org.bukkit.scheduler.BukkitRunnable() {
                     int ticks = 0;
                     @Override
@@ -897,7 +1005,6 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
                     }
                 }.runTaskTimer(main, 0L, 10L);
             }
-            index++; // On passe à la chambre suivante pour le prochain joueur
         }
 
         Bukkit.broadcast(Component.text("[BOTC] La nuit est tombée... Regagnez vos chambres avant l'arrivée du démon !", NamedTextColor.DARK_BLUE).decorate(TextDecoration.BOLD));
@@ -907,13 +1014,13 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
         org.bukkit.scoreboard.Team nightTeam = Bukkit.getScoreboardManager().getMainScoreboard().getTeam("botc_night");
 
         org.bukkit.Location tribunalLoc = null;
-        if (main.getConfig().contains("tribunal.x")) {
-            String worldName = main.getConfig().getString("tribunal.world");
+        if (main.getConfig().contains(main.getPresetPath("tribunal.x"))) {
+            String worldName = main.getConfig().getString(main.getPresetPath("tribunal.world"));
             if (worldName != null) {
                 org.bukkit.World world = Bukkit.getWorld(worldName);
-                double tx = main.getConfig().getDouble("tribunal.x");
-                double ty = main.getConfig().getDouble("tribunal.y");
-                double tz = main.getConfig().getDouble("tribunal.z");
+                double tx = main.getConfig().getDouble(main.getPresetPath("tribunal.x"));
+                double ty = main.getConfig().getDouble(main.getPresetPath("tribunal.y"));
+                double tz = main.getConfig().getDouble(main.getPresetPath("tribunal.z"));
                 if (world != null) tribunalLoc = new org.bukkit.Location(world, tx, ty, tz);
             }
         }

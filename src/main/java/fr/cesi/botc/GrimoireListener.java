@@ -2,6 +2,8 @@ package fr.cesi.botc;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,7 +16,6 @@ import java.util.UUID;
 public class GrimoireListener implements Listener {
 
     private final Botc main;
-    private final ActionMenuView actionMenuView = new ActionMenuView();
 
     public GrimoireListener(Botc main) {
         this.main = main;
@@ -22,32 +23,76 @@ public class GrimoireListener implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        // On vérifie que c'est bien un joueur qui a cliqué
         if (!(event.getWhoClicked() instanceof Player admin)) return;
 
-        // On vérifie qu'on est bien dans l'interface du Grimoire
-        if (!event.getView().title().equals(Component.text("Grimoire du Conteur", NamedTextColor.DARK_PURPLE))) {
+        // Extraction propre du titre
+        Component titleComponent = event.getView().title();
+        String titleStr = PlainTextComponentSerializer.plainText().serialize(titleComponent);
+
+        if (!titleStr.equals("Grimoire du Conteur")) return;
+        event.setCancelled(true); // Sécurité anti-vol d'items
+
+        ItemStack clickedItem = event.getCurrentItem();
+        if (clickedItem == null || clickedItem.getType() == Material.AIR) return;
+
+        int slot = event.getSlot();
+
+        // ==========================================================
+        // ⚡ ACTION 1 : CLIC SUR L'ENDER PEARL (Slot 45 - Flash TP)
+        // ==========================================================
+        if (slot == 45) {
+            admin.closeInventory();
+
+            // On va chercher le point central du Tribunal indexé sur le PRESET ACTUEL
+            if (main.getConfig().contains(main.getPresetPath("tribunal.x"))) {
+                String worldName = main.getConfig().getString(main.getPresetPath("tribunal.world"));
+                double x = main.getConfig().getDouble(main.getPresetPath("tribunal.x"));
+                double y = main.getConfig().getDouble(main.getPresetPath("tribunal.y"));
+                double z = main.getConfig().getDouble(main.getPresetPath("tribunal.z"));
+
+                org.bukkit.World world = Bukkit.getWorld(worldName);
+                if (world != null) {
+                    // On TP l'admin en conservant son orientation de regard actuelle (Yaw/Pitch)
+                    org.bukkit.Location loc = new org.bukkit.Location(world, x, y, z, admin.getLocation().getYaw(), admin.getLocation().getPitch());
+                    admin.teleport(loc);
+                    admin.playSound(admin.getLocation(), org.bukkit.Sound.ENTITY_ENDERMAN_TELEPORT, 1.0f, 1.0f);
+                    admin.sendMessage(Component.text("✨ Flash ! Tu as été rapatrié au centre du Tribunal.", NamedTextColor.GREEN));
+                }
+            } else {
+                admin.sendMessage(Component.text("❌ Le tribunal n'est pas encore configuré sur cette map ! Cliquez sur la Balise de votre menu principal.", NamedTextColor.RED));
+            }
             return;
         }
 
-        // Sécurité : On empêche de voler l'item
-        event.setCancelled(true);
+        // ==========================================================
+        // 🪓 ACTION 2 : CLIC SUR UNE TÊTE DE JOUEUR
+        // ==========================================================
+        if (clickedItem.getType() == Material.PLAYER_HEAD) {
+            SkullMeta meta = (SkullMeta) clickedItem.getItemMeta();
+            if (meta == null || meta.getOwningPlayer() == null) return;
 
-        // On vérifie que le Conteur a cliqué sur une tête
-        ItemStack clickedItem = event.getCurrentItem();
-        if (clickedItem == null || clickedItem.getType() != Material.PLAYER_HEAD) return;
+            // 🌟 A. SOUS-LOGIQUE : LE SHIFT-CLIC (Téléportation directe sur le joueur)
+            if (event.isShiftClick()) {
+                Player targetPlayer = meta.getOwningPlayer().getPlayer();
 
-        // On récupère les métadonnées de la tête
-        SkullMeta meta = (SkullMeta) clickedItem.getItemMeta();
-        if (meta == null || meta.getOwningPlayer() == null) return;
+                if (targetPlayer != null && targetPlayer.isOnline()) {
+                    admin.closeInventory();
+                    admin.teleport(targetPlayer.getLocation());
+                    admin.playSound(admin.getLocation(), org.bukkit.Sound.ENTITY_ENDERMAN_TELEPORT, 0.8f, 1.2f);
+                    admin.sendMessage(Component.text("✨ Téléportation réussie auprès de " + targetPlayer.getName() + " !", NamedTextColor.GREEN));
+                } else {
+                    admin.sendMessage(Component.text("❌ Ce joueur s'est déconnecté du serveur.", NamedTextColor.RED));
+                }
+                return; // On stoppe la méthode ici pour éviter d'ouvrir le sous-menu d'action !
+            }
 
-        // Récupération du profil du joueur ciblé
-        UUID targetUUID = meta.getOwningPlayer().getUniqueId();
-        BotcPlayer targetBotc = main.getPlayersMap().get(targetUUID);
+            // 🌟 B. SOUS-LOGIQUE : CLIC CLASSIQUE (Ouverture du menu d'attribution de rôle / exécution)
+            UUID targetUUID = meta.getOwningPlayer().getUniqueId();
+            BotcPlayer targetBotc = main.getPlayersMap().get(targetUUID);
 
-        if (targetBotc != null) {
-            // ON OUVRE LE SOUS-MENU !
-            new ActionMenuView().openActionMenu(admin, targetBotc);
+            if (targetBotc != null) {
+                new ActionMenuView().openActionMenu(admin, targetBotc);
+            }
         }
     }
 }

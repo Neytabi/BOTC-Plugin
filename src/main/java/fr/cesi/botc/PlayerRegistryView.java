@@ -19,18 +19,16 @@ public class PlayerRegistryView {
         Component title = Component.text("Registre du Tribunal", NamedTextColor.DARK_GREEN);
         Inventory inv = Bukkit.createInventory(null, 9, title);
 
-        // Récupération du profil BOTC du joueur qui regarde le menu
         BotcPlayer bp = main.getPlayersMap().get(player.getUniqueId());
 
         // ==========================================
-        // 🗳️ GESTION DU BOUTON VOTE (Slot 2)
+        // 🗳️ GESTION DU BOUTON VOTE (Slot 0)
         // ==========================================
         ItemStack vote;
         ItemMeta vMeta;
 
-        // Si le joueur est mort ET qu'il a DEJA utilisé son unique vote fantôme
         if (bp != null && !bp.isAlive() && !bp.hasGhostVote()) {
-            vote = new ItemStack(Material.RED_WOOL); // 🔴 LAINE ROUGE : Vote épuisé !
+            vote = new ItemStack(Material.RED_WOOL);
             vMeta = vote.getItemMeta();
             if (vMeta != null) {
                 vMeta.displayName(Component.text("❌ VOTE IMPOSSIBLE", NamedTextColor.RED));
@@ -41,7 +39,7 @@ public class PlayerRegistryView {
                 vote.setItemMeta(vMeta);
             }
         } else {
-            vote = new ItemStack(Material.LIME_WOOL); // 🟢 LAINE VERTE : Peut voter (Vivant ou Fantôme avec jeton)
+            vote = new ItemStack(Material.LIME_WOOL);
             vMeta = vote.getItemMeta();
             if (vMeta != null) {
                 vMeta.displayName(Component.text("🗳️ LEVER LA MAIN (Voter OUI)", NamedTextColor.GREEN));
@@ -55,17 +53,16 @@ public class PlayerRegistryView {
                 vote.setItemMeta(vMeta);
             }
         }
-        inv.setItem(2, vote);
+        inv.setItem(0, vote);
 
         // ==========================================
-        // 📢 GESTION DU BOUTON NOMINATION (Slot 6)
+        // 📢 GESTION DU BOUTON NOMINATION (Slot 2)
         // ==========================================
         ItemStack accuse;
         ItemMeta aMeta;
 
-        // Si le joueur est mort : pas le droit de nommer !
         if (bp != null && !bp.isAlive()) {
-            accuse = new ItemStack(Material.BOOK); // 📖 Transformé en bête livre normal (ou BARRIER)
+            accuse = new ItemStack(Material.BOOK);
             aMeta = accuse.getItemMeta();
             if (aMeta != null) {
                 aMeta.displayName(Component.text("❌ NOMINATION IMPOSSIBLE", NamedTextColor.RED));
@@ -76,7 +73,7 @@ public class PlayerRegistryView {
                 accuse.setItemMeta(aMeta);
             }
         } else {
-            accuse = new ItemStack(Material.WRITABLE_BOOK); // 📝 Plume active pour les vivants
+            accuse = new ItemStack(Material.WRITABLE_BOOK);
             aMeta = accuse.getItemMeta();
             if (aMeta != null) {
                 aMeta.displayName(Component.text("📣 NOMMER UN SUSPECT", NamedTextColor.GOLD));
@@ -87,24 +84,21 @@ public class PlayerRegistryView {
                 accuse.setItemMeta(aMeta);
             }
         }
-        inv.setItem(6, accuse);
+        inv.setItem(2, accuse);
 
         // ==========================================
         // 🎭 RAPPEL DU RÔLE SECRET (Slot 4 - Centre)
         // ==========================================
-        ItemStack roleInfo = new ItemStack(Material.ENCHANTED_BOOK); // Livre magique brillant
+        ItemStack roleInfo = new ItemStack(Material.ENCHANTED_BOOK);
         ItemMeta rMeta = roleInfo.getItemMeta();
         if (rMeta != null) {
             rMeta.displayName(Component.text("🎭 TON RÔLE ACTUEL", NamedTextColor.LIGHT_PURPLE).decorate(TextDecoration.BOLD));
             List<Component> rLore = new ArrayList<>();
 
-            // Si le joueur a un rôle enregistré dans son profil BOTC
             if (bp != null && bp.getDisplayedRole() != null && !bp.getDisplayedRole().isEmpty()) {
                 rLore.add(Component.text("Tu incarnes : ", NamedTextColor.WHITE)
                         .append(Component.text(bp.getDisplayedRole(), NamedTextColor.GOLD).decorate(TextDecoration.BOLD)));
                 rLore.add(Component.text("-----------------------------------", NamedTextColor.GRAY));
-
-                // Si tu as une fonction getDisplayedRoleDesc() ou similaire dans ton BotcPlayer :
                 rLore.add(Component.text(bp.getRoleDescription(), NamedTextColor.GRAY));
             } else {
                 rLore.add(Component.text("Aucun rôle ne t'a été attribué", NamedTextColor.RED));
@@ -114,7 +108,37 @@ public class PlayerRegistryView {
             rMeta.lore(rLore);
             roleInfo.setItemMeta(rMeta);
         }
-        inv.setItem(4, roleInfo); // Posé pile au milieu !
+        inv.setItem(4, roleInfo);
+
+        // ==========================================
+        // 💬 GESTION DU BOUTON QUESTION (Slot 6)
+        // ==========================================
+        ItemStack question = new ItemStack(Material.FEATHER);
+        ItemMeta qMeta = question.getItemMeta();
+        if (qMeta != null) {
+            qMeta.displayName(Component.text("💬 POSER UNE QUESTION", NamedTextColor.AQUA));
+            List<Component> qLore = new ArrayList<>();
+            qLore.add(Component.text("Clique pour envoyer une question privée", NamedTextColor.GRAY));
+            qLore.add(Component.text("aux Conteurs directement depuis le chat.", NamedTextColor.GRAY));
+            qMeta.lore(qLore);
+            question.setItemMeta(qMeta);
+        }
+        inv.setItem(6, question);
+
+        // ==========================================
+        // ✋ GESTION DU BOUTON PAROLE (Slot 8)
+        // ==========================================
+        ItemStack parole = new ItemStack(Material.PAPER);
+        ItemMeta pMeta = parole.getItemMeta();
+        if (pMeta != null) {
+            pMeta.displayName(Component.text("✋ DEMANDER LA PAROLE", NamedTextColor.GREEN));
+            List<Component> pLore = new ArrayList<>();
+            pLore.add(Component.text("Bouton réservé aux fantômes pour", NamedTextColor.GRAY));
+            pLore.add(Component.text("demander une intervention au Conseil.", NamedTextColor.GRAY));
+            pMeta.lore(pLore);
+            parole.setItemMeta(pMeta);
+        }
+        inv.setItem(8, parole);
 
         player.openInventory(inv);
     }

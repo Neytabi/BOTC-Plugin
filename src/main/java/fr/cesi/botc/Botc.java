@@ -17,17 +17,42 @@ public final class Botc extends JavaPlugin {
     private VoteManager voteManager;
     private BotcVoicechatPlugin voicechatPlugin;
     private boolean isNight = false;
+    private final java.util.List<java.util.UUID> hasNominatedToday = new java.util.ArrayList<>();
+    private final java.util.List<java.util.UUID> hasBeenNominatedToday = new java.util.ArrayList<>();
+    private final java.util.HashMap<java.util.UUID, Boolean> isAskingQuestion = new java.util.HashMap<>();
+    private boolean isCouncilOpen = false;
+    public java.util.List<java.util.UUID> getHasNominatedToday() { return hasNominatedToday; }
+    public java.util.List<java.util.UUID> getHasBeenNominatedToday() { return hasBeenNominatedToday; }
+    public java.util.HashMap<java.util.UUID, Boolean> getIsAskingQuestion() { return isAskingQuestion; }
+    public boolean isCouncilOpen() { return isCouncilOpen; }
+    public void setCouncilOpen(boolean open) { this.isCouncilOpen = open; }
 
     private boolean seatsAssigned = false;
     public boolean isSeatsAssigned() { return seatsAssigned; }
     public void setSeatsAssigned(boolean assigned) { this.seatsAssigned = assigned; }
 
     public boolean isNight() { return isNight; }
+    private String activePreset = "default";
+
+    public String getActivePreset() { return activePreset; }
+    public void setActivePreset(String preset) {
+        this.activePreset = preset;
+        getConfig().set("active_preset", preset);
+        saveConfig();
+    }
+    public String getPresetPath(String subPath) {
+        return "presets." + activePreset + "." + subPath;
+    }
     public void setNight(boolean night) { this.isNight = night; }
     private final HashMap<UUID, BossBar> activeBossBars = new HashMap<>();
 
     @Override
     public void onEnable() {
+        if (!getConfig().contains("active_preset")) {
+            getConfig().set("active_preset", "default");
+            saveConfig();
+        }
+        this.activePreset = getConfig().getString("active_preset", "default");
         // 1. FORCER LA CRÉATION DU DOSSIER ET DE LA CONFIG
         if (!getDataFolder().exists()) {
             getDataFolder().mkdir();
@@ -65,7 +90,9 @@ public final class Botc extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ItemInteractListener(this), this);
         getServer().getPluginManager().registerEvents(new ConteurMenuListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerRegistryListener(this), this);
-        getServer().getPluginManager().registerEvents(new NominationListener(), this);
+        getServer().getPluginManager().registerEvents(new NominationListener(this), this);
+        getServer().getPluginManager().registerEvents(new PresetListener(this), this);
+        getServer().getPluginManager().registerEvents(new GameChatListener(this), this);
 
         this.voteManager = new VoteManager(this);
 
@@ -153,11 +180,17 @@ public final class Botc extends JavaPlugin {
         return this.voicechatPlugin;
     }
 
+    // --- MODIFICATION DE TA MÉTHODE resetGame() ---
     public void resetGame() {
         this.clearAllRoleBossBars();
+        this.hasNominatedToday.clear();
+        this.hasBeenNominatedToday.clear();
+        this.isAskingQuestion.clear();
         this.seatsAssigned = false;
+        this.isCouncilOpen = false;
 
-        List<String> roomsStr = getConfig().getStringList("rooms");
+        // 🌟 CORRECTION MULTI-MAP : On utilise getPresetPath("rooms")
+        List<String> roomsStr = getConfig().getStringList(getPresetPath("rooms"));
         for (String roomStr : roomsStr) {
             String[] parts = roomStr.split(",");
             org.bukkit.World w = Bukkit.getWorld(parts[0]);
@@ -165,7 +198,6 @@ public final class Botc extends JavaPlugin {
                 int bx = Integer.parseInt(parts[1]);
                 int by = Integer.parseInt(parts[2]);
                 int bz = Integer.parseInt(parts[3]);
-                // On remplace la tête par de l'air pour que le château soit propre pour la prochaine game
                 w.getBlockAt(bx, by, bz).setType(org.bukkit.Material.AIR);
             }
         }
@@ -173,14 +205,32 @@ public final class Botc extends JavaPlugin {
         for (BotcPlayer bp : playersMap.values()) {
             bp.setAlive(true);
             bp.setGhostVote(true);
-
-            // 🌟 AJOUT : On efface son attribution de chaise
             bp.setChairIndex(-1);
 
             org.bukkit.entity.Player p = org.bukkit.Bukkit.getPlayer(bp.getPlayerUUID());
             if (p != null) {
                 p.getInventory().setHelmet(new org.bukkit.inventory.ItemStack(org.bukkit.Material.AIR));
                 p.setGameMode(org.bukkit.GameMode.SURVIVAL);
+
+                // 🌟 SYNCHRONISATION PARFAITE AVEC PLAYERJOINLISTENER
+                p.getInventory().clear();
+                if (p.isOp()) {
+                    org.bukkit.inventory.ItemStack livreMJ = new org.bukkit.inventory.ItemStack(org.bukkit.Material.ENCHANTED_BOOK);
+                    org.bukkit.inventory.meta.ItemMeta meta = livreMJ.getItemMeta();
+                    if (meta != null) {
+                        meta.displayName(Component.text("📖 Le Grimoire du Conteur", NamedTextColor.DARK_PURPLE));
+                        livreMJ.setItemMeta(meta);
+                    }
+                    p.getInventory().setItem(0, livreMJ);
+                } else {
+                    org.bukkit.inventory.ItemStack registreJoueur = new org.bukkit.inventory.ItemStack(org.bukkit.Material.BOOK);
+                    org.bukkit.inventory.meta.ItemMeta meta = registreJoueur.getItemMeta();
+                    if (meta != null) {
+                        meta.displayName(Component.text("📜 Registre du Tribunal", NamedTextColor.DARK_GREEN));
+                        registreJoueur.setItemMeta(meta);
+                    }
+                    p.getInventory().setItem(0, registreJoueur);
+                }
             }
         }
         org.bukkit.Bukkit.broadcast(net.kyori.adventure.text.Component.text("[BOTC] Le Conteur a reinitialise la partie. Tout le monde est vivant et les jetons de vote sont rendus !", net.kyori.adventure.text.format.NamedTextColor.GOLD));

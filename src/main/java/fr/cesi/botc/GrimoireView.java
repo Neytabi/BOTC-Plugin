@@ -8,6 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.ArrayList;
@@ -30,9 +31,8 @@ public class GrimoireView {
         int slot = 0;
         // On parcourt tous les joueurs enregistrés dans notre modèle (la HashMap)
         for (UUID uuid : main.getPlayersMap().keySet()) {
-            if (slot >= 54) break; // Sécurité pour ne pas dépasser la taille du coffre
+            if (slot >= 45) break; // Sécurité : On s'arrête avant la dernière ligne pour laisser la place aux outils !
 
-            // --- LA CORRECTION EST ICI ---
             // Si le joueur derrière cet UUID est OP (le Conteur), on l'ignore !
             if (Bukkit.getOfflinePlayer(uuid).isOp()) continue;
 
@@ -42,6 +42,19 @@ public class GrimoireView {
             inv.setItem(slot, item);
             slot++;
         }
+
+        // 🌟 APPORT : Bouton de Téléportation Flash au Tribunal (Slot 45)
+        ItemStack btnTp = new ItemStack(Material.ENDER_PEARL);
+        ItemMeta tpMeta = btnTp.getItemMeta();
+        if (tpMeta != null) {
+            tpMeta.displayName(Component.text("⚡ Flash-TP au Tribunal", NamedTextColor.LIGHT_PURPLE).decorate(TextDecoration.BOLD));
+            tpMeta.lore(List.of(
+                    Component.text("Clique ici pour te téléporter instantanément", NamedTextColor.GRAY),
+                    Component.text("au centre du cercle de discussion.", NamedTextColor.GRAY)
+            ));
+            btnTp.setItemMeta(tpMeta);
+        }
+        inv.setItem(45, btnTp);
 
         // On ouvre magiquement l'inventaire à l'admin (le Conteur)
         admin.openInventory(inv);
@@ -82,6 +95,11 @@ public class GrimoireView {
             } else {
                 lore.add(Component.text("Rôle : " + botcPlayer.getRealRole(), NamedTextColor.AQUA));
             }
+
+            // 🌟 AJOUT ERGONOMIQUE : Petite notice d'utilisation pour le Conteur
+            lore.add(Component.text(" "));
+            lore.add(Component.text("🖱️ CLIC : Gérer la vie et le rôle", NamedTextColor.GRAY));
+            lore.add(Component.text("⌨️ SHIFT + CLIC : Se TP sur lui", NamedTextColor.LIGHT_PURPLE));
 
             meta.lore(lore);
             head.setItemMeta(meta);

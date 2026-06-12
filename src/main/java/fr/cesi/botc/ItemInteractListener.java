@@ -31,7 +31,7 @@ public class ItemInteractListener implements Listener {
                 String name = PlainTextComponentSerializer.plainText().serialize(item.getItemMeta().displayName());
                 if (name.contains("Le Grimoire du Conteur")) {
                     event.setCancelled(true);
-                    new ConteurMenuView().openConteurMenu(player);
+                    new ConteurMenuView().openConteurMenu(player, main);
                 }
             }
             return;
