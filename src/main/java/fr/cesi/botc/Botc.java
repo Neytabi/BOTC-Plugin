@@ -13,6 +13,10 @@ import net.kyori.adventure.bossbar.BossBar;
 
 public final class Botc extends JavaPlugin {
 
+    private final java.util.Set<java.util.UUID> vcMutedPlayers = new java.util.HashSet<>();
+
+    public java.util.Set<java.util.UUID> getVcMutedPlayers() { return vcMutedPlayers; }
+
     private final HashMap<UUID, BotcPlayer> playersMap = new HashMap<>();
     private VoteManager voteManager;
     private BotcVoicechatPlugin voicechatPlugin;
@@ -21,6 +25,21 @@ public final class Botc extends JavaPlugin {
     private final java.util.List<java.util.UUID> hasBeenNominatedToday = new java.util.ArrayList<>();
     private final java.util.HashMap<java.util.UUID, Boolean> isAskingQuestion = new java.util.HashMap<>();
     private boolean isCouncilOpen = false;
+
+    // 🌟 SÉCURISATION DU STATUT DES MENUS ET DU VOTE DE MAP
+    private boolean nameTagsHidden = false;
+    private boolean isMapVoteOpen = false;
+    private final java.util.HashMap<java.util.UUID, String> mapVotes = new java.util.HashMap<>();
+    private org.bukkit.scheduler.BukkitTask mapVoteTask = null;
+
+    public boolean isNameTagsHidden() { return nameTagsHidden; }
+    public void setNameTagsHidden(boolean hidden) { this.nameTagsHidden = hidden; }
+    public boolean isMapVoteOpen() { return isMapVoteOpen; }
+    public void setMapVoteOpen(boolean open) { this.isMapVoteOpen = open; }
+    public java.util.HashMap<java.util.UUID, String> getMapVotes() { return mapVotes; }
+    public org.bukkit.scheduler.BukkitTask getMapVoteTask() { return mapVoteTask; }
+    public void setMapVoteTask(org.bukkit.scheduler.BukkitTask task) { this.mapVoteTask = task; }
+
     public java.util.List<java.util.UUID> getHasNominatedToday() { return hasNominatedToday; }
     public java.util.List<java.util.UUID> getHasBeenNominatedToday() { return hasBeenNominatedToday; }
     public java.util.HashMap<java.util.UUID, Boolean> getIsAskingQuestion() { return isAskingQuestion; }
@@ -61,7 +80,7 @@ public final class Botc extends JavaPlugin {
         // 2. ENREGISTREMENT DE LA COMMANDE ET DE SON AUTO-COMPLÉTION
         var botcCommand = this.getCommand("botc");
         if (botcCommand != null) {
-            BotcCommand cmd = new BotcCommand(this);
+            fr.cesi.botc.commands.BotcCommandManager cmd = new fr.cesi.botc.commands.BotcCommandManager(this);
             botcCommand.setExecutor(cmd);
             botcCommand.setTabCompleter(cmd);
         }
@@ -182,12 +201,28 @@ public final class Botc extends JavaPlugin {
 
     // --- MODIFICATION DE TA MÉTHODE resetGame() ---
     public void resetGame() {
+        this.nameTagsHidden = false;
+        this.isMapVoteOpen = false;
+        this.mapVotes.clear();
+        if (this.mapVoteTask != null) {
+            this.mapVoteTask.cancel();
+            this.mapVoteTask = null;
+        }
         this.clearAllRoleBossBars();
         this.hasNominatedToday.clear();
         this.hasBeenNominatedToday.clear();
         this.isAskingQuestion.clear();
         this.seatsAssigned = false;
         this.isCouncilOpen = false;
+
+        // 🔄 À REMPLACER DANS LA MÉTHODE resetGame() DE Botc.java :
+        for (java.util.UUID uuid : new java.util.HashSet<>(vcMutedPlayers)) {
+            org.bukkit.entity.Player p = org.bukkit.Bukkit.getPlayer(uuid);
+            if (p != null && p.isOnline()) {
+                org.bukkit.Bukkit.dispatchCommand(org.bukkit.Bukkit.getConsoleSender(), "voicechat servermute " + p.getName());
+            }
+        }
+        this.vcMutedPlayers.clear();
 
         // 🌟 CORRECTION MULTI-MAP : On utilise getPresetPath("rooms")
         List<String> roomsStr = getConfig().getStringList(getPresetPath("rooms"));

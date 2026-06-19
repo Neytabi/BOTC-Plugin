@@ -72,6 +72,50 @@ public class ConteurMenuView {
         }
         inv.setItem(5, chairItem);
 
+        // 🌟 APPORT : Bouton 7 : Visibilité des Pseudos (Slot 6)
+        ItemStack nameTagsItem = new ItemStack(Material.NAME_TAG);
+        ItemMeta ntMeta = nameTagsItem.getItemMeta();
+        if (ntMeta != null) {
+            org.bukkit.scoreboard.Team nightTeam = Bukkit.getScoreboardManager().getMainScoreboard().getTeam("botc_night");
+            boolean hidden = nightTeam != null && !nightTeam.getEntries().isEmpty();
+            String status = hidden ? "CACHÉS (Anonymat)" : "VISIBLES";
+
+            ntMeta.displayName(Component.text("🏷️ Visibilité Pseudos : " + status, NamedTextColor.YELLOW).decorate(TextDecoration.BOLD));
+            ntMeta.lore(List.of(
+                    Component.text("CLIC : Basculer l'affichage des nametags", NamedTextColor.GRAY),
+                    Component.text("pour masquer ou afficher les noms en jeu.", NamedTextColor.GRAY)
+            ));
+            nameTagsItem.setItemMeta(ntMeta);
+        }
+        inv.setItem(6, nameTagsItem);
+
+        // 🌟 APPORT : Bouton 8 : Coupe-parole Vocal Proximité SVC (Slot 7)
+        ItemStack muteItem = new ItemStack(Material.JUKEBOX);
+        ItemMeta mGlobalMeta = muteItem.getItemMeta();
+        if (mGlobalMeta != null) {
+            mGlobalMeta.displayName(Component.text("🎙️ Modération Vocale (SVC)", NamedTextColor.RED).decorate(TextDecoration.BOLD));
+            mGlobalMeta.lore(List.of(
+                    Component.text("CLIC GAUCHE : Réclamer le silence (/botc silence)", NamedTextColor.GRAY),
+                    Component.text("CLIC DROIT : Réactiver les micros (/botc paroleall)", NamedTextColor.GRAY)
+            ));
+            muteItem.setItemMeta(mGlobalMeta);
+        }
+        inv.setItem(7, muteItem);
+
+        // 🌟 APPORT : Bouton 9 : Système de Scrutin / Vote de Map (Slot 8)
+        ItemStack voteMapItem = new ItemStack(Material.MAP);
+        ItemMeta vmMeta = voteMapItem.getItemMeta();
+        if (vmMeta != null) {
+            vmMeta.displayName(Component.text("🗳️ Lancer un Vote de Map", NamedTextColor.LIGHT_PURPLE).decorate(TextDecoration.BOLD));
+            vmMeta.lore(List.of(
+                    Component.text("CLIC GAUCHE : Ouvrir le vote aux joueurs", NamedTextColor.GRAY),
+                    Component.text("CLIC DROIT : Clôturer et charger la map gagnante", NamedTextColor.GRAY)
+            ));
+            voteMapItem.setItemMeta(vmMeta);
+        }
+        inv.setItem(8, voteMapItem);
+
+
         // ==========================================================
         // 🛠️ BARRE DE SETUP ET CONFIGURATION (Dernière ligne du Menu)
         // ==========================================================
@@ -86,7 +130,7 @@ public class ConteurMenuView {
                     Component.text("supprimer tes arènes de jeu.", NamedTextColor.GRAY)));
             btnPreset.setItemMeta(pMeta);
         }
-        inv.setItem(baseSlot + 0, btnPreset);
+        inv.setItem(baseSlot, btnPreset);
 
         // Slot +1 : Vitre séparatrice
         ItemStack separator = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
@@ -96,7 +140,7 @@ public class ConteurMenuView {
 
         // Slot +2 : 🏛️ Enregistrer le centre du Tribunal
         ItemStack btnTribunal = new ItemStack(Material.BEACON);
-        var tribMeta = btnTribunal.getItemMeta(); // 🌟 FIX : Renommé en tribMeta pour éviter le doublon avec tMeta
+        var tribMeta = btnTribunal.getItemMeta();
         if (tribMeta != null) {
             tribMeta.displayName(Component.text("Enregistrer le centre du Tribunal", NamedTextColor.GOLD).decorate(TextDecoration.BOLD));
             tribMeta.lore(List.of(Component.text("Définit ta position actuelle comme le", NamedTextColor.GRAY),
@@ -107,7 +151,7 @@ public class ConteurMenuView {
 
         // Slot +3 : 🪑 Ajouter une Chaise
         ItemStack btnChair = new ItemStack(Material.OAK_STAIRS);
-        var setupChairMeta = btnChair.getItemMeta(); // 🌟 FIX : Renommé en setupChairMeta pour éviter le doublon avec cMeta
+        var setupChairMeta = btnChair.getItemMeta();
         if (setupChairMeta != null) {
             setupChairMeta.displayName(Component.text("Ajouter un Siège au Cercle", NamedTextColor.YELLOW));
             setupChairMeta.lore(List.of(Component.text("Enregistre ta position comme une chaise.", NamedTextColor.GRAY),
@@ -141,21 +185,22 @@ public class ConteurMenuView {
         }
         inv.setItem(baseSlot + 5, btnDeath);
 
-        // Slot +6 : ⚡ Mode de l'Éclair (Dynamique selon la config)
-        ItemStack btnLightning = new ItemStack(Material.LIGHTNING_ROD);
-        var lightningMeta = btnLightning.getItemMeta();
-        if (lightningMeta != null) {
-            String mode = main.getConfig().getString(main.getPresetPath("lightning.mode"), "player");
-            String modeText = mode.equalsIgnoreCase("player") ? "Sur le Joueur condamné" : "Local (Au Tribunal)";
+        // 🏷️ Visibilité des Pseudos (Slot 6) - Version Sécurisée sans doublon
+        ItemStack nameTagsButton = new ItemStack(Material.NAME_TAG);
+        ItemMeta nameTagsMeta = nameTagsButton.getItemMeta();
+        if (nameTagsMeta != null) {
+            boolean hidden = main.isNameTagsHidden();
+            String status = hidden ? "CACHÉS (Anonymat Actif)" : "VISIBLES";
 
-            lightningMeta.displayName(Component.text("Ciblage de l'Éclair", NamedTextColor.GOLD).decorate(TextDecoration.BOLD));
-            lightningMeta.lore(List.of(
-                    Component.text("Mode actuel : ", NamedTextColor.GRAY).append(Component.text(modeText, NamedTextColor.YELLOW)),
-                    Component.text("CLIC : Alterner le ciblage de la foudre", NamedTextColor.GRAY)
+            nameTagsMeta.displayName(Component.text("🏷️ Visibilité Pseudos : ", NamedTextColor.YELLOW)
+                    .append(Component.text(status, hidden ? NamedTextColor.RED : NamedTextColor.GREEN).decorate(TextDecoration.BOLD)));
+            nameTagsMeta.lore(List.of(
+                    Component.text("CLIC : Basculer l'affichage des nametags", NamedTextColor.GRAY),
+                    Component.text("pour masquer ou afficher les noms en jeu.", NamedTextColor.GRAY)
             ));
-            btnLightning.setItemMeta(lightningMeta);
+            nameTagsButton.setItemMeta(nameTagsMeta);
         }
-        inv.setItem(baseSlot + 6, btnLightning);
+        inv.setItem(6, nameTagsButton);
 
         // Slot +7 : ✨ Outils de vérification et de Nettoyage (Blaze Powder)
         ItemStack btnTest = new ItemStack(Material.BLAZE_POWDER);

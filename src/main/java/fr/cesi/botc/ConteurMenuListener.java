@@ -3,6 +3,7 @@ package fr.cesi.botc;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -34,7 +35,7 @@ public class ConteurMenuListener implements Listener {
         int slot = event.getSlot();
 
         // ==========================================================
-        // 🎮 LIGNE 1 : SCRIPT DE JEU / GAMEPLAY (Slots 0 à 5)
+        // 🎮 LIGNE 1 : SCRIPT DE JEU / GAMEPLAY (Slots 0 à 8)
         // ==========================================================
         if (slot < 9) {
             switch (slot) {
@@ -70,13 +71,38 @@ public class ConteurMenuListener implements Listener {
                     }
                     admin.performCommand(IsAnyoneSeated ? "botc debout" : "botc assis");
                 }
+                case 6 -> { // 🏷️ ACTION : Alterner Pseudos globalement
+                    boolean currentlyHidden = main.isNameTagsHidden();
+                    if (currentlyHidden) {
+                        admin.performCommand("botc shownames");
+                    } else {
+                        admin.performCommand("botc hidenames");
+                    }
+                    new ConteurMenuView().openConteurMenu(admin, main);
+                }
+                case 7 -> { // 🌟 APPORT : JUKEBOX : Silence / Parole All Vocaux
+                    admin.closeInventory();
+                    if (event.isLeftClick()) {
+                        admin.performCommand("botc silence");
+                    } else if (event.isRightClick()) {
+                        admin.performCommand("botc paroleall");
+                    }
+                }
+                case 8 -> { // 🌟 APPORT : MAP : Lancer ou Arrêter le scrutin de Preset Map
+                    admin.closeInventory();
+                    if (event.isLeftClick()) {
+                        admin.performCommand("botc mapvote start");
+                    } else if (event.isRightClick()) {
+                        admin.performCommand("botc mapvote stop");
+                    }
+                }
             }
         }
         // ==========================================================
         // 🛠️ LIGNE 2 : BARRE DE SETUP ET CONFIGURATION (Slots 9 à 17)
         // ==========================================================
         else if (slot >= 9 && slot <= 17) {
-            int relativeSlot = slot - 9; // Index de 0 à 8 pour la ligne du bas
+            int relativeSlot = slot - 9;
 
             switch (relativeSlot) {
                 case 0 -> { // FILLED_MAP : Menu des Presets
@@ -102,12 +128,10 @@ public class ConteurMenuListener implements Listener {
                         admin.closeInventory();
                         admin.performCommand("botc setplayerdeath");
                     } else if (event.isRightClick()) {
-                        // 🌟 ACTION : On efface la coordonnée dans le preset actuel
                         main.getConfig().set(main.getPresetPath("death"), null);
                         main.saveConfig();
                         admin.sendMessage(Component.text("🗑️ Estrade d'exécution supprimée. Les condamnés mourront désormais sur place !", NamedTextColor.YELLOW));
                         admin.playSound(admin.getLocation(), org.bukkit.Sound.ENTITY_ITEM_BREAK, 0.5f, 1.0f);
-                        // Rafraîchissement visuel immédiat
                         new ConteurMenuView().openConteurMenu(admin, main);
                     }
                 }
@@ -118,11 +142,9 @@ public class ConteurMenuListener implements Listener {
                     } else {
                         admin.performCommand("botc setlightning player");
                     }
-                    // 🌟 RE-OPEN : On rafraîchit le menu pour actualiser instantanément le texte du Lore !
                     new ConteurMenuView().openConteurMenu(admin, main);
                 }
                 case 7 -> { // BLAZE_POWDER : Particules OU Suppression
-                    // Détection des Shift-Clics pour supprimer
                     if (event.getClick() == org.bukkit.event.inventory.ClickType.SHIFT_LEFT) {
                         admin.closeInventory();
                         admin.performCommand("botc delchairs");
@@ -130,7 +152,6 @@ public class ConteurMenuListener implements Listener {
                         admin.closeInventory();
                         admin.performCommand("botc delrooms");
                     }
-                    // Clics normaux pour l'affichage des particules
                     else if (event.isLeftClick()) {
                         admin.closeInventory();
                         admin.performCommand("botc showchairs");

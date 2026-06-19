@@ -28,17 +28,31 @@ public class GrimoireView {
         Component title = Component.text("Grimoire du Conteur", NamedTextColor.DARK_PURPLE);
         Inventory inv = Bukkit.createInventory(null, 54, title);
 
+        // ==========================================================
+        // 🔄 ALIGNEMENT DU GRIMOIRE SUR L'ORDRE DES CHAISES
+        // ==========================================================
+        List<BotcPlayer> sortedPlayers = new ArrayList<>(main.getPlayersMap().values());
+
+        // 1. On filtre les MJ pour ne pas encombrer le Grimoire
+        sortedPlayers.removeIf(bp -> Bukkit.getOfflinePlayer(bp.getPlayerUUID()).isOp());
+
+        // 2. On trie : d'abord par index de chaise, puis par ordre alphabétique si pas assis
+        sortedPlayers.sort((p1, p2) -> {
+            int idx1 = p1.getChairIndex();
+            int idx2 = p2.getChairIndex();
+
+            if (idx1 != -1 && idx2 != -1) return Integer.compare(idx1, idx2);
+            if (idx1 != -1) return -1; // p1 a une chaise, il passe devant
+            if (idx2 != -1) return 1;  // p2 a une chaise, il passe devant
+            return p1.getPlayerName().compareToIgnoreCase(p2.getPlayerName()); // Tri alphabétique par défaut
+        });
+
+        // 3. On remplit l'inventaire avec la liste parfaitement ordonnée
         int slot = 0;
-        // On parcourt tous les joueurs enregistrés dans notre modèle (la HashMap)
-        for (UUID uuid : main.getPlayersMap().keySet()) {
+        for (BotcPlayer botcPlayer : sortedPlayers) {
             if (slot >= 45) break; // Sécurité : On s'arrête avant la dernière ligne pour laisser la place aux outils !
 
-            // Si le joueur derrière cet UUID est OP (le Conteur), on l'ignore !
-            if (Bukkit.getOfflinePlayer(uuid).isOp()) continue;
-
-            BotcPlayer botcPlayer = main.getPlayersMap().get(uuid);
             ItemStack item = createPlayerHead(botcPlayer);
-
             inv.setItem(slot, item);
             slot++;
         }
@@ -55,6 +69,22 @@ public class GrimoireView {
             btnTp.setItemMeta(tpMeta);
         }
         inv.setItem(45, btnTp);
+
+        // Slot 46 : Liaison NameTag synchro dans le Grimoire
+        ItemStack btnNames = new ItemStack(Material.NAME_TAG);
+        ItemMeta namesMeta = btnNames.getItemMeta();
+        if (namesMeta != null) {
+            boolean hidden = main.isNameTagsHidden();
+            String status = hidden ? "CACHÉS (Anonymat Actif)" : "VISIBLES";
+
+            namesMeta.displayName(Component.text("🏷️ Visibilité des Pseudos", NamedTextColor.YELLOW).decorate(TextDecoration.BOLD));
+            namesMeta.lore(List.of(
+                    Component.text("Statut actuel : ", NamedTextColor.GRAY).append(Component.text(status, hidden ? NamedTextColor.RED : NamedTextColor.GREEN)),
+                    Component.text("🖱️ CLIC : Alterner la visibilité pour tous", NamedTextColor.GRAY)
+            ));
+            btnNames.setItemMeta(namesMeta);
+        }
+        inv.setItem(46, btnNames);
 
         // On ouvre magiquement l'inventaire à l'admin (le Conteur)
         admin.openInventory(inv);

@@ -27,11 +27,8 @@ public class ActionMenuListener implements Listener {
         Component titleComponent = event.getView().title();
         String titleStr = PlainTextComponentSerializer.plainText().serialize(titleComponent);
 
-        boolean isBotcMenu = titleStr.startsWith("Action : ")
-                || titleStr.equals("Menu Principal du Conteur")
-                || titleStr.equals("Registre du Tribunal")
-                || titleStr.equals("Nommer un suspect");
-        if (!isBotcMenu) return;
+        // 🌟 CORRECTION : Ce menu n'intercepte PLUS DU TOUT le Registre ni le Tribunal
+        if (!titleStr.startsWith("Action : ")) return;
         event.setCancelled(true);
 
         ItemStack clickedItem = event.getCurrentItem();
@@ -55,53 +52,48 @@ public class ActionMenuListener implements Listener {
             new RoleSelectionView().openRoleMenu(admin, targetBotc);
         }
 
-        // --- BOUTON : TUER LE JOUEUR (ÉPÉE EN FER) ---
         if (type == Material.IRON_SWORD) {
             targetBotc.setAlive(false);
 
-            // [LOGIQUE DIABLOTIN & FEMME ÉCARLATE]
             if (targetBotc.getRealRole().equalsIgnoreCase("Diablotin")) {
                 long vivantsRestants = main.getPlayersMap().values().stream().filter(BotcPlayer::isAlive).count();
 
                 if (vivantsRestants >= 5) {
                     BotcPlayer scarletWoman = null;
                     for (BotcPlayer bp : main.getPlayersMap().values()) {
-                        if (bp.getRealRole().equalsIgnoreCase("Femme Écarlate") && bp.isAlive()) {
+                        if (bp.getRealRole().equalsIgnoreCase("Femme Ecarlate") && bp.isAlive()) {
                             scarletWoman = bp;
                             break;
                         }
                     }
 
                     if (scarletWoman != null) {
-                        scarletWoman.setRole("Diablotin", "Tu as hérité du rôle de Diablotin suite à la mort de ton maître !");
+                        scarletWoman.setRole("Diablotin", "Tu as herite du role de Diablotin suite a la mort de ton maitre !");
 
                         Player pScarlet = Bukkit.getPlayer(scarletWoman.getPlayerUUID());
                         if (pScarlet != null) {
                             pScarlet.sendMessage(Component.text("=====================================", NamedTextColor.DARK_RED));
-                            pScarlet.sendMessage(Component.text("LA FEMME ÉCARLATE S'ÉVEILLE !", NamedTextColor.GOLD).decorate(TextDecoration.BOLD));
+                            pScarlet.sendMessage(Component.text("LA FEMME ECARLATE S'EVEILLE !", NamedTextColor.GOLD).decorate(TextDecoration.BOLD));
                             pScarlet.sendMessage(Component.text("Le Diablotin est mort. Tu deviens le nouveau DIABLOTIN !", NamedTextColor.RED));
                             pScarlet.sendMessage(Component.text("=====================================", NamedTextColor.DARK_RED));
                         }
-                        admin.sendMessage(Component.text("[PROTÉGÉ] Le Diablotin est mort, mais la Femme Écarlate a pris sa place automatiquement !", NamedTextColor.GOLD));
+                        admin.sendMessage(Component.text("[PROTEGE] Le Diablotin est mort, mais la Femme Ecarlate a pris sa place automatiquement !", NamedTextColor.GOLD));
                     }
                 }
             }
 
             admin.closeInventory();
 
-            // Annonce de la mort globale
             Bukkit.broadcast(Component.text("[BOTC] Une ombre plane sur le village... " + targetBotc.getPlayerName() + " est mort.", NamedTextColor.RED));
 
             final Player pTarget = Bukkit.getPlayer(targetBotc.getPlayerUUID());
 
             if (pTarget != null) {
-                // 1. Sauvegarder l'ancienne chaise pour le retour
                 final org.bukkit.entity.Entity ancienneChamberChair = pTarget.getVehicle();
                 if (ancienneChamberChair != null) {
                     ancienneChamberChair.removePassenger(pTarget);
                 }
 
-                // 2. TÉLÉPORTATION DU CONDAMNÉ SUR L'ESTRADE (/botc setplayerdeath)
                 if (main.getConfig().contains("death.x")) {
                     org.bukkit.World w = Bukkit.getWorld(main.getConfig().getString("death.world", "world"));
                     double x = main.getConfig().getDouble("death.x");
@@ -115,7 +107,6 @@ public class ActionMenuListener implements Listener {
                     }
                 }
 
-                // 3. FRAPPE DE L'ÉCLAIR (Selon config locale ou sur la tête)
                 String lightMode = main.getConfig().getString("lightning.mode", "player");
 
                 if (lightMode.equalsIgnoreCase("local") && main.getConfig().contains("lightning.x")) {
@@ -131,30 +122,24 @@ public class ActionMenuListener implements Listener {
                     pTarget.getWorld().strikeLightningEffect(pTarget.getLocation());
                 }
 
-                // 4. PARAMÈTRES DE MORT VISUELS (Barrière, particules, mode aventure)
                 pTarget.getInventory().setHelmet(new ItemStack(Material.BARRIER));
                 pTarget.getWorld().spawnParticle(org.bukkit.Particle.LARGE_SMOKE, pTarget.getLocation().add(0, 1, 0), 30, 0.5, 0.5, 0.5, 0.05);
                 pTarget.setGameMode(org.bukkit.GameMode.ADVENTURE);
 
-                // --- 🌟 AJOUT : NOTIFICATION THÉÂTRALE DU MORT (Title + Son + Chat) 🌟 ---
                 net.kyori.adventure.title.Title deathTitle = net.kyori.adventure.title.Title.title(
                         Component.text("💀 TU ES MORT 💀", NamedTextColor.DARK_RED).decorate(TextDecoration.BOLD),
-                        Component.text("Tu deviens un fantôme. Il te reste 1 ultime vote.", NamedTextColor.GRAY)
+                        Component.text("Tu deviens un fantome. Il te reste 1 ultime vote.", NamedTextColor.GRAY)
                 );
                 pTarget.showTitle(deathTitle);
 
-                // Râle du Wither ralentit pour donner un effet terrifiant
                 pTarget.playSound(pTarget.getLocation(), org.bukkit.Sound.ENTITY_WITHER_DEATH, 0.8f, 0.5f);
 
-                // Guide de survie du fantôme dans le chat
                 pTarget.sendMessage(Component.text("=============================================", NamedTextColor.DARK_RED));
-                pTarget.sendMessage(Component.text("👻 BIENVENUE DANS L'AU-DELÀ", NamedTextColor.RED).decorate(TextDecoration.BOLD));
-                pTarget.sendMessage(Component.text("• Tu n'as plus de rôle actif et tu ne peux plus nommer de suspect.", NamedTextColor.GRAY));
+                pTarget.sendMessage(Component.text("👻 BIENVENUE DANS L'AU-DELA", NamedTextColor.RED).decorate(TextDecoration.BOLD));
+                pTarget.sendMessage(Component.text("• Tu n'as plus de role actif et tu ne peux plus nommer de suspect.", NamedTextColor.GRAY));
                 pTarget.sendMessage(Component.text("• Ton bouton de vote dans ton Registre reste actif pour UN SEUL vote.", NamedTextColor.YELLOW));
                 pTarget.sendMessage(Component.text("=============================================", NamedTextColor.DARK_RED));
-                // --------------------------------------------------------------------------
 
-                // 5. RETOUR AUTOMATIQUE RASSIS SUR SA CHAISE APRÈS 1.5 SECONDE (30 ticks)
                 if (ancienneChamberChair != null && ancienneChamberChair.isValid()) {
                     new org.bukkit.scheduler.BukkitRunnable() {
                         @Override
