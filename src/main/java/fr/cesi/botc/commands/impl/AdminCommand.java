@@ -10,11 +10,9 @@ import java.util.List;
 
 public class AdminCommand implements SubCommand {
 
-    private final Botc main;
     private final GrimoireView grimoireView;
 
     public AdminCommand(Botc main) {
-        this.main = main;
         this.grimoireView = new GrimoireView(main);
     }
 

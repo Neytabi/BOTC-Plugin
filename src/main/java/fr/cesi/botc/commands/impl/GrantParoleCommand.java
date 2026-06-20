@@ -13,10 +13,7 @@ import java.util.List;
 
 public class GrantParoleCommand implements SubCommand {
 
-    private final Botc main;
-
     public GrantParoleCommand(Botc main) {
-        this.main = main;
     }
 
     @Override

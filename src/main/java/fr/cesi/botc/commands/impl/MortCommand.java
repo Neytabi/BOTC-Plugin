@@ -13,10 +13,7 @@ import java.util.List;
 
 public class MortCommand implements SubCommand {
 
-    private final Botc main;
-
     public MortCommand(Botc main) {
-        this.main = main;
     }
 
     @Override

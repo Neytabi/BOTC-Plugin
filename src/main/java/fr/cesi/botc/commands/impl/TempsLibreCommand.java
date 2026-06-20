@@ -13,10 +13,7 @@ import java.util.List;
 
 public class TempsLibreCommand implements SubCommand {
 
-    private final Botc main;
-
     public TempsLibreCommand(Botc main) {
-        this.main = main;
     }
 
     @Override

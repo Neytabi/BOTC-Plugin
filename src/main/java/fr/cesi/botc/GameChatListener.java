@@ -8,7 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
+import io.papermc.paper.event.player.AsyncChatEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -21,7 +21,7 @@ public class GameChatListener implements Listener {
     }
 
     @EventHandler
-    public void onPlayerChat(AsyncPlayerChatEvent event) {
+    public void onPlayerChat(AsyncChatEvent event) {
         Player player = event.getPlayer();
 
         // Les admins ont toujours le droit de parler dans le chat
@@ -34,7 +34,7 @@ public class GameChatListener implements Listener {
 
             Component log = Component.text("[QUESTION SECRETE] ", NamedTextColor.LIGHT_PURPLE).decorate(TextDecoration.BOLD)
                     .append(Component.text(player.getName() + " : ", NamedTextColor.YELLOW))
-                    .append(Component.text(event.getMessage(), NamedTextColor.WHITE));
+                    .append(Component.text(PlainTextComponentSerializer.plainText().serialize(event.message()), NamedTextColor.WHITE));
 
             for (Player op : Bukkit.getOnlinePlayers()) {
                 if (op.isOp()) {

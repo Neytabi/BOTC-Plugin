@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
+import io.papermc.paper.event.player.AsyncChatEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -84,14 +84,14 @@ public class PresetListener implements Listener {
     }
 
     @EventHandler
-    public void onPlayerChat(AsyncPlayerChatEvent event) {
+    public void onPlayerChat(AsyncChatEvent event) {
         Player player = event.getPlayer();
         if (!chatPromptPlayers.containsKey(player.getUniqueId())) return;
 
         event.setCancelled(true); // Bloque l'envoi du message aux autres joueurs du chat
         chatPromptPlayers.remove(player.getUniqueId());
 
-        String message = event.getMessage().trim();
+        String message = plainText(event.message()).trim();
         if (message.equalsIgnoreCase("annuler")) {
             player.sendMessage(Component.text("❌ Création annulée.", NamedTextColor.RED));
             Bukkit.getScheduler().runTask(main, () -> presetView.openPresetMenu(player));

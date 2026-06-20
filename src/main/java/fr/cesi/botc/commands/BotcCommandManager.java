@@ -49,11 +49,9 @@ import java.util.Map;
 
 public class BotcCommandManager implements CommandExecutor, TabCompleter {
 
-    private final Botc main;
     private final Map<String, SubCommand> subCommands = new HashMap<>();
 
     public BotcCommandManager(Botc main) {
-        this.main = main;
 
         // Enregistrement des nouvelles sous-commandes
         registerCommand(new VoteOuiCommand(main));

@@ -3,13 +3,11 @@ package fr.cesi.botc;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 public class NominationView {
@@ -20,10 +18,14 @@ public class NominationView {
 
         int slot = 0;
         for (BotcPlayer bp : main.getPlayersMap().values()) {
-            if (slot >= 18) break; // On laisse les deux premières lignes aux têtes (maximum 18 têtes)
-            if (Bukkit.getOfflinePlayer(bp.getPlayerUUID()).isOp()) continue;
-            if (!bp.isAlive()) continue;
-            if (bp.getPlayerName().equalsIgnoreCase(player.getName())) continue;
+            if (slot >= 18)
+                break; // On laisse les deux premières lignes aux têtes (maximum 18 têtes)
+            if (Bukkit.getOfflinePlayer(bp.getPlayerUUID()).isOp())
+                continue;
+            if (!bp.isAlive())
+                continue;
+            if (bp.getPlayerName().equalsIgnoreCase(player.getName()))
+                continue;
 
             ItemStack head = new ItemStack(Material.PLAYER_HEAD);
             SkullMeta meta = (SkullMeta) head.getItemMeta();

@@ -3,7 +3,6 @@ package fr.cesi.botc;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -21,16 +20,19 @@ public class ConteurMenuListener implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        if (!(event.getWhoClicked() instanceof Player admin)) return;
+        if (!(event.getWhoClicked() instanceof Player admin))
+            return;
 
         Component titleComponent = event.getView().title();
         String titleStr = PlainTextComponentSerializer.plainText().serialize(titleComponent);
 
-        if (!titleStr.equals("Menu Principal du Conteur")) return;
+        if (!titleStr.equals("Menu Principal du Conteur"))
+            return;
         event.setCancelled(true);
 
         ItemStack clicked = event.getCurrentItem();
-        if (clicked == null || clicked.getType() == Material.AIR) return;
+        if (clicked == null || clicked.getType() == Material.AIR)
+            return;
 
         int slot = event.getSlot();
 
@@ -63,7 +65,8 @@ public class ConteurMenuListener implements Listener {
                     admin.closeInventory();
                     boolean IsAnyoneSeated = false;
                     for (Player p : org.bukkit.Bukkit.getOnlinePlayers()) {
-                        if (p.isOp()) continue;
+                        if (p.isOp())
+                            continue;
                         if (p.isInsideVehicle()) {
                             IsAnyoneSeated = true;
                             break;
@@ -130,7 +133,9 @@ public class ConteurMenuListener implements Listener {
                     } else if (event.isRightClick()) {
                         main.getConfig().set(main.getPresetPath("death"), null);
                         main.saveConfig();
-                        admin.sendMessage(Component.text("🗑️ Estrade d'exécution supprimée. Les condamnés mourront désormais sur place !", NamedTextColor.YELLOW));
+                        admin.sendMessage(Component.text(
+                                "🗑️ Estrade d'exécution supprimée. Les condamnés mourront désormais sur place !",
+                                NamedTextColor.YELLOW));
                         admin.playSound(admin.getLocation(), org.bukkit.Sound.ENTITY_ITEM_BREAK, 0.5f, 1.0f);
                         new ConteurMenuView().openConteurMenu(admin, main);
                     }
@@ -151,8 +156,7 @@ public class ConteurMenuListener implements Listener {
                     } else if (event.getClick() == org.bukkit.event.inventory.ClickType.SHIFT_RIGHT) {
                         admin.closeInventory();
                         admin.performCommand("botc delrooms");
-                    }
-                    else if (event.isLeftClick()) {
+                    } else if (event.isLeftClick()) {
                         admin.closeInventory();
                         admin.performCommand("botc showchairs");
                     } else if (event.isRightClick()) {

@@ -79,7 +79,7 @@ public class NominationListener implements Listener {
         if (isVierge) {
             BotcPlayer accuserBP = main.getPlayersMap().get(accuserUUID);
             
-            boolean viergeIvre = targetBP.getRealRole().equalsIgnoreCase("Ivrogne");
+            boolean viergeIvre = targetBP != null && targetBP.getRealRole().equalsIgnoreCase("Ivrogne");
             boolean accuserIvre = accuserBP != null && accuserBP.getRealRole().equalsIgnoreCase("Ivrogne");
             
             if (!viergeIvre && !accuserIvre) {

@@ -2,7 +2,6 @@ package fr.cesi.botc;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -22,17 +21,20 @@ public class ActionMenuListener implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        if (!(event.getWhoClicked() instanceof Player admin)) return;
+        if (!(event.getWhoClicked() instanceof Player admin))
+            return;
 
         Component titleComponent = event.getView().title();
         String titleStr = PlainTextComponentSerializer.plainText().serialize(titleComponent);
 
         // 🌟 CORRECTION : Ce menu n'intercepte PLUS DU TOUT le Registre ni le Tribunal
-        if (!titleStr.startsWith("Action : ")) return;
+        if (!titleStr.startsWith("Action : "))
+            return;
         event.setCancelled(true);
 
         ItemStack clickedItem = event.getCurrentItem();
-        if (clickedItem == null || clickedItem.getType() == Material.AIR) return;
+        if (clickedItem == null || clickedItem.getType() == Material.AIR)
+            return;
 
         String targetName = titleStr.replace("Action : ", "").trim();
 
@@ -44,7 +46,8 @@ public class ActionMenuListener implements Listener {
             }
         }
 
-        if (targetBotc == null) return;
+        if (targetBotc == null)
+            return;
 
         Material type = clickedItem.getType();
 
@@ -60,12 +63,15 @@ public class ActionMenuListener implements Listener {
             targetBotc.setAlive(true);
             admin.closeInventory();
 
-            Bukkit.broadcast(Component.text("[BOTC] Les cieux s'ouvrent ! " + targetBotc.getPlayerName() + " ressuscite !", NamedTextColor.GREEN));
+            Bukkit.broadcast(
+                    Component.text("[BOTC] Les cieux s'ouvrent ! " + targetBotc.getPlayerName() + " ressuscite !",
+                            NamedTextColor.GREEN));
 
             Player pTarget = Bukkit.getPlayer(targetBotc.getPlayerUUID());
             if (pTarget != null) {
                 pTarget.getInventory().setHelmet(new ItemStack(Material.AIR));
-                pTarget.getWorld().spawnParticle(org.bukkit.Particle.HAPPY_VILLAGER, pTarget.getLocation().add(0, 1, 0), 40, 0.5, 0.5, 0.5, 0.1);
+                pTarget.getWorld().spawnParticle(org.bukkit.Particle.HAPPY_VILLAGER, pTarget.getLocation().add(0, 1, 0),
+                        40, 0.5, 0.5, 0.5, 0.1);
                 pTarget.playSound(pTarget.getLocation(), org.bukkit.Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 0.5f);
                 pTarget.setGameMode(org.bukkit.GameMode.SURVIVAL);
             }

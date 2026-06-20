@@ -13,7 +13,6 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class GrimoireView {
 
@@ -36,21 +35,27 @@ public class GrimoireView {
         // 1. On filtre les MJ pour ne pas encombrer le Grimoire
         sortedPlayers.removeIf(bp -> Bukkit.getOfflinePlayer(bp.getPlayerUUID()).isOp());
 
-        // 2. On trie : d'abord par index de chaise, puis par ordre alphabétique si pas assis
+        // 2. On trie : d'abord par index de chaise, puis par ordre alphabétique si pas
+        // assis
         sortedPlayers.sort((p1, p2) -> {
             int idx1 = p1.getChairIndex();
             int idx2 = p2.getChairIndex();
 
-            if (idx1 != -1 && idx2 != -1) return Integer.compare(idx1, idx2);
-            if (idx1 != -1) return -1; // p1 a une chaise, il passe devant
-            if (idx2 != -1) return 1;  // p2 a une chaise, il passe devant
+            if (idx1 != -1 && idx2 != -1)
+                return Integer.compare(idx1, idx2);
+            if (idx1 != -1)
+                return -1; // p1 a une chaise, il passe devant
+            if (idx2 != -1)
+                return 1; // p2 a une chaise, il passe devant
             return p1.getPlayerName().compareToIgnoreCase(p2.getPlayerName()); // Tri alphabétique par défaut
         });
 
         // 3. On remplit l'inventaire avec la liste parfaitement ordonnée
         int slot = 0;
         for (BotcPlayer botcPlayer : sortedPlayers) {
-            if (slot >= 45) break; // Sécurité : On s'arrête avant la dernière ligne pour laisser la place aux outils !
+            if (slot >= 45)
+                break; // Sécurité : On s'arrête avant la dernière ligne pour laisser la place aux
+                       // outils !
 
             ItemStack item = createPlayerHead(botcPlayer);
             inv.setItem(slot, item);
@@ -61,11 +66,11 @@ public class GrimoireView {
         ItemStack btnTp = new ItemStack(Material.ENDER_PEARL);
         ItemMeta tpMeta = btnTp.getItemMeta();
         if (tpMeta != null) {
-            tpMeta.displayName(Component.text("⚡ Flash-TP au Tribunal", NamedTextColor.LIGHT_PURPLE).decorate(TextDecoration.BOLD));
+            tpMeta.displayName(Component.text("⚡ Flash-TP au Tribunal", NamedTextColor.LIGHT_PURPLE)
+                    .decorate(TextDecoration.BOLD));
             tpMeta.lore(List.of(
                     Component.text("Clique ici pour te téléporter instantanément", NamedTextColor.GRAY),
-                    Component.text("au centre du cercle de discussion.", NamedTextColor.GRAY)
-            ));
+                    Component.text("au centre du cercle de discussion.", NamedTextColor.GRAY)));
             btnTp.setItemMeta(tpMeta);
         }
         inv.setItem(45, btnTp);
@@ -77,11 +82,12 @@ public class GrimoireView {
             boolean hidden = main.isNameTagsHidden();
             String status = hidden ? "CACHÉS (Anonymat Actif)" : "VISIBLES";
 
-            namesMeta.displayName(Component.text("🏷️ Visibilité des Pseudos", NamedTextColor.YELLOW).decorate(TextDecoration.BOLD));
+            namesMeta.displayName(
+                    Component.text("🏷️ Visibilité des Pseudos", NamedTextColor.YELLOW).decorate(TextDecoration.BOLD));
             namesMeta.lore(List.of(
-                    Component.text("Statut actuel : ", NamedTextColor.GRAY).append(Component.text(status, hidden ? NamedTextColor.RED : NamedTextColor.GREEN)),
-                    Component.text("🖱️ CLIC : Alterner la visibilité pour tous", NamedTextColor.GRAY)
-            ));
+                    Component.text("Statut actuel : ", NamedTextColor.GRAY)
+                            .append(Component.text(status, hidden ? NamedTextColor.RED : NamedTextColor.GREEN)),
+                    Component.text("🖱️ CLIC : Alterner la visibilité pour tous", NamedTextColor.GRAY)));
             btnNames.setItemMeta(namesMeta);
         }
         inv.setItem(46, btnNames);
@@ -101,7 +107,8 @@ public class GrimoireView {
                 meta.setOwningPlayer(target);
             }
 
-            // Définition du nom et du Lore (description) en fonction de son état (Vivant/Mort)
+            // Définition du nom et du Lore (description) en fonction de son état
+            // (Vivant/Mort)
             List<Component> lore = new ArrayList<>();
 
             if (botcPlayer.isAlive()) {
@@ -121,7 +128,8 @@ public class GrimoireView {
             // Gestion du rôle (Ivrogne ou Normal)
             if (botcPlayer.getRealRole().equals("Ivrogne")) {
                 lore.add(Component.text("Rôle REEL : Ivrogne", NamedTextColor.GOLD).decorate(TextDecoration.BOLD));
-                lore.add(Component.text("Rôle AFFICHÉ au joueur : " + botcPlayer.getDisplayedRole(), NamedTextColor.YELLOW));
+                lore.add(Component.text("Rôle AFFICHÉ au joueur : " + botcPlayer.getDisplayedRole(),
+                        NamedTextColor.YELLOW));
             } else {
                 lore.add(Component.text("Rôle : " + botcPlayer.getRealRole(), NamedTextColor.AQUA));
             }

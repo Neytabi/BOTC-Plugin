@@ -28,11 +28,12 @@ public class BotcVoicechatPlugin implements VoicechatPlugin {
 
         // 🌟 INTERCEPTION DES FLUX AUDIO DU MICRO
         registration.registerEvent(de.maxhenkel.voicechat.api.events.MicrophonePacketEvent.class, event -> {
-            if (event.getSenderConnection() == null)
+            var senderConnection = event.getSenderConnection();
+            if (senderConnection == null)
                 return;
 
             // Récupération de l'UUID du joueur qui est en train de parler
-            java.util.UUID playerUUID = event.getSenderConnection().getPlayer().getUuid();
+            java.util.UUID playerUUID = senderConnection.getPlayer().getUuid();
 
             // 🛡️ EXCLUSION DES MJ : Si le joueur est OP, on quitte immédiatement (il n'est
             // jamais mute)
