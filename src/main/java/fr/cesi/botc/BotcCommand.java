@@ -513,6 +513,12 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
 
             Bukkit.broadcast(
                     Component.text("[BOTC] Le conseil est terminé, vous pouvez vous lever.", NamedTextColor.GREEN));
+
+            player.sendMessage(Component.text("➔ Prochaine étape : ", NamedTextColor.AQUA)
+                    .append(Component.text("Mettre la nuit", NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
+                    .append(Component.text(" [CLIQUE POUR EXECUTER]", NamedTextColor.GREEN))
+                    .clickEvent(net.kyori.adventure.text.event.ClickEvent.runCommand("/botc nuit")));
+
             return true;
         }
 
@@ -535,6 +541,12 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
                     .text("[BOTC] Silence ! Le Conteur va annoncer les victimes de la nuit.", NamedTextColor.DARK_RED)
                     .decorate(TextDecoration.BOLD));
             Bukkit.broadcast(Component.text("=============================================", NamedTextColor.RED));
+
+            player.sendMessage(Component.text("➔ Prochaine étape : ", NamedTextColor.AQUA)
+                    .append(Component.text("Temps libre", NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
+                    .append(Component.text(" [CLIQUE POUR EXECUTER]", NamedTextColor.GREEN))
+                    .clickEvent(net.kyori.adventure.text.event.ClickEvent.runCommand("/botc tempslibre")));
+
             return true;
         }
 
@@ -560,6 +572,12 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
                     Component.text("[BOTC] Le temps libre est déclaré. Les discussions privées sont autorisées !",
                             NamedTextColor.DARK_GREEN).decorate(TextDecoration.BOLD));
             Bukkit.broadcast(Component.text("=============================================", NamedTextColor.GREEN));
+
+            player.sendMessage(Component.text("➔ Prochaine étape : ", NamedTextColor.AQUA)
+                    .append(Component.text("Ouvrir le conseil", NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
+                    .append(Component.text(" [CLIQUE POUR EXECUTER]", NamedTextColor.GREEN))
+                    .clickEvent(net.kyori.adventure.text.event.ClickEvent.runCommand("/botc conseil")));
+
             return true;
         }
         if (args[0].equalsIgnoreCase("grantparole") && args.length > 1) {
@@ -672,6 +690,11 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
                     .decorate(TextDecoration.BOLD));
             Bukkit.broadcast(Component.text("=============================================", NamedTextColor.GOLD));
 
+            player.sendMessage(Component.text("➔ Prochaine étape : ", NamedTextColor.AQUA)
+                    .append(Component.text("S'asseoir au tribunal", NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
+                    .append(Component.text(" [CLIQUE POUR EXECUTER]", NamedTextColor.GREEN))
+                    .clickEvent(net.kyori.adventure.text.event.ClickEvent.runCommand("/botc assis")));
+
             return true;
         }
 
@@ -715,6 +738,11 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
                 }
             }.runTaskTimer(main, 0L, 1L); // 1L = exécution à chaque tick pour un effet fluide à 60fps
 
+            player.sendMessage(Component.text("➔ Prochaine étape : ", NamedTextColor.AQUA)
+                    .append(Component.text("Mettre le jour", NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
+                    .append(Component.text(" [CLIQUE POUR EXECUTER]", NamedTextColor.GREEN))
+                    .clickEvent(net.kyori.adventure.text.event.ClickEvent.runCommand("/botc jour")));
+
             return true;
         }
 
@@ -748,6 +776,11 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
                     player.getWorld().setTime(currentTime);
                 }
             }.runTaskTimer(main, 0L, 1L);
+
+            player.sendMessage(Component.text("➔ Prochaine étape : ", NamedTextColor.AQUA)
+                    .append(Component.text("Annoncer les morts", NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
+                    .append(Component.text(" [CLIQUE POUR EXECUTER]", NamedTextColor.GREEN))
+                    .clickEvent(net.kyori.adventure.text.event.ClickEvent.runCommand("/botc mort")));
 
             return true;
         }
@@ -888,6 +921,12 @@ public class BotcCommand implements CommandExecutor, org.bukkit.command.TabCompl
             Bukkit.broadcast(
                     Component.text("[BOTC] Le tribunal commence. Tout le monde est assis à sa place attribuée !",
                             NamedTextColor.GOLD));
+
+            player.sendMessage(Component.text("➔ Prochaine étape : ", NamedTextColor.AQUA)
+                    .append(Component.text("Libérer les joueurs", NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
+                    .append(Component.text(" [CLIQUE POUR EXECUTER]", NamedTextColor.GREEN))
+                    .clickEvent(net.kyori.adventure.text.event.ClickEvent.runCommand("/botc debout")));
+
             return true;
         }
 

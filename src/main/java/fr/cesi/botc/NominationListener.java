@@ -44,13 +44,11 @@ public class NominationListener implements Listener {
         UUID accuserUUID = accuser.getUniqueId();
         UUID targetUUID = meta.getOwningPlayer().getUniqueId();
 
-        // Vérification des limites de nomination quotidiennes
-        if (main.getHasNominatedToday().contains(accuserUUID)) {
-            accuser.closeInventory();
-            accuser.sendMessage(Component.text("❌ Vous avez déjà accusé un suspect durant ce conseil !", NamedTextColor.RED));
-            return;
-        }
-        if (main.getHasBeenNominatedToday().contains(targetUUID)) {
+        // Vérification des limites de nomination (la Vierge est immunisée à la limite quotidienne)
+        BotcPlayer targetBP = main.getPlayersMap().get(targetUUID);
+        boolean isVierge = targetBP != null && targetBP.getDisplayedRole().equalsIgnoreCase("Vierge");
+
+        if (!isVierge && main.getHasBeenNominatedToday().contains(targetUUID)) {
             accuser.closeInventory();
             accuser.sendMessage(Component.text("❌ Ce joueur a déjà fait l'objet d'une accusation aujourd'hui !", NamedTextColor.RED));
             return;
@@ -59,9 +57,10 @@ public class NominationListener implements Listener {
         String targetName = PlainTextComponentSerializer.plainText().serialize(meta.displayName());
         accuser.closeInventory();
 
-        // Enregistrement du verrou de nomination unique
-        main.getHasNominatedToday().add(accuserUUID);
-        main.getHasBeenNominatedToday().add(targetUUID);
+        // Enregistrement du verrou de nomination unique pour le joueur cible (sauf Vierge)
+        if (!isVierge) {
+            main.getHasBeenNominatedToday().add(targetUUID);
+        }
 
         Bukkit.broadcast(Component.text("----------------------------------------", NamedTextColor.GRAY));
         Bukkit.broadcast(Component.text("ACCUSATION FORMELLE !", NamedTextColor.GOLD).decorate(TextDecoration.BOLD));
@@ -74,6 +73,28 @@ public class NominationListener implements Listener {
 
         for (Player p : Bukkit.getOnlinePlayers()) {
             p.playSound(p.getLocation(), org.bukkit.Sound.ENTITY_WITHER_SPAWN, 0.6f, 1.2f);
+        }
+
+        // Logique spécifique à la Vierge
+        if (isVierge) {
+            BotcPlayer accuserBP = main.getPlayersMap().get(accuserUUID);
+            
+            boolean viergeIvre = targetBP.getRealRole().equalsIgnoreCase("Ivrogne");
+            boolean accuserIvre = accuserBP != null && accuserBP.getRealRole().equalsIgnoreCase("Ivrogne");
+            
+            if (!viergeIvre && !accuserIvre) {
+                // Envoyer le message au MJ
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    if (p.isOp()) {
+                        p.sendMessage(Component.text("⚠️ ", NamedTextColor.RED)
+                                .append(Component.text("La Vierge a été nommée !", NamedTextColor.YELLOW).decorate(TextDecoration.BOLD)));
+                        p.sendMessage(Component.text("➔ ", NamedTextColor.AQUA)
+                                .append(Component.text("Tuer l'accusateur (" + accuser.getName() + ")", NamedTextColor.RED).decorate(TextDecoration.BOLD))
+                                .append(Component.text(" [CLIQUE POUR EXECUTER]", NamedTextColor.GREEN))
+                                .clickEvent(net.kyori.adventure.text.event.ClickEvent.runCommand("/botc execute " + accuser.getName())));
+                    }
+                }
+            }
         }
     }
 }

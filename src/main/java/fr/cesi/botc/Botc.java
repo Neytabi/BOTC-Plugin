@@ -290,6 +290,89 @@ public final class Botc extends JavaPlugin {
         victim.sendMessage(Component.text("• Ton bouton de vote dans ton Registre est encore actif pour UN SEUL vote.", net.kyori.adventure.text.format.NamedTextColor.YELLOW));
         victim.sendMessage(Component.text("=============================================", net.kyori.adventure.text.format.NamedTextColor.DARK_RED));
     }
+
+    public void executePlayer(BotcPlayer targetBotc, org.bukkit.command.CommandSender admin) {
+        targetBotc.setAlive(false);
+
+        if (targetBotc.getRealRole().equalsIgnoreCase("Diablotin")) {
+            long vivantsRestants = playersMap.values().stream().filter(BotcPlayer::isAlive).count();
+
+            if (vivantsRestants >= 5) {
+                BotcPlayer scarletWoman = null;
+                for (BotcPlayer bp : playersMap.values()) {
+                    if (bp.getRealRole().equalsIgnoreCase("Femme Ecarlate") && bp.isAlive()) {
+                        scarletWoman = bp;
+                        break;
+                    }
+                }
+
+                if (scarletWoman != null) {
+                    scarletWoman.setRole("Diablotin", "Tu as herite du role de Diablotin suite a la mort de ton maitre !");
+
+                    Player pScarlet = Bukkit.getPlayer(scarletWoman.getPlayerUUID());
+                    if (pScarlet != null) {
+                        pScarlet.sendMessage(Component.text("=====================================", NamedTextColor.DARK_RED));
+                        pScarlet.sendMessage(Component.text("LA FEMME ECARLATE S'EVEILLE !", NamedTextColor.GOLD).decorate(TextDecoration.BOLD));
+                        pScarlet.sendMessage(Component.text("Le Diablotin est mort. Tu deviens le nouveau DIABLOTIN !", NamedTextColor.RED));
+                        pScarlet.sendMessage(Component.text("=====================================", NamedTextColor.DARK_RED));
+                    }
+                    if (admin != null) {
+                        admin.sendMessage(Component.text("[PROTEGE] Le Diablotin est mort, mais la Femme Ecarlate a pris sa place automatiquement !", NamedTextColor.GOLD));
+                    }
+                }
+            }
+        }
+
+        Bukkit.broadcast(Component.text("[BOTC] Une ombre plane sur le village... " + targetBotc.getPlayerName() + " est mort.", NamedTextColor.RED));
+
+        final Player pTarget = Bukkit.getPlayer(targetBotc.getPlayerUUID());
+
+        if (pTarget != null) {
+            final org.bukkit.entity.Entity ancienneChamberChair = pTarget.getVehicle();
+            if (ancienneChamberChair != null) {
+                ancienneChamberChair.removePassenger(pTarget);
+            }
+
+            if (getConfig().contains("death.x")) {
+                org.bukkit.World w = Bukkit.getWorld(getConfig().getString("death.world", "world"));
+                double x = getConfig().getDouble("death.x");
+                double y = getConfig().getDouble("death.y");
+                double z = getConfig().getDouble("death.z");
+                float yaw = (float) getConfig().getDouble("death.yaw");
+                float pitch = (float) getConfig().getDouble("death.pitch");
+
+                if (w != null) {
+                    pTarget.teleport(new org.bukkit.Location(w, x, y, z, yaw, pitch));
+                }
+            }
+
+            String lightMode = getConfig().getString("lightning.mode", "player");
+
+            if (lightMode.equalsIgnoreCase("local") && getConfig().contains("lightning.x")) {
+                org.bukkit.World world = Bukkit.getWorld(getConfig().getString("lightning.world", "world"));
+                double lx = getConfig().getDouble("lightning.x");
+                double ly = getConfig().getDouble("lightning.y");
+                double lz = getConfig().getDouble("lightning.z");
+
+                if (world != null) {
+                    world.strikeLightningEffect(new org.bukkit.Location(world, lx, ly, lz));
+                }
+            } else {
+                pTarget.getWorld().strikeLightningEffect(pTarget.getLocation());
+            }
+
+            pTarget.getInventory().setHelmet(new org.bukkit.inventory.ItemStack(org.bukkit.Material.BARRIER));
+            pTarget.getWorld().spawnParticle(org.bukkit.Particle.LARGE_SMOKE, pTarget.getLocation().add(0, 1, 0), 30, 0.5, 0.5, 0.5, 0.05);
+
+            Bukkit.getScheduler().runTaskLater(this, () -> {
+                prononcerMort(pTarget);
+                // Si la partie est en cours, replacer le mort à sa place de tribunal
+                if (isSeatsAssigned() && targetBotc.getChairIndex() != -1) {
+                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "botc assis");
+                }
+            }, 60L);
+        }
+    }
     public void rafraichirRoleBossBar(Player player, String roleName) {
         // Si le joueur a déjà une ancienne BossBar de rôle, on la cache
         if (activeBossBars.containsKey(player.getUniqueId())) {

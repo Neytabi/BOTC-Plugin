@@ -2,6 +2,7 @@ package fr.cesi.botc.commands;
 
 import fr.cesi.botc.Botc;
 import fr.cesi.botc.BotcCommand;
+import fr.cesi.botc.commands.impl.ExecuteCommand;
 import fr.cesi.botc.commands.impl.HelpCommand;
 import fr.cesi.botc.commands.impl.MapVoteCommand;
 import fr.cesi.botc.commands.impl.VoteOuiCommand;
@@ -34,6 +35,7 @@ public class BotcCommandManager implements CommandExecutor, TabCompleter {
         registerCommand(new VoteOuiCommand(main));
         registerCommand(new HelpCommand());
         registerCommand(new MapVoteCommand(main));
+        subCommands.put("execute", new ExecuteCommand(main));
     }
 
     private void registerCommand(SubCommand cmd) {

@@ -125,6 +125,12 @@ public class MapVoteCommand implements SubCommand {
                 player.sendMessage(Component.text("❌ Le vote est clos ou a expiré.", NamedTextColor.RED));
                 return;
             }
+
+            if (main.getMapVotes().containsKey(player.getUniqueId())) {
+                player.sendMessage(Component.text("❌ Vous avez déjà voté pour une map !", NamedTextColor.RED));
+                return;
+            }
+
             String choice = args[2].toLowerCase();
             main.getMapVotes().put(player.getUniqueId(), choice);
 
@@ -194,8 +200,10 @@ public class MapVoteCommand implements SubCommand {
         List<String> completions = new ArrayList<>();
         if (args.length == 2 && player.isOp()) {
             String input = args[1].toLowerCase();
-            if ("start".startsWith(input)) completions.add("start");
-            if ("stop".startsWith(input)) completions.add("stop");
+            if ("start".startsWith(input))
+                completions.add("start");
+            if ("stop".startsWith(input))
+                completions.add("stop");
         }
         return completions;
     }
