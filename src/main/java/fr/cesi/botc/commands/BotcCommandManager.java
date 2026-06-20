@@ -1,11 +1,37 @@
 package fr.cesi.botc.commands;
 
 import fr.cesi.botc.Botc;
-import fr.cesi.botc.BotcCommand;
+import fr.cesi.botc.commands.impl.AdminCommand;
+import fr.cesi.botc.commands.impl.AssisCommand;
+import fr.cesi.botc.commands.impl.ConseilCommand;
+import fr.cesi.botc.commands.impl.DeboutCommand;
 import fr.cesi.botc.commands.impl.ExecuteCommand;
 import fr.cesi.botc.commands.impl.HelpCommand;
+import fr.cesi.botc.commands.impl.JourCommand;
 import fr.cesi.botc.commands.impl.MapVoteCommand;
+import fr.cesi.botc.commands.impl.MortCommand;
+import fr.cesi.botc.commands.impl.NuitCommand;
 import fr.cesi.botc.commands.impl.VoteOuiCommand;
+import fr.cesi.botc.commands.impl.GrantParoleCommand;
+import fr.cesi.botc.commands.impl.HideNamesCommand;
+import fr.cesi.botc.commands.impl.OrderCommand;
+import fr.cesi.botc.commands.impl.ParoleAllCommand;
+import fr.cesi.botc.commands.impl.ShowNamesCommand;
+import fr.cesi.botc.commands.impl.SilenceCommand;
+import fr.cesi.botc.commands.impl.TempsLibreCommand;
+import fr.cesi.botc.commands.impl.VcMuteCommand;
+import fr.cesi.botc.commands.impl.VcUnmuteCommand;
+import fr.cesi.botc.commands.impl.AddChairCommand;
+import fr.cesi.botc.commands.impl.AddRoomCommand;
+import fr.cesi.botc.commands.impl.DelChairsCommand;
+import fr.cesi.botc.commands.impl.DelRoomsCommand;
+import fr.cesi.botc.commands.impl.ShowChairsCommand;
+import fr.cesi.botc.commands.impl.ShowRoomsCommand;
+import fr.cesi.botc.commands.impl.PresetCommand;
+import fr.cesi.botc.commands.impl.ResetCommand;
+import fr.cesi.botc.commands.impl.SetLightningCommand;
+import fr.cesi.botc.commands.impl.SetPlayerDeathCommand;
+import fr.cesi.botc.commands.impl.SetTribunalCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
@@ -25,17 +51,50 @@ public class BotcCommandManager implements CommandExecutor, TabCompleter {
 
     private final Botc main;
     private final Map<String, SubCommand> subCommands = new HashMap<>();
-    private final BotcCommand legacyCommand;
 
     public BotcCommandManager(Botc main) {
         this.main = main;
-        this.legacyCommand = new BotcCommand(main);
 
         // Enregistrement des nouvelles sous-commandes
         registerCommand(new VoteOuiCommand(main));
         registerCommand(new HelpCommand());
         registerCommand(new MapVoteCommand(main));
         subCommands.put("execute", new ExecuteCommand(main));
+        
+        // Lot 1
+        subCommands.put("settribunal", new SetTribunalCommand(main));
+        subCommands.put("preset", new PresetCommand(main));
+        subCommands.put("reset", new ResetCommand(main));
+        subCommands.put("setplayerdeath", new SetPlayerDeathCommand(main));
+        subCommands.put("setlightning", new SetLightningCommand(main));
+
+        // Lot 2
+        subCommands.put("addroom", new AddRoomCommand(main));
+        subCommands.put("delrooms", new DelRoomsCommand(main));
+        subCommands.put("showrooms", new ShowRoomsCommand(main));
+        subCommands.put("addchair", new AddChairCommand(main));
+        subCommands.put("delchairs", new DelChairsCommand(main));
+        subCommands.put("showchairs", new ShowChairsCommand(main));
+
+        // Lot 3
+        subCommands.put("silence", new SilenceCommand(main));
+        subCommands.put("paroleall", new ParoleAllCommand(main));
+        subCommands.put("grantparole", new GrantParoleCommand(main));
+        subCommands.put("vcmute", new VcMuteCommand(main));
+        subCommands.put("vcunmute", new VcUnmuteCommand(main));
+        subCommands.put("order", new OrderCommand(main));
+        subCommands.put("shownames", new ShowNamesCommand(main));
+        subCommands.put("hidenames", new HideNamesCommand(main));
+
+        // Lot 4
+        subCommands.put("debout", new DeboutCommand(main));
+        subCommands.put("mort", new MortCommand(main));
+        subCommands.put("tempslibre", new TempsLibreCommand(main));
+        subCommands.put("conseil", new ConseilCommand(main));
+        subCommands.put("nuit", new NuitCommand(main));
+        subCommands.put("jour", new JourCommand(main));
+        subCommands.put("assis", new AssisCommand(main));
+        subCommands.put("admin", new AdminCommand(main));
     }
 
     private void registerCommand(SubCommand cmd) {
@@ -61,7 +120,8 @@ public class BotcCommandManager implements CommandExecutor, TabCompleter {
         String subName = args[0].toLowerCase();
         SubCommand target = subCommands.get(subName);
 
-        // Si la commande a été migrée vers le nouveau système
+        // Si la commande n'a pas été trouvée, c'est probablement "voteoui" qui n'a pas de SubCommand, ou une commande invalide.
+        // voteoui a été gérée par l'ancien Listener potentiellement ou on peut l'ignorer ici vu qu'elle est censée être gérée via SubCommand si on veut.
         if (target != null) {
             if (target.requiresOp() && !player.isOp()) {
                 player.sendMessage(Component.text("➔ Tu n'es pas le Conteur de cette partie !", NamedTextColor.RED));
@@ -76,8 +136,8 @@ public class BotcCommandManager implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        // Sinon, on passe au système legacy (BotcCommand d'origine)
-        return legacyCommand.onCommand(sender, command, label, args);
+        player.sendMessage(Component.text("Commande introuvable.", NamedTextColor.RED));
+        return true;
     }
 
     @Override
@@ -97,10 +157,9 @@ public class BotcCommandManager implements CommandExecutor, TabCompleter {
                 }
             }
 
-            // Auto-complétion des anciennes commandes
-            List<String> legacyCompletions = legacyCommand.onTabComplete(sender, command, label, args);
-            if (legacyCompletions != null) {
-                completions.addAll(legacyCompletions);
+            // Ajout du joueur (voteoui) qui n'a pas encore de classe dédiée, au cas où
+            if ("voteoui".startsWith(input)) {
+                completions.add("voteoui");
             }
 
             return completions;
@@ -112,9 +171,6 @@ public class BotcCommandManager implements CommandExecutor, TabCompleter {
                     return target.getSubcommandArguments(player, args);
                 }
             }
-
-            // Fallback
-            return legacyCommand.onTabComplete(sender, command, label, args);
         }
 
         return new ArrayList<>();
