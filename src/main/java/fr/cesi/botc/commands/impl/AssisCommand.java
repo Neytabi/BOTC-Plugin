@@ -48,7 +48,7 @@ public class AssisCommand implements SubCommand {
             return;
         }
 
-        // --- 🌟 ALGORITHME DE RÉPARTITION FIXE ET UNIQUE 🌟 ---
+        // ---  ALGORITHME DE RÉPARTITION FIXE ET UNIQUE  ---
         // Si c'est le premier "/botc assis" depuis le reset, on mélange et on fixe les
         // places !
         if (!main.isSeatsAssigned()) {
@@ -77,7 +77,7 @@ public class AssisCommand implements SubCommand {
                 if (p.isOp())
                     continue;
                 BotcPlayer bp = main.getPlayersMap().get(p.getUniqueId());
-                if (bp != null && bp.getChairIndex() == -1) { // 🌟 N'attribue une place que s'il n'en a pas
+                if (bp != null && bp.getChairIndex() == -1) { //  N'attribue une place que s'il n'en a pas
                     for (int i = 0; i < chairsStr.size(); i++) {
                         if (!chaisesPrises.contains(i)) {
                             bp.setChairIndex(i);
@@ -93,7 +93,7 @@ public class AssisCommand implements SubCommand {
         if (main.getVoicechatPlugin() != null && main.getVoicechatPlugin().getVoicechatApi() != null) {
             de.maxhenkel.voicechat.api.VoicechatServerApi voiceApi = main.getVoicechatPlugin().getVoicechatApi();
             de.maxhenkel.voicechat.api.Group tribunalGroup = voiceApi.groupBuilder()
-                    .setName("🏛️ Tribunal")
+                    .setName(" Tribunal")
                     .setPersistent(false)
                     .setType(de.maxhenkel.voicechat.api.Group.Type.NORMAL)
                     .build();
@@ -118,7 +118,7 @@ public class AssisCommand implements SubCommand {
         org.bukkit.scoreboard.Team nightTeam = scoreboard.getTeam("botc_night");
 
         net.kyori.adventure.title.Title assisTitle = net.kyori.adventure.title.Title.title(
-                Component.text("🪑 TOUT LE MONDE ASSIS 🪑", NamedTextColor.GOLD).decorate(TextDecoration.BOLD),
+                Component.text(" TOUT LE MONDE ASSIS ", NamedTextColor.GOLD).decorate(TextDecoration.BOLD),
                 Component.text("Le Tribunal est en séance. Silence dans les rangs.", NamedTextColor.GRAY));
 
         for (Player p : Bukkit.getOnlinePlayers()) {
@@ -175,7 +175,7 @@ public class AssisCommand implements SubCommand {
                 Component.text("[BOTC] Le tribunal commence. Tout le monde est assis à sa place attribuée !",
                         NamedTextColor.GOLD));
 
-        player.sendMessage(Component.text("➔ Prochaine étape : ", NamedTextColor.AQUA)
+        player.sendMessage(Component.text("-> Prochaine étape : ", NamedTextColor.AQUA)
                 .append(Component.text("Libérer les joueurs", NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
                 .append(Component.text(" [CLIQUE POUR EXECUTER]", NamedTextColor.GREEN))
                 .clickEvent(net.kyori.adventure.text.event.ClickEvent.runCommand("/botc debout")));

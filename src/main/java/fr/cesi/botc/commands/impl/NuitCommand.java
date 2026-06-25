@@ -78,7 +78,7 @@ public class NuitCommand implements SubCommand {
             }
         }.runTaskTimer(main, 0L, 1L); // 1L = exécution à chaque tick pour un effet fluide à 60fps
 
-        player.sendMessage(Component.text("➔ Prochaine étape : ", NamedTextColor.AQUA)
+        player.sendMessage(Component.text("-> Prochaine étape : ", NamedTextColor.AQUA)
                 .append(Component.text("Mettre le jour", NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
                 .append(Component.text(" [CLIQUE POUR EXECUTER]", NamedTextColor.GREEN))
                 .clickEvent(net.kyori.adventure.text.event.ClickEvent.runCommand("/botc jour")));
@@ -89,7 +89,7 @@ public class NuitCommand implements SubCommand {
         List<String> roomsStr = main.getConfig().getStringList(main.getPresetPath("rooms"));
 
         net.kyori.adventure.title.Title nightTitle = net.kyori.adventure.title.Title.title(
-                Component.text("🌙 LA NUIT TOMBE 🌙", NamedTextColor.BLUE).decorate(TextDecoration.BOLD),
+                Component.text(" LA NUIT TOMBE ", NamedTextColor.BLUE).decorate(TextDecoration.BOLD),
                 Component.text("Fermez les yeux... Le démon s'éveille.", NamedTextColor.GRAY));
 
         for (Player p : Bukkit.getOnlinePlayers()) {
@@ -101,7 +101,7 @@ public class NuitCommand implements SubCommand {
             p.spawnParticle(org.bukkit.Particle.LARGE_SMOKE, p.getLocation().add(0, 1, 0), 20, 0.5, 0.5, 0.5, 0.0);
         }
 
-        // 🌟 CORRECTION LOGIQUE : On attribue les chambres selon le CHAIR INDEX fixe de
+        //  CORRECTION LOGIQUE : On attribue les chambres selon le CHAIR INDEX fixe de
         // la game !
         for (Player p : Bukkit.getOnlinePlayers()) {
             if (p.isOp())
@@ -140,7 +140,7 @@ public class NuitCommand implements SubCommand {
                     }
                 }
 
-                // 🌟 CORRECTION VISUELLE : Attribution du skin décalée d'un tick pour éviter
+                //  CORRECTION VISUELLE : Attribution du skin décalée d'un tick pour éviter
                 // Steve/Alex
                 final Player targetPlayer = p;
                 new org.bukkit.scheduler.BukkitRunnable() {
@@ -156,7 +156,7 @@ public class NuitCommand implements SubCommand {
                 final org.bukkit.Location targetRoomLoc = block.getLocation().add(0.5, 0, 0.5);
 
                 // Message privé basé sur le vrai numéro de chambre aligné à la chaise
-                p.sendMessage(Component.text("➔ La nuit tombe ! Rejoins vite tes quartiers : ", NamedTextColor.RED)
+                p.sendMessage(Component.text("-> La nuit tombe ! Rejoins vite tes quartiers : ", NamedTextColor.RED)
                         .append(Component.text("Chambre #" + (index + 1), NamedTextColor.YELLOW)
                                 .decorate(TextDecoration.BOLD)));
 
@@ -176,13 +176,13 @@ public class NuitCommand implements SubCommand {
 
                         if (distance < 2.0) {
                             p.sendActionBar(
-                                    Component.text("✦ Vous êtes en sécurité dans votre chambre ✦", NamedTextColor.GREEN)
+                                    Component.text(" Vous êtes en sécurité dans votre chambre ", NamedTextColor.GREEN)
                                             .decorate(TextDecoration.BOLD));
                             this.cancel();
                             return;
                         }
 
-                        p.sendActionBar(Component.text("➔ Ta Chambre : ", NamedTextColor.GOLD)
+                        p.sendActionBar(Component.text("-> Ta Chambre : ", NamedTextColor.GOLD)
                                 .append(Component.text((int) distance + "m", NamedTextColor.YELLOW)
                                         .decorate(TextDecoration.BOLD)));
 

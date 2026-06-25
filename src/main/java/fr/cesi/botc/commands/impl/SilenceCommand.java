@@ -42,7 +42,7 @@ public class SilenceCommand implements SubCommand {
     @Override
     public void execute(Player player, String[] args) {
         Bukkit.broadcast(
-                Component.text("🤫 Le Conteur réclame un silence absolu ! Micros coupés.", NamedTextColor.RED)
+                Component.text(" Le Conteur réclame un silence absolu ! Micros coupés.", NamedTextColor.RED)
                         .decorate(TextDecoration.BOLD));
         for (Player p : Bukkit.getOnlinePlayers()) {
             if (p.isOp())

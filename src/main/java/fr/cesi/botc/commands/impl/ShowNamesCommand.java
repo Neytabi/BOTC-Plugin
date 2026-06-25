@@ -49,7 +49,7 @@ public class ShowNamesCommand implements SubCommand {
                 nightTeam.removeEntry(p.getName());
             }
         }
-        player.sendMessage(Component.text("✓ Tous les pseudos sont désormais VISIBLES.", NamedTextColor.GREEN));
+        player.sendMessage(Component.text("v Tous les pseudos sont désormais VISIBLES.", NamedTextColor.GREEN));
     }
 
     @Override

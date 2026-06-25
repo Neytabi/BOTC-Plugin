@@ -42,7 +42,7 @@ public class ParoleAllCommand implements SubCommand {
     @Override
     public void execute(Player player, String[] args) {
         Bukkit.broadcast(
-                Component.text("🗣️ Le Conteur vous redonne la parole. Le débat reprend !", NamedTextColor.GREEN)
+                Component.text(" Le Conteur vous redonne la parole. Le débat reprend !", NamedTextColor.GREEN)
                         .decorate(TextDecoration.BOLD));
         for (Player p : Bukkit.getOnlinePlayers()) {
             if (p.isOp())

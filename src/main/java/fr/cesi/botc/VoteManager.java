@@ -81,7 +81,7 @@ public class VoteManager {
         // Si c'est un fantôme qui vote, on lui retire son jeton TOUT DE SUITE
         if (!voterBotc.isAlive()) {
             voterBotc.setGhostVote(false);
-            player.sendMessage(Component.text("[BOTC] 👻 Jeton consommé ! Tu as utilisé ton unique vote de fantôme.", NamedTextColor.RED));
+            player.sendMessage(Component.text("[BOTC]  Jeton consommé ! Tu as utilisé ton unique vote de fantôme.", NamedTextColor.RED));
         } else {
             player.sendMessage(Component.text("Ton vote OUI a ete pris en compte !", NamedTextColor.GREEN));
         }

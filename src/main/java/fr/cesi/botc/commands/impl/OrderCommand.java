@@ -43,19 +43,19 @@ public class OrderCommand implements SubCommand {
     public void execute(Player player, String[] args) {
         if (!main.isSeatsAssigned()) {
             player.sendMessage(Component.text(
-                    "🚨 L'ordre n'est pas encore généré ! Lance d'abord un /botc assis pour créer le cercle de cette game.",
+                    " L'ordre n'est pas encore généré ! Lance d'abord un /botc assis pour créer le cercle de cette game.",
                     NamedTextColor.RED));
             return;
         }
 
         player.sendMessage(
-                Component.text("=== 🔄 ORDRE DU CERCLE DE JEU (Du siège 1 à X) ===", NamedTextColor.DARK_PURPLE)
+                Component.text("===  ORDRE DU CERCLE DE JEU (Du siège 1 à X) ===", NamedTextColor.DARK_PURPLE)
                         .decorate(TextDecoration.BOLD));
 
         // On récupère et trie les joueurs selon leur index de chaise
         java.util.List<BotcPlayer> orderedPlayers = new java.util.ArrayList<>(main.getPlayersMap().values());
         orderedPlayers.removeIf(bp -> bp.getChairIndex() == -1);
-        orderedPlayers.sort(java.util.Comparator.comparingInt(BotcPlayer::getChairIndex));
+        orderedPlayers.sort(java.util.Comparator.comparingInt(bp -> bp.getChairIndex()));
 
         if (orderedPlayers.isEmpty()) {
             player.sendMessage(
@@ -64,13 +64,13 @@ public class OrderCommand implements SubCommand {
         }
 
         for (BotcPlayer bp : orderedPlayers) {
-            // On prépare le tag de vie (Vert si vivant, Rouge 💀 si mort)
+            // On prépare le tag de vie (Vert si vivant, Rouge  si mort)
             Component statusTag = bp.isAlive()
                     ? Component.text("[VIVANT]", NamedTextColor.GREEN)
-                    : Component.text("[MORT 💀]", NamedTextColor.RED);
+                    : Component.text("[MORT ]", NamedTextColor.RED);
 
             // On affiche la ligne : Siège #1 : Pseudo | [VIVANT] | Rôle : Diablotin
-            player.sendMessage(Component.text("🪑 Siège #" + (bp.getChairIndex() + 1) + " : ", NamedTextColor.GOLD)
+            player.sendMessage(Component.text(" Siège #" + (bp.getChairIndex() + 1) + " : ", NamedTextColor.GOLD)
                     .append(Component.text(bp.getPlayerName(), NamedTextColor.AQUA).decorate(TextDecoration.BOLD))
                     .append(Component.text(" | ", NamedTextColor.GRAY))
                     .append(statusTag)

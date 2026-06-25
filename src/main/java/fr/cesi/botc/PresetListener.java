@@ -43,7 +43,7 @@ public class PresetListener implements Listener {
         if (clicked.getType() == Material.ANVIL) {
             player.closeInventory();
             chatPromptPlayers.put(player.getUniqueId(), true);
-            player.sendMessage(Component.text("💬 TAPE LE NOM DE LA NOUVELLE MAP DANS TON CHAT (Sans espaces, ou tape 'annuler') :", NamedTextColor.LIGHT_PURPLE));
+            player.sendMessage(Component.text(" TAPE LE NOM DE LA NOUVELLE MAP DANS TON CHAT (Sans espaces, ou tape 'annuler') :", NamedTextColor.LIGHT_PURPLE));
             player.playSound(player.getLocation(), org.bukkit.Sound.BLOCK_ANVIL_USE, 0.5f, 1.0f);
             return;
         }
@@ -54,12 +54,12 @@ public class PresetListener implements Listener {
             if (meta == null) return;
 
             String displayName = plainText(meta.displayName());
-            String presetName = displayName.replace("🗺️", "").trim().toLowerCase();
+            String presetName = displayName.replace("", "").trim().toLowerCase();
 
             // CLIC DROIT -> SUPPRIMER
             if (event.isRightClick()) {
                 if (presetName.equals("default")) {
-                    player.sendMessage(Component.text("❌ Impossible de supprimer l'arène par défaut.", NamedTextColor.RED));
+                    player.sendMessage(Component.text("x Impossible de supprimer l'arène par défaut.", NamedTextColor.RED));
                     return;
                 }
                 main.getConfig().set("presets." + presetName, null);
@@ -69,14 +69,14 @@ public class PresetListener implements Listener {
                     main.setActivePreset("default");
                 }
 
-                player.sendMessage(Component.text("✓ Preset '" + presetName + "' supprimé de la base de données.", NamedTextColor.GREEN));
+                player.sendMessage(Component.text("v Preset '" + presetName + "' supprimé de la base de données.", NamedTextColor.GREEN));
                 player.playSound(player.getLocation(), org.bukkit.Sound.ENTITY_ITEM_BREAK, 0.6f, 0.8f);
                 presetView.openPresetMenu(player); // Rafraîchissement dynamique
             }
             // CLIC GAUCHE -> SÉLECTIONNER
             else if (event.isLeftClick()) {
                 main.setActivePreset(presetName);
-                player.sendMessage(Component.text("🗺️ Basculement de map réussi ! Preset chargé : " + presetName, NamedTextColor.GREEN));
+                player.sendMessage(Component.text(" Basculement de map réussi ! Preset chargé : " + presetName, NamedTextColor.GREEN));
                 player.playSound(player.getLocation(), org.bukkit.Sound.ITEM_BOOK_PAGE_TURN, 0.8f, 1.2f);
                 presetView.openPresetMenu(player); // Met à jour la carte brillante
             }
@@ -93,7 +93,7 @@ public class PresetListener implements Listener {
 
         String message = plainText(event.message()).trim();
         if (message.equalsIgnoreCase("annuler")) {
-            player.sendMessage(Component.text("❌ Création annulée.", NamedTextColor.RED));
+            player.sendMessage(Component.text("x Création annulée.", NamedTextColor.RED));
             Bukkit.getScheduler().runTask(main, () -> presetView.openPresetMenu(player));
             return;
         }
@@ -101,7 +101,7 @@ public class PresetListener implements Listener {
         // Nettoyage automatique du texte (Alphanumérique uniquement)
         String cleanName = message.toLowerCase().replaceAll("[^a-z0-9_]", "");
         if (cleanName.isEmpty()) {
-            player.sendMessage(Component.text("❌ Nom invalide (Lettres et chiffres uniquement, sans caractères spéciaux).", NamedTextColor.RED));
+            player.sendMessage(Component.text("x Nom invalide (Lettres et chiffres uniquement, sans caractères spéciaux).", NamedTextColor.RED));
             Bukkit.getScheduler().runTask(main, () -> presetView.openPresetMenu(player));
             return;
         }
@@ -113,7 +113,7 @@ public class PresetListener implements Listener {
                 main.getConfig().set("presets." + cleanName + ".chairs", new ArrayList<String>());
                 main.getConfig().set("presets." + cleanName + ".rooms", new ArrayList<String>());
                 main.saveConfig();
-                player.sendMessage(Component.text("✓ Nouveau preset '" + cleanName + "' initialisé et sélectionné !", NamedTextColor.GREEN));
+                player.sendMessage(Component.text("v Nouveau preset '" + cleanName + "' initialisé et sélectionné !", NamedTextColor.GREEN));
             }
             player.playSound(player.getLocation(), org.bukkit.Sound.UI_TOAST_CHALLENGE_COMPLETE, 0.5f, 1.2f);
             presetView.openPresetMenu(player);

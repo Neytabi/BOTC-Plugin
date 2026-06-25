@@ -39,7 +39,7 @@ public class TempsLibreCommand implements SubCommand {
     @Override
     public void execute(Player player, String[] args) {
         net.kyori.adventure.title.Title title = net.kyori.adventure.title.Title.title(
-                Component.text("🗣️ TEMPS LIBRE 🗣️", NamedTextColor.GREEN).decorate(TextDecoration.BOLD),
+                Component.text(" TEMPS LIBRE ", NamedTextColor.GREEN).decorate(TextDecoration.BOLD),
                 Component.text("Dispersez-vous et complotez en secret !", NamedTextColor.GRAY));
 
         // On force tout le monde à se lever pour qu'ils puissent courir partout
@@ -57,7 +57,7 @@ public class TempsLibreCommand implements SubCommand {
                         NamedTextColor.DARK_GREEN).decorate(TextDecoration.BOLD));
         Bukkit.broadcast(Component.text("=============================================", NamedTextColor.GREEN));
 
-        player.sendMessage(Component.text("➔ Prochaine étape : ", NamedTextColor.AQUA)
+        player.sendMessage(Component.text("-> Prochaine étape : ", NamedTextColor.AQUA)
                 .append(Component.text("Ouvrir le conseil", NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
                 .append(Component.text(" [CLIQUE POUR EXECUTER]", NamedTextColor.GREEN))
                 .clickEvent(net.kyori.adventure.text.event.ClickEvent.runCommand("/botc conseil")));

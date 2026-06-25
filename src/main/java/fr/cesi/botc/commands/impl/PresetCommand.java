@@ -50,22 +50,22 @@ public class PresetCommand implements SubCommand {
 
         // 1. LISTER LES PRESETS
         if (sub.equals("list")) {
-            player.sendMessage(Component.text("=== 🗺️ LISTE DES MAPS / PRESETS ===", NamedTextColor.DARK_PURPLE)
+            player.sendMessage(Component.text("===  LISTE DES MAPS / PRESETS ===", NamedTextColor.DARK_PURPLE)
                     .decorate(TextDecoration.BOLD));
             String active = main.getActivePreset();
 
             if (main.getConfig().getConfigurationSection("presets") == null) {
-                player.sendMessage(Component.text("• " + active + " ", NamedTextColor.GREEN)
+                player.sendMessage(Component.text("- " + active + " ", NamedTextColor.GREEN)
                         .append(Component.text("[ACTIF]", NamedTextColor.GOLD).decorate(TextDecoration.BOLD)));
                 return;
             }
 
             for (String key : main.getConfig().getConfigurationSection("presets").getKeys(false)) {
                 if (key.equalsIgnoreCase(active)) {
-                    player.sendMessage(Component.text("• " + key + " ", NamedTextColor.GREEN)
+                    player.sendMessage(Component.text("- " + key + " ", NamedTextColor.GREEN)
                             .append(Component.text("[ACTIF]", NamedTextColor.GOLD).decorate(TextDecoration.BOLD)));
                 } else {
-                    player.sendMessage(Component.text("• " + key, NamedTextColor.GRAY));
+                    player.sendMessage(Component.text("- " + key, NamedTextColor.GRAY));
                 }
             }
             return;
@@ -84,7 +84,7 @@ public class PresetCommand implements SubCommand {
                 main.getConfig().set("presets." + presetName + ".chairs", new ArrayList<String>());
                 main.getConfig().set("presets." + presetName + ".rooms", new ArrayList<String>());
                 main.saveConfig();
-                player.sendMessage(Component.text("✓ Preset '" + presetName + "' créé avec succès et sélectionné !",
+                player.sendMessage(Component.text("v Preset '" + presetName + "' créé avec succès et sélectionné !",
                         NamedTextColor.GREEN));
             } else {
                 player.sendMessage(
@@ -97,14 +97,14 @@ public class PresetCommand implements SubCommand {
         // 3. SÉLECTIONNER UN PRESET
         if (sub.equals("select")) {
             if (!main.getConfig().contains("presets." + presetName) && !presetName.equals("default")) {
-                player.sendMessage(Component.text("❌ Ce preset n'existe pas !", NamedTextColor.RED));
+                player.sendMessage(Component.text("x Ce preset n'existe pas !", NamedTextColor.RED));
                 return;
             }
             main.setActivePreset(presetName);
-            player.sendMessage(Component.text("🗺️ Map changée ! Preset actif désormais : " + presetName,
+            player.sendMessage(Component.text(" Map changée ! Preset actif désormais : " + presetName,
                     NamedTextColor.GREEN));
 
-            // 🌟 APPORT : TÉLÉPORTATION AUTOMATIQUE DU MJ AU TRIBUNAL DE LA NOUVELLE MAP
+            //  APPORT : TÉLÉPORTATION AUTOMATIQUE DU MJ AU TRIBUNAL DE LA NOUVELLE MAP
             if (main.getConfig().contains(main.getPresetPath("tribunal.x"))) {
                 String worldName = main.getConfig().getString(main.getPresetPath("tribunal.world"));
                 if (worldName != null) {
@@ -115,11 +115,11 @@ public class PresetCommand implements SubCommand {
                     if (world != null) {
                         org.bukkit.Location tribunalSpawn = new org.bukkit.Location(world, tx, ty + 1.0, tz);
 
-                        // 🌟 COUPORET DE TP GLOBAL : On embarque tout le monde (Joueurs + MJ)
+                        //  COUPORET DE TP GLOBAL : On embarque tout le monde (Joueurs + MJ)
                         for (Player p : Bukkit.getOnlinePlayers()) {
                             p.teleport(tribunalSpawn);
                             p.sendMessage(Component.text(
-                                    "⚡ Flash-TP ! Tout le village a été téléporté au Tribunal de la nouvelle map.",
+                                    " Flash-TP ! Tout le village a été téléporté au Tribunal de la nouvelle map.",
                                     NamedTextColor.AQUA, TextDecoration.ITALIC));
                             p.playSound(p.getLocation(), org.bukkit.Sound.ENTITY_ENDERMAN_TELEPORT, 0.5f, 1.0f);
                         }
@@ -142,7 +142,7 @@ public class PresetCommand implements SubCommand {
                 main.setActivePreset("default");
             }
             player.sendMessage(
-                    Component.text("✓ Preset '" + presetName + "' définitivement supprimé.", NamedTextColor.GREEN));
+                    Component.text("v Preset '" + presetName + "' définitivement supprimé.", NamedTextColor.GREEN));
         }
     }
 

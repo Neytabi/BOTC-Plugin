@@ -34,7 +34,7 @@ public class ChatBlockerListener implements Listener {
                 event.setCancelled(true);
 
                 // Optionnel : un petit message discret pour lui rappeler qu'il est bloqué
-                player.sendActionBar(net.kyori.adventure.text.Component.text("➔ Vous devez rester assis pendant le Tribunal !", net.kyori.adventure.text.format.NamedTextColor.RED));
+                player.sendActionBar(net.kyori.adventure.text.Component.text("-> Vous devez rester assis pendant le Tribunal !", net.kyori.adventure.text.format.NamedTextColor.RED));
             }
         }
     }

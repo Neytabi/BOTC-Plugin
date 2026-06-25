@@ -28,7 +28,7 @@ public class GrimoireView {
         Inventory inv = Bukkit.createInventory(null, 54, title);
 
         // ==========================================================
-        // 🔄 ALIGNEMENT DU GRIMOIRE SUR L'ORDRE DES CHAISES
+        //  ALIGNEMENT DU GRIMOIRE SUR L'ORDRE DES CHAISES
         // ==========================================================
         List<BotcPlayer> sortedPlayers = new ArrayList<>(main.getPlayersMap().values());
 
@@ -62,11 +62,11 @@ public class GrimoireView {
             slot++;
         }
 
-        // 🌟 APPORT : Bouton de Téléportation Flash au Tribunal (Slot 45)
+        //  APPORT : Bouton de Téléportation Flash au Tribunal (Slot 45)
         ItemStack btnTp = new ItemStack(Material.ENDER_PEARL);
         ItemMeta tpMeta = btnTp.getItemMeta();
         if (tpMeta != null) {
-            tpMeta.displayName(Component.text("⚡ Flash-TP au Tribunal", NamedTextColor.LIGHT_PURPLE)
+            tpMeta.displayName(Component.text(" Flash-TP au Tribunal", NamedTextColor.LIGHT_PURPLE)
                     .decorate(TextDecoration.BOLD));
             tpMeta.lore(List.of(
                     Component.text("Clique ici pour te téléporter instantanément", NamedTextColor.GRAY),
@@ -83,11 +83,11 @@ public class GrimoireView {
             String status = hidden ? "CACHÉS (Anonymat Actif)" : "VISIBLES";
 
             namesMeta.displayName(
-                    Component.text("🏷️ Visibilité des Pseudos", NamedTextColor.YELLOW).decorate(TextDecoration.BOLD));
+                    Component.text(" Visibilité des Pseudos", NamedTextColor.YELLOW).decorate(TextDecoration.BOLD));
             namesMeta.lore(List.of(
                     Component.text("Statut actuel : ", NamedTextColor.GRAY)
                             .append(Component.text(status, hidden ? NamedTextColor.RED : NamedTextColor.GREEN)),
-                    Component.text("🖱️ CLIC : Alterner la visibilité pour tous", NamedTextColor.GRAY)));
+                    Component.text(" CLIC : Alterner la visibilité pour tous", NamedTextColor.GRAY)));
             btnNames.setItemMeta(namesMeta);
         }
         inv.setItem(46, btnNames);
@@ -134,10 +134,10 @@ public class GrimoireView {
                 lore.add(Component.text("Rôle : " + botcPlayer.getRealRole(), NamedTextColor.AQUA));
             }
 
-            // 🌟 AJOUT ERGONOMIQUE : Petite notice d'utilisation pour le Conteur
+            //  AJOUT ERGONOMIQUE : Petite notice d'utilisation pour le Conteur
             lore.add(Component.text(" "));
-            lore.add(Component.text("🖱️ CLIC : Gérer la vie et le rôle", NamedTextColor.GRAY));
-            lore.add(Component.text("⌨️ SHIFT + CLIC : Se TP sur lui", NamedTextColor.LIGHT_PURPLE));
+            lore.add(Component.text(" CLIC : Gérer la vie et le rôle", NamedTextColor.GRAY));
+            lore.add(Component.text(" SHIFT + CLIC : Se TP sur lui", NamedTextColor.LIGHT_PURPLE));
 
             meta.lore(lore);
             head.setItemMeta(meta);

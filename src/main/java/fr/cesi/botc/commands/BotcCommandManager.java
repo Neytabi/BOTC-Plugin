@@ -122,7 +122,7 @@ public class BotcCommandManager implements CommandExecutor, TabCompleter {
         // voteoui a été gérée par l'ancien Listener potentiellement ou on peut l'ignorer ici vu qu'elle est censée être gérée via SubCommand si on veut.
         if (target != null) {
             if (target.requiresOp() && !player.isOp()) {
-                player.sendMessage(Component.text("➔ Tu n'es pas le Conteur de cette partie !", NamedTextColor.RED));
+                player.sendMessage(Component.text("-> Tu n'es pas le Conteur de cette partie !", NamedTextColor.RED));
                 return true;
             }
             try {

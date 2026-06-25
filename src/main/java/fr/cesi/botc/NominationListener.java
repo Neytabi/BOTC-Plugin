@@ -30,7 +30,7 @@ public class NominationListener implements Listener {
         String titleStr = PlainTextComponentSerializer.plainText().serialize(titleComponent);
 
         // ==========================================================
-        // 👥 UNIQUEMENT LA SÉLECTION DES SUSPECTS
+        //  UNIQUEMENT LA SÉLECTION DES SUSPECTS
         // ==========================================================
         if (!titleStr.equals("Nommer un suspect")) return;
         event.setCancelled(true);
@@ -50,7 +50,7 @@ public class NominationListener implements Listener {
 
         if (!isVierge && main.getHasBeenNominatedToday().contains(targetUUID)) {
             accuser.closeInventory();
-            accuser.sendMessage(Component.text("❌ Ce joueur a déjà fait l'objet d'une accusation aujourd'hui !", NamedTextColor.RED));
+            accuser.sendMessage(Component.text("x Ce joueur a déjà fait l'objet d'une accusation aujourd'hui !", NamedTextColor.RED));
             return;
         }
 
@@ -86,9 +86,9 @@ public class NominationListener implements Listener {
                 // Envoyer le message au MJ
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     if (p.isOp()) {
-                        p.sendMessage(Component.text("⚠️ ", NamedTextColor.RED)
+                        p.sendMessage(Component.text(" ", NamedTextColor.RED)
                                 .append(Component.text("La Vierge a été nommée !", NamedTextColor.YELLOW).decorate(TextDecoration.BOLD)));
-                        p.sendMessage(Component.text("➔ ", NamedTextColor.AQUA)
+                        p.sendMessage(Component.text("-> ", NamedTextColor.AQUA)
                                 .append(Component.text("Tuer l'accusateur (" + accuser.getName() + ")", NamedTextColor.RED).decorate(TextDecoration.BOLD))
                                 .append(Component.text(" [CLIQUE POUR EXECUTER]", NamedTextColor.GREEN))
                                 .clickEvent(net.kyori.adventure.text.event.ClickEvent.runCommand("/botc execute " + accuser.getName())));

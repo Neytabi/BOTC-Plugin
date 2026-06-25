@@ -40,7 +40,7 @@ public class PlayerRegistryListener implements Listener {
             case 0: // CASE 0 : BOUTON VOTE (Laine Verte / Rouge)
                 if (clicked.getType() == Material.RED_WOOL) {
                     player.closeInventory();
-                    player.sendMessage(Component.text("🚨 Tu as déjà utilisé ton vote fantôme pour cette partie !", NamedTextColor.RED));
+                    player.sendMessage(Component.text(" Tu as déjà utilisé ton vote fantôme pour cette partie !", NamedTextColor.RED));
                     player.playSound(player.getLocation(), org.bukkit.Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
                 } else if (clicked.getType() == Material.LIME_WOOL) {
                     main.getVoteManager().registerVote(player);
@@ -55,7 +55,7 @@ public class PlayerRegistryListener implements Listener {
             case 2: // CASE 2 : BOUTON NOMINATION (Livre écrit / Normal)
                 if (clicked.getType() == Material.BOOK) {
                     player.closeInventory();
-                    player.sendMessage(Component.text("🚨 Les morts ne peuvent plus désigner de suspect !", NamedTextColor.RED));
+                    player.sendMessage(Component.text(" Les morts ne peuvent plus désigner de suspect !", NamedTextColor.RED));
                     player.playSound(player.getLocation(), org.bukkit.Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
                 } else if (clicked.getType() == Material.WRITABLE_BOOK) {
                     new NominationView().openNominationMenu(player, main);
@@ -75,14 +75,14 @@ public class PlayerRegistryListener implements Listener {
 
             case 8: // CASE 8 : LE PAPIER (Demander la parole)
                 if (bp != null && bp.isAlive()) {
-                    player.sendMessage(Component.text("❌ Tu es vivant ! Tu as déjà le droit de parler au Conseil.", NamedTextColor.RED));
+                    player.sendMessage(Component.text("x Tu es vivant ! Tu as déjà le droit de parler au Conseil.", NamedTextColor.RED));
                     return;
                 }
 
                 player.closeInventory();
                 player.sendMessage(Component.text("Demande de parole envoyée aux Conteurs.", NamedTextColor.GREEN));
 
-                Component prompt = Component.text("💀 Le fantôme " + player.getName() + " demande la parole. ", NamedTextColor.GOLD)
+                Component prompt = Component.text(" Le fantôme " + player.getName() + " demande la parole. ", NamedTextColor.GOLD)
                         .append(Component.text("[ACCORDER]", NamedTextColor.GREEN).decorate(TextDecoration.BOLD)
                                 .clickEvent(net.kyori.adventure.text.event.ClickEvent.runCommand("/botc grantparole " + player.getName())));
 

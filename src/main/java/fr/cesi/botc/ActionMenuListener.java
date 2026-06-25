@@ -27,7 +27,7 @@ public class ActionMenuListener implements Listener {
         Component titleComponent = event.getView().title();
         String titleStr = PlainTextComponentSerializer.plainText().serialize(titleComponent);
 
-        // 🌟 CORRECTION : Ce menu n'intercepte PLUS DU TOUT le Registre ni le Tribunal
+        //  CORRECTION : Ce menu n'intercepte PLUS DU TOUT le Registre ni le Tribunal
         if (!titleStr.startsWith("Action : "))
             return;
         event.setCancelled(true);

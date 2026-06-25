@@ -68,7 +68,7 @@ public class JourCommand implements SubCommand {
             }
         }.runTaskTimer(main, 0L, 1L);
 
-        player.sendMessage(Component.text("➔ Prochaine étape : ", NamedTextColor.AQUA)
+        player.sendMessage(Component.text("-> Prochaine étape : ", NamedTextColor.AQUA)
                 .append(Component.text("Annoncer les morts", NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
                 .append(Component.text(" [CLIQUE POUR EXECUTER]", NamedTextColor.GREEN))
                 .clickEvent(net.kyori.adventure.text.event.ClickEvent.runCommand("/botc mort")));
@@ -99,7 +99,7 @@ public class JourCommand implements SubCommand {
         }
         // Titre du réveil
         net.kyori.adventure.title.Title wakeTitle = net.kyori.adventure.title.Title.title(
-                Component.text("🌅 LE RÉVEIL 🌅", NamedTextColor.YELLOW).decorate(TextDecoration.BOLD),
+                Component.text(" LE RÉVEIL ", NamedTextColor.YELLOW).decorate(TextDecoration.BOLD),
                 Component.text("Regagnez le Tribunal pour le Conseil.", NamedTextColor.LIGHT_PURPLE));
         for (Player p : Bukkit.getOnlinePlayers()) {
 
@@ -125,14 +125,14 @@ public class JourCommand implements SubCommand {
 
                     if (distance < 3.0) {
                         p.sendActionBar(
-                                Component.text("✦ Vous êtes arrivé à la salle du conseil ✦", NamedTextColor.GREEN)
+                                Component.text(" Vous êtes arrivé à la salle du conseil ", NamedTextColor.GREEN)
                                         .decorate(TextDecoration.BOLD));
                         p.playSound(p.getLocation(), org.bukkit.Sound.UI_TOAST_CHALLENGE_COMPLETE, 0.4f, 1.5f);
                         this.cancel();
                         return;
                     }
 
-                    p.sendActionBar(Component.text("➔ Salle du Conseil : ", NamedTextColor.GOLD)
+                    p.sendActionBar(Component.text("-> Salle du Conseil : ", NamedTextColor.GOLD)
                             .append(Component.text((int) distance + "m", NamedTextColor.YELLOW)
                                     .decorate(TextDecoration.BOLD)));
 

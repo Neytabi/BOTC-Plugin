@@ -25,7 +25,7 @@ public class PresetView {
     }
 
     public void openPresetMenu(Player player) {
-        Inventory inv = Bukkit.createInventory(null, 27, Component.text("🗺️ Gestion des Presets Maps", NamedTextColor.DARK_PURPLE).decorate(TextDecoration.BOLD));
+        Inventory inv = Bukkit.createInventory(null, 27, Component.text(" Gestion des Presets Maps", NamedTextColor.DARK_PURPLE).decorate(TextDecoration.BOLD));
 
         // Remplissage decoratif avec des vitres grises
         ItemStack filler = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
@@ -62,22 +62,22 @@ public class PresetView {
 
             if (meta != null) {
                 if (isActive) {
-                    meta.displayName(Component.text("🗺️ " + name.toUpperCase(), NamedTextColor.GOLD).decorate(TextDecoration.BOLD));
+                    meta.displayName(Component.text(" " + name.toUpperCase(), NamedTextColor.GOLD).decorate(TextDecoration.BOLD));
                     meta.addEnchant(Enchantment.MENDING, 1, true);
                     meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
                 } else {
-                    meta.displayName(Component.text("🗺️ " + name, NamedTextColor.YELLOW));
+                    meta.displayName(Component.text(" " + name, NamedTextColor.YELLOW));
                 }
 
                 List<Component> lore = new ArrayList<>();
                 lore.add(Component.text("---------------------------------", NamedTextColor.GRAY));
                 if (isActive) {
-                    lore.add(Component.text("▶ MAP ACTUELLE DE LA PARTIE ◀", NamedTextColor.GREEN).decorate(TextDecoration.BOLD));
+                    lore.add(Component.text("> MAP ACTUELLE DE LA PARTIE <", NamedTextColor.GREEN).decorate(TextDecoration.BOLD));
                 } else {
-                    lore.add(Component.text("🖱️ CLIC GAUCHE : Activer cette arène", NamedTextColor.AQUA));
+                    lore.add(Component.text(" CLIC GAUCHE : Activer cette arène", NamedTextColor.AQUA));
                 }
                 if (!name.equals("default")) {
-                    lore.add(Component.text("🖱️ CLIC DROIT : Supprimer définitivement", NamedTextColor.RED));
+                    lore.add(Component.text(" CLIC DROIT : Supprimer définitivement", NamedTextColor.RED));
                 }
                 meta.lore(lore);
                 item.setItemMeta(meta);
@@ -90,7 +90,7 @@ public class PresetView {
         ItemStack anvil = new ItemStack(Material.ANVIL);
         ItemMeta anvilMeta = anvil.getItemMeta();
         if (anvilMeta != null) {
-            anvilMeta.displayName(Component.text("➕ Créer une nouvelle Map", NamedTextColor.GREEN).decorate(TextDecoration.BOLD));
+            anvilMeta.displayName(Component.text(" Créer une nouvelle Map", NamedTextColor.GREEN).decorate(TextDecoration.BOLD));
             List<Component> anvilLore = new ArrayList<>();
             anvilLore.add(Component.text("Génère un profil de configuration vierge.", NamedTextColor.GRAY));
             anvilLore.add(Component.text("Tu saisiras le nom directement dans ton chat !", NamedTextColor.YELLOW));

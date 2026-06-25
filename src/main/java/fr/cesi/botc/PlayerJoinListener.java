@@ -34,7 +34,7 @@ public class PlayerJoinListener implements Listener {
                     org.bukkit.Material.ENCHANTED_BOOK);
             org.bukkit.inventory.meta.ItemMeta meta = livreMJ.getItemMeta();
             if (meta != null) {
-                meta.displayName(net.kyori.adventure.text.Component.text("📖 Le Grimoire du Conteur",
+                meta.displayName(net.kyori.adventure.text.Component.text(" Le Grimoire du Conteur",
                         net.kyori.adventure.text.format.NamedTextColor.DARK_PURPLE));
                 livreMJ.setItemMeta(meta);
             }
@@ -43,12 +43,12 @@ public class PlayerJoinListener implements Listener {
                 player.getInventory().addItem(livreMJ);
             }
         } else {
-            // 👤 Objet des Joueurs (Livre Normal) -> AJOUTÉ ICI !
+            //  Objet des Joueurs (Livre Normal) -> AJOUTÉ ICI !
             org.bukkit.inventory.ItemStack registreJoueur = new org.bukkit.inventory.ItemStack(
                     org.bukkit.Material.BOOK);
             org.bukkit.inventory.meta.ItemMeta meta = registreJoueur.getItemMeta();
             if (meta != null) {
-                meta.displayName(net.kyori.adventure.text.Component.text("📜 Registre du Tribunal",
+                meta.displayName(net.kyori.adventure.text.Component.text(" Registre du Tribunal",
                         net.kyori.adventure.text.format.NamedTextColor.DARK_GREEN));
                 registreJoueur.setItemMeta(meta);
             }
@@ -59,7 +59,7 @@ public class PlayerJoinListener implements Listener {
         }
 
         // =========================================================================
-        // 🌟 AJOUT : RE-FIXATION AUTOMATIQUE SUR LA CHAISE APRÈS UN CRASH
+        //  AJOUT : RE-FIXATION AUTOMATIQUE SUR LA CHAISE APRÈS UN CRASH
         // =========================================================================
         BotcPlayer bp = main.getPlayersMap().get(player.getUniqueId());
         if (main.isSeatsAssigned() && bp != null && bp.getChairIndex() != -1 && !player.isOp()) {
@@ -111,7 +111,7 @@ public class PlayerJoinListener implements Listener {
                         }
                         chair.addPassenger(player);
                         player.sendMessage(
-                                Component.text("✓ Tu as été replacé automatiquement sur ton siège après ton crash.",
+                                Component.text("v Tu as été replacé automatiquement sur ton siège après ton crash.",
                                         NamedTextColor.GREEN));
                     }
                 }
@@ -123,10 +123,10 @@ public class PlayerJoinListener implements Listener {
         player.sendMessage(Component.text("  Bienvenue à Ravenswood Bluff (BOTC) !  ", NamedTextColor.GOLD)
                 .decorate(TextDecoration.BOLD));
         player.sendMessage(Component.text("=============================================", NamedTextColor.DARK_PURPLE));
-        player.sendMessage(Component.text("• Écoutez attentivement le Conteur.", NamedTextColor.GRAY));
-        player.sendMessage(Component.text("• Ne trichez pas pendant la nuit.", NamedTextColor.GRAY));
+        player.sendMessage(Component.text("- Écoutez attentivement le Conteur.", NamedTextColor.GRAY));
+        player.sendMessage(Component.text("- Ne trichez pas pendant la nuit.", NamedTextColor.GRAY));
         player.sendMessage(Component.text(
-                "• Pour voter lors d'une accusation, cliquez sur le bouton vert dans le chat.", NamedTextColor.YELLOW));
+                "- Pour voter lors d'une accusation, cliquez sur le bouton vert dans le chat.", NamedTextColor.YELLOW));
         player.sendMessage(Component.text("=============================================", NamedTextColor.DARK_PURPLE));
         player.sendMessage(Component.text("/botc help pour avoir les commandes", NamedTextColor.GRAY));
         player.sendMessage(Component.text("Plugin made by Pill0N and Neytabi", NamedTextColor.RED));

@@ -49,9 +49,9 @@ public class VcMuteCommand implements SubCommand {
         if (target != null) {
             main.getVcMutedPlayers().add(target.getUniqueId());
             target.sendMessage(
-                    Component.text("🤫 Le Conteur a temporairement coupé ton micro.", NamedTextColor.RED));
+                    Component.text(" Le Conteur a temporairement coupé ton micro.", NamedTextColor.RED));
             player.sendMessage(
-                    Component.text("✓ Micro de " + target.getName() + " coupé via l'API.", NamedTextColor.GREEN));
+                    Component.text("v Micro de " + target.getName() + " coupé via l'API.", NamedTextColor.GREEN));
         } else {
             player.sendMessage(Component.text("Joueur introuvable.", NamedTextColor.RED));
         }

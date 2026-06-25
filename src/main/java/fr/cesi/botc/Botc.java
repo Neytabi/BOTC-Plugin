@@ -26,7 +26,7 @@ public final class Botc extends JavaPlugin {
     private final java.util.HashMap<java.util.UUID, Boolean> isAskingQuestion = new java.util.HashMap<>();
     private boolean isCouncilOpen = false;
 
-    // 🌟 SÉCURISATION DU STATUT DES MENUS ET DU VOTE DE MAP
+    //  SÉCURISATION DU STATUT DES MENUS ET DU VOTE DE MAP
     private boolean nameTagsHidden = false;
     private boolean isMapVoteOpen = false;
     private final java.util.HashMap<java.util.UUID, String> mapVotes = new java.util.HashMap<>();
@@ -130,7 +130,7 @@ public final class Botc extends JavaPlugin {
             service.registerPlugin(this.voicechatPlugin);
             getLogger().info("Liaison initiale avec Simple Voice Chat API réussie !");
 
-            // --- 🪄 LE FIX DE FORCAGE POUR PLUGMAN 🪄 ---
+            // ---  LE FIX DE FORCAGE POUR PLUGMAN  ---
             try {
                 de.maxhenkel.voicechat.api.VoicechatApi foundApi = null;
 
@@ -168,7 +168,7 @@ public final class Botc extends JavaPlugin {
                         if (field.getType().isAssignableFrom(foundApi.getClass()) || field.getType().getName().contains("Voicechat")) {
                             field.setAccessible(true);
                             field.set(this.voicechatPlugin, foundApi);
-                            getLogger().info("⚠️ [PLUGMAN REPAIR] Connexion au serveur vocal restaurée avec succès !");
+                            getLogger().info(" [PLUGMAN REPAIR] Connexion au serveur vocal restaurée avec succès !");
                             break;
                         }
                     }
@@ -215,16 +215,10 @@ public final class Botc extends JavaPlugin {
         this.seatsAssigned = false;
         this.isCouncilOpen = false;
 
-        // 🔄 À REMPLACER DANS LA MÉTHODE resetGame() DE Botc.java :
-        for (java.util.UUID uuid : new java.util.HashSet<>(vcMutedPlayers)) {
-            org.bukkit.entity.Player p = org.bukkit.Bukkit.getPlayer(uuid);
-            if (p != null && p.isOnline()) {
-                org.bukkit.Bukkit.dispatchCommand(org.bukkit.Bukkit.getConsoleSender(), "voicechat servermute " + p.getName());
-            }
-        }
+        //  On vide simplement la liste des mutes, le BotcVoicechatPlugin s'occupe du reste.
         this.vcMutedPlayers.clear();
 
-        // 🌟 CORRECTION MULTI-MAP : On utilise getPresetPath("rooms")
+        //  CORRECTION MULTI-MAP : On utilise getPresetPath("rooms")
         List<String> roomsStr = getConfig().getStringList(getPresetPath("rooms"));
         for (String roomStr : roomsStr) {
             String[] parts = roomStr.split(",");
@@ -247,13 +241,13 @@ public final class Botc extends JavaPlugin {
                 p.getInventory().setHelmet(new org.bukkit.inventory.ItemStack(org.bukkit.Material.AIR));
                 p.setGameMode(org.bukkit.GameMode.SURVIVAL);
 
-                // 🌟 SYNCHRONISATION PARFAITE AVEC PLAYERJOINLISTENER
+                //  SYNCHRONISATION PARFAITE AVEC PLAYERJOINLISTENER
                 p.getInventory().clear();
                 if (p.isOp()) {
                     org.bukkit.inventory.ItemStack livreMJ = new org.bukkit.inventory.ItemStack(org.bukkit.Material.ENCHANTED_BOOK);
                     org.bukkit.inventory.meta.ItemMeta meta = livreMJ.getItemMeta();
                     if (meta != null) {
-                        meta.displayName(Component.text("📖 Le Grimoire du Conteur", NamedTextColor.DARK_PURPLE));
+                        meta.displayName(Component.text(" Le Grimoire du Conteur", NamedTextColor.DARK_PURPLE));
                         livreMJ.setItemMeta(meta);
                     }
                     p.getInventory().setItem(0, livreMJ);
@@ -261,7 +255,7 @@ public final class Botc extends JavaPlugin {
                     org.bukkit.inventory.ItemStack registreJoueur = new org.bukkit.inventory.ItemStack(org.bukkit.Material.BOOK);
                     org.bukkit.inventory.meta.ItemMeta meta = registreJoueur.getItemMeta();
                     if (meta != null) {
-                        meta.displayName(Component.text("📜 Registre du Tribunal", NamedTextColor.DARK_GREEN));
+                        meta.displayName(Component.text(" Registre du Tribunal", NamedTextColor.DARK_GREEN));
                         registreJoueur.setItemMeta(meta);
                     }
                     p.getInventory().setItem(0, registreJoueur);
@@ -275,7 +269,7 @@ public final class Botc extends JavaPlugin {
         if (victim == null || !victim.isOnline()) return;
 
         net.kyori.adventure.title.Title deathTitle = net.kyori.adventure.title.Title.title(
-                Component.text("💀 TU ES MORT 💀", net.kyori.adventure.text.format.NamedTextColor.DARK_RED)
+                Component.text(" TU ES MORT ", net.kyori.adventure.text.format.NamedTextColor.DARK_RED)
                         .decorate(net.kyori.adventure.text.format.TextDecoration.BOLD),
                 Component.text("Tu deviens un fantôme. Il te reste 1 ultime vote.", net.kyori.adventure.text.format.NamedTextColor.GRAY)
         );
@@ -285,9 +279,9 @@ public final class Botc extends JavaPlugin {
         victim.getWorld().strikeLightningEffect(victim.getLocation());
 
         victim.sendMessage(Component.text("=============================================", net.kyori.adventure.text.format.NamedTextColor.DARK_RED));
-        victim.sendMessage(Component.text("👻 BIENVENUE DANS L'AU-DELÀ", net.kyori.adventure.text.format.NamedTextColor.RED).decorate(net.kyori.adventure.text.format.TextDecoration.BOLD));
-        victim.sendMessage(Component.text("• Tu n'as plus de rôle actif et tu ne peux plus nommer de suspect.", net.kyori.adventure.text.format.NamedTextColor.GRAY));
-        victim.sendMessage(Component.text("• Ton bouton de vote dans ton Registre est encore actif pour UN SEUL vote.", net.kyori.adventure.text.format.NamedTextColor.YELLOW));
+        victim.sendMessage(Component.text(" BIENVENUE DANS L'AU-DELÀ", net.kyori.adventure.text.format.NamedTextColor.RED).decorate(net.kyori.adventure.text.format.TextDecoration.BOLD));
+        victim.sendMessage(Component.text("- Tu n'as plus de rôle actif et tu ne peux plus nommer de suspect.", net.kyori.adventure.text.format.NamedTextColor.GRAY));
+        victim.sendMessage(Component.text("- Ton bouton de vote dans ton Registre est encore actif pour UN SEUL vote.", net.kyori.adventure.text.format.NamedTextColor.YELLOW));
         victim.sendMessage(Component.text("=============================================", net.kyori.adventure.text.format.NamedTextColor.DARK_RED));
     }
 
@@ -295,7 +289,7 @@ public final class Botc extends JavaPlugin {
         targetBotc.setAlive(false);
 
         if (targetBotc.getRealRole().equalsIgnoreCase("Diablotin")) {
-            long vivantsRestants = playersMap.values().stream().filter(BotcPlayer::isAlive).count();
+            long vivantsRestants = playersMap.values().stream().filter(bp -> bp != null && bp.isAlive()).count();
 
             if (vivantsRestants >= 5) {
                 BotcPlayer scarletWoman = null;
@@ -381,7 +375,7 @@ public final class Botc extends JavaPlugin {
 
         // Création d'un bandeau violet/or super propre en haut de l'écran
         BossBar roleBar = BossBar.bossBar(
-                Component.text("🎭 Ton Rôle Secret : ", NamedTextColor.LIGHT_PURPLE)
+                Component.text(" Ton Rôle Secret : ", NamedTextColor.LIGHT_PURPLE)
                         .append(Component.text(roleName, NamedTextColor.GOLD).decorate(TextDecoration.BOLD)),
                 1.0f, // Remplie à 100%
                 BossBar.Color.PURPLE,

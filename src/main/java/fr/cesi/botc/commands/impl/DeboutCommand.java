@@ -84,7 +84,7 @@ public class DeboutCommand implements SubCommand {
         Bukkit.broadcast(
                 Component.text("[BOTC] Le conseil est terminé, vous pouvez vous lever.", NamedTextColor.GREEN));
 
-        player.sendMessage(Component.text("➔ Prochaine étape : ", NamedTextColor.AQUA)
+        player.sendMessage(Component.text("-> Prochaine étape : ", NamedTextColor.AQUA)
                 .append(Component.text("Mettre la nuit", NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
                 .append(Component.text(" [CLIQUE POUR EXECUTER]", NamedTextColor.GREEN))
                 .clickEvent(net.kyori.adventure.text.event.ClickEvent.runCommand("/botc nuit")));

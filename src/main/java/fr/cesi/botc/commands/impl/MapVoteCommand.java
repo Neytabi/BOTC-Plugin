@@ -51,7 +51,7 @@ public class MapVoteCommand implements SubCommand {
 
         if (subAction.equals("start") && player.isOp()) {
             if (main.isMapVoteOpen()) {
-                player.sendMessage(Component.text("❌ Un scrutin de map est déjà ouvert !", NamedTextColor.RED));
+                player.sendMessage(Component.text("x Un scrutin de map est déjà ouvert !", NamedTextColor.RED));
                 return;
             }
 
@@ -63,14 +63,14 @@ public class MapVoteCommand implements SubCommand {
             Bukkit.broadcast(
                     Component.text("=========================================", NamedTextColor.DARK_PURPLE));
             Bukkit.broadcast(
-                    Component.text("🗳️ SCRUTIN OUVERT : ÉLECTION DE LA PROCHAINE MAP !", NamedTextColor.GOLD)
+                    Component.text(" SCRUTIN OUVERT : ÉLECTION DE LA PROCHAINE MAP !", NamedTextColor.GOLD)
                             .decorate(TextDecoration.BOLD));
             Bukkit.broadcast(
                     Component.text("Cliquez sur l'arène de votre choix pour voter :", NamedTextColor.LIGHT_PURPLE));
 
             if (main.getConfig().getConfigurationSection("presets") != null) {
                 for (String presetKey : main.getConfig().getConfigurationSection("presets").getKeys(false)) {
-                    Component voteButton = Component.text(" 🗺️ Map: ", NamedTextColor.GRAY)
+                    Component voteButton = Component.text("  Map: ", NamedTextColor.GRAY)
                             .append(Component.text(presetKey, NamedTextColor.AQUA).decorate(TextDecoration.BOLD))
                             .append(Component.text(" [CLIQUE POUR VOTER]", NamedTextColor.GREEN)
                                     .decorate(TextDecoration.BOLD)
@@ -93,7 +93,7 @@ public class MapVoteCommand implements SubCommand {
 
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         p.sendActionBar(
-                                Component.text("🗳️ Fin des votes de map dans : ", NamedTextColor.LIGHT_PURPLE)
+                                Component.text(" Fin des votes de map dans : ", NamedTextColor.LIGHT_PURPLE)
                                         .append(Component.text(countdown[0] + "s", NamedTextColor.YELLOW)
                                                 .decorate(TextDecoration.BOLD))
                                         .append(Component.text(" (" + main.getMapVotes().size() + " votes émis)",
@@ -122,12 +122,12 @@ public class MapVoteCommand implements SubCommand {
 
         if (subAction.equals("choose") && args.length > 2) {
             if (!main.isMapVoteOpen()) {
-                player.sendMessage(Component.text("❌ Le vote est clos ou a expiré.", NamedTextColor.RED));
+                player.sendMessage(Component.text("x Le vote est clos ou a expiré.", NamedTextColor.RED));
                 return;
             }
 
             if (main.getMapVotes().containsKey(player.getUniqueId())) {
-                player.sendMessage(Component.text("❌ Vous avez déjà voté pour une map !", NamedTextColor.RED));
+                player.sendMessage(Component.text("x Vous avez déjà voté pour une map !", NamedTextColor.RED));
                 return;
             }
 
@@ -135,7 +135,7 @@ public class MapVoteCommand implements SubCommand {
             main.getMapVotes().put(player.getUniqueId(), choice);
 
             Bukkit.broadcast(Component.text(
-                    "🗳️ " + player.getName() + " a voté ! (Total : " + main.getMapVotes().size() + " votes)",
+                    " " + player.getName() + " a voté ! (Total : " + main.getMapVotes().size() + " votes)",
                     NamedTextColor.GRAY));
             player.playSound(player.getLocation(), org.bukkit.Sound.BLOCK_NOTE_BLOCK_PLING, 0.5f, 1.5f);
             return;
@@ -153,7 +153,7 @@ public class MapVoteCommand implements SubCommand {
 
             if (main.getMapVotes().isEmpty()) {
                 Bukkit.broadcast(
-                        Component.text("🗳️ Clôture du vote : Aucun joueur n'a émis de choix. Map inchangée.",
+                        Component.text(" Clôture du vote : Aucun joueur n'a émis de choix. Map inchangée.",
                                 NamedTextColor.YELLOW));
                 return;
             }
@@ -169,15 +169,15 @@ public class MapVoteCommand implements SubCommand {
 
             Bukkit.broadcast(Component.text("=========================================", NamedTextColor.GOLD));
             Bukkit.broadcast(
-                    Component.text("🗳️ LE SCRUTIN EST CLOS !", NamedTextColor.GOLD).decorate(TextDecoration.BOLD));
+                    Component.text(" LE SCRUTIN EST CLOS !", NamedTextColor.GOLD).decorate(TextDecoration.BOLD));
 
             tally.forEach((mapName, totalVotes) -> {
-                Bukkit.broadcast(Component.text(" • " + mapName + " : ", NamedTextColor.GRAY)
+                Bukkit.broadcast(Component.text(" - " + mapName + " : ", NamedTextColor.GRAY)
                         .append(Component.text(totalVotes + " Vote(s)", NamedTextColor.AQUA)));
             });
 
             Bukkit.broadcast(
-                    Component.text("🏆 LA MAP GAGNANTE EST : " + winner.toUpperCase() + " !", NamedTextColor.GREEN)
+                    Component.text(" LA MAP GAGNANTE EST : " + winner.toUpperCase() + " !", NamedTextColor.GREEN)
                             .decorate(TextDecoration.BOLD));
             Bukkit.broadcast(Component.text("=========================================", NamedTextColor.GOLD));
 
@@ -191,7 +191,7 @@ public class MapVoteCommand implements SubCommand {
 
         // Si la sous-action est invalide ou problème de permissions
         if (!player.isOp() && (subAction.equals("start") || subAction.equals("stop"))) {
-            player.sendMessage(Component.text("➔ Tu n'es pas le Conteur de cette partie !", NamedTextColor.RED));
+            player.sendMessage(Component.text("-> Tu n'es pas le Conteur de cette partie !", NamedTextColor.RED));
         }
     }
 

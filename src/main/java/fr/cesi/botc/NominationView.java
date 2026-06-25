@@ -1,4 +1,4 @@
-// 🔄 REMPLACE TOUTE TA CLASSE NominationView PAR CELLE-CI :
+//  REMPLACE TOUTE TA CLASSE NominationView PAR CELLE-CI :
 package fr.cesi.botc;
 
 import net.kyori.adventure.text.Component;

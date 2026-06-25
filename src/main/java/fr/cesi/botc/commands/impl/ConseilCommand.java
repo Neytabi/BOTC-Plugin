@@ -46,7 +46,7 @@ public class ConseilCommand implements SubCommand {
         main.getHasBeenNominatedToday().clear();
         // 1. Préparation de l'affichage à l'écran
         net.kyori.adventure.title.Title title = net.kyori.adventure.title.Title.title(
-                Component.text("⚖️ LE CONSEIL COMMENCE ⚖️", NamedTextColor.GOLD).decorate(TextDecoration.BOLD),
+                Component.text(" LE CONSEIL COMMENCE ", NamedTextColor.GOLD).decorate(TextDecoration.BOLD),
                 Component.text("Retournez au tribunal ! Fin du temps libre.", NamedTextColor.GRAY));
 
         // 2. Récupération de la position du Tribunal sauvegardée
@@ -93,7 +93,7 @@ public class ConseilCommand implements SubCommand {
 
                     // Quand le joueur arrive à moins de 3 blocs du centre
                     if (distance < 3.0) {
-                        p.sendActionBar(Component.text("✦ Vous êtes arrivé à votre siège ✦", NamedTextColor.GREEN)
+                        p.sendActionBar(Component.text(" Vous êtes arrivé à votre siège ", NamedTextColor.GREEN)
                                 .decorate(TextDecoration.BOLD));
                         p.playSound(p.getLocation(), org.bukkit.Sound.UI_TOAST_CHALLENGE_COMPLETE, 0.4f, 1.5f);
                         this.cancel();
@@ -101,7 +101,7 @@ public class ConseilCommand implements SubCommand {
                     }
 
                     // Affichage de la distance dans la barre d'action
-                    p.sendActionBar(Component.text("➔ Retour au Conseil : ", NamedTextColor.GOLD)
+                    p.sendActionBar(Component.text("-> Retour au Conseil : ", NamedTextColor.GOLD)
                             .append(Component.text((int) distance + "m", NamedTextColor.YELLOW)
                                     .decorate(TextDecoration.BOLD)));
 
@@ -133,7 +133,7 @@ public class ConseilCommand implements SubCommand {
                 .decorate(TextDecoration.BOLD));
         Bukkit.broadcast(Component.text("=============================================", NamedTextColor.GOLD));
 
-        player.sendMessage(Component.text("➔ Prochaine étape : ", NamedTextColor.AQUA)
+        player.sendMessage(Component.text("-> Prochaine étape : ", NamedTextColor.AQUA)
                 .append(Component.text("S'asseoir au tribunal", NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
                 .append(Component.text(" [CLIQUE POUR EXECUTER]", NamedTextColor.GREEN))
                 .clickEvent(net.kyori.adventure.text.event.ClickEvent.runCommand("/botc assis")));

@@ -26,7 +26,7 @@ public class BotcVoicechatPlugin implements VoicechatPlugin {
         registration.registerEvent(de.maxhenkel.voicechat.api.events.VoicechatServerStartedEvent.class,
                 this::onServerStarted);
 
-        // 🌟 INTERCEPTION DES FLUX AUDIO DU MICRO
+        //  INTERCEPTION DES FLUX AUDIO DU MICRO
         registration.registerEvent(de.maxhenkel.voicechat.api.events.MicrophonePacketEvent.class, event -> {
             var senderConnection = event.getSenderConnection();
             if (senderConnection == null)
@@ -35,7 +35,7 @@ public class BotcVoicechatPlugin implements VoicechatPlugin {
             // Récupération de l'UUID du joueur qui est en train de parler
             java.util.UUID playerUUID = senderConnection.getPlayer().getUuid();
 
-            // 🛡️ EXCLUSION DES MJ : Si le joueur est OP, on quitte immédiatement (il n'est
+            //  EXCLUSION DES MJ : Si le joueur est OP, on quitte immédiatement (il n'est
             // jamais mute)
             org.bukkit.entity.Player p = org.bukkit.Bukkit.getPlayer(playerUUID);
             if (p != null && p.isOp()) {

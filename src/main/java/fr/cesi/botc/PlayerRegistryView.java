@@ -22,7 +22,7 @@ public class PlayerRegistryView {
         BotcPlayer bp = main.getPlayersMap().get(player.getUniqueId());
 
         // ==========================================
-        // 🗳️ GESTION DU BOUTON VOTE (Slot 0)
+        //  GESTION DU BOUTON VOTE (Slot 0)
         // ==========================================
         ItemStack vote;
         ItemMeta vMeta;
@@ -31,7 +31,7 @@ public class PlayerRegistryView {
             vote = new ItemStack(Material.RED_WOOL);
             vMeta = vote.getItemMeta();
             if (vMeta != null) {
-                vMeta.displayName(Component.text("❌ VOTE IMPOSSIBLE", NamedTextColor.RED));
+                vMeta.displayName(Component.text("x VOTE IMPOSSIBLE", NamedTextColor.RED));
                 List<Component> lore = new ArrayList<>();
                 lore.add(Component.text("Tu es mort et ton unique jeton de", NamedTextColor.GRAY));
                 lore.add(Component.text("vote fantôme a déjà été consommé.", NamedTextColor.GRAY));
@@ -42,10 +42,10 @@ public class PlayerRegistryView {
             vote = new ItemStack(Material.LIME_WOOL);
             vMeta = vote.getItemMeta();
             if (vMeta != null) {
-                vMeta.displayName(Component.text("🗳️ LEVER LA MAIN (Voter OUI)", NamedTextColor.GREEN));
+                vMeta.displayName(Component.text(" LEVER LA MAIN (Voter OUI)", NamedTextColor.GREEN));
                 List<Component> lore = new ArrayList<>();
                 if (bp != null && !bp.isAlive()) {
-                    lore.add(Component.text("⚠️ ATTENTION : C'est ton DERNIER vote fantôme !", NamedTextColor.YELLOW));
+                    lore.add(Component.text(" ATTENTION : C'est ton DERNIER vote fantôme !", NamedTextColor.YELLOW));
                 } else {
                     lore.add(Component.text("Clique pour voter OUI à l'accusation en cours.", NamedTextColor.GRAY));
                 }
@@ -56,7 +56,7 @@ public class PlayerRegistryView {
         inv.setItem(0, vote);
 
         // ==========================================
-        // 📢 GESTION DU BOUTON NOMINATION (Slot 2)
+        //  GESTION DU BOUTON NOMINATION (Slot 2)
         // ==========================================
         ItemStack accuse;
         ItemMeta aMeta;
@@ -65,7 +65,7 @@ public class PlayerRegistryView {
             accuse = new ItemStack(Material.BOOK);
             aMeta = accuse.getItemMeta();
             if (aMeta != null) {
-                aMeta.displayName(Component.text("❌ NOMINATION IMPOSSIBLE", NamedTextColor.RED));
+                aMeta.displayName(Component.text("x NOMINATION IMPOSSIBLE", NamedTextColor.RED));
                 List<Component> lore = new ArrayList<>();
                 lore.add(Component.text("Tu es un fantôme. Les morts ne peuvent", NamedTextColor.GRAY));
                 lore.add(Component.text("plus lancer d'accusations au Tribunal.", NamedTextColor.GRAY));
@@ -76,7 +76,7 @@ public class PlayerRegistryView {
             accuse = new ItemStack(Material.WRITABLE_BOOK);
             aMeta = accuse.getItemMeta();
             if (aMeta != null) {
-                aMeta.displayName(Component.text("📣 NOMMER UN SUSPECT", NamedTextColor.GOLD));
+                aMeta.displayName(Component.text(" NOMMER UN SUSPECT", NamedTextColor.GOLD));
                 List<Component> lore = new ArrayList<>();
                 lore.add(Component.text("Clique pour ouvrir le registre des suspects", NamedTextColor.GRAY));
                 lore.add(Component.text("et envoyer quelqu'un à l'échafaud.", NamedTextColor.GRAY));
@@ -87,12 +87,12 @@ public class PlayerRegistryView {
         inv.setItem(2, accuse);
 
         // ==========================================
-        // 🎭 RAPPEL DU RÔLE SECRET (Slot 4 - Centre)
+        //  RAPPEL DU RÔLE SECRET (Slot 4 - Centre)
         // ==========================================
         ItemStack roleInfo = new ItemStack(Material.ENCHANTED_BOOK);
         ItemMeta rMeta = roleInfo.getItemMeta();
         if (rMeta != null) {
-            rMeta.displayName(Component.text("🎭 TON RÔLE ACTUEL", NamedTextColor.LIGHT_PURPLE).decorate(TextDecoration.BOLD));
+            rMeta.displayName(Component.text(" TON RÔLE ACTUEL", NamedTextColor.LIGHT_PURPLE).decorate(TextDecoration.BOLD));
             List<Component> rLore = new ArrayList<>();
 
             if (bp != null && bp.getDisplayedRole() != null && !bp.getDisplayedRole().isEmpty()) {
@@ -111,12 +111,12 @@ public class PlayerRegistryView {
         inv.setItem(4, roleInfo);
 
         // ==========================================
-        // 💬 GESTION DU BOUTON QUESTION (Slot 6)
+        //  GESTION DU BOUTON QUESTION (Slot 6)
         // ==========================================
         ItemStack question = new ItemStack(Material.FEATHER);
         ItemMeta qMeta = question.getItemMeta();
         if (qMeta != null) {
-            qMeta.displayName(Component.text("💬 POSER UNE QUESTION", NamedTextColor.AQUA));
+            qMeta.displayName(Component.text(" POSER UNE QUESTION", NamedTextColor.AQUA));
             List<Component> qLore = new ArrayList<>();
             qLore.add(Component.text("Clique pour envoyer une question privée", NamedTextColor.GRAY));
             qLore.add(Component.text("aux Conteurs directement depuis le chat.", NamedTextColor.GRAY));
@@ -126,12 +126,12 @@ public class PlayerRegistryView {
         inv.setItem(6, question);
 
         // ==========================================
-        // ✋ GESTION DU BOUTON PAROLE (Slot 8)
+        //  GESTION DU BOUTON PAROLE (Slot 8)
         // ==========================================
         ItemStack parole = new ItemStack(Material.PAPER);
         ItemMeta pMeta = parole.getItemMeta();
         if (pMeta != null) {
-            pMeta.displayName(Component.text("✋ DEMANDER LA PAROLE", NamedTextColor.GREEN));
+            pMeta.displayName(Component.text(" DEMANDER LA PAROLE", NamedTextColor.GREEN));
             List<Component> pLore = new ArrayList<>();
             pLore.add(Component.text("Bouton réservé aux fantômes pour", NamedTextColor.GRAY));
             pLore.add(Component.text("demander une intervention au Conseil.", NamedTextColor.GRAY));

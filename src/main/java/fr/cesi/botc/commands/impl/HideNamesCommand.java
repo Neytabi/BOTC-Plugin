@@ -56,7 +56,7 @@ public class HideNamesCommand implements SubCommand {
             nightTeam.addEntry(p.getName());
         }
         player.sendMessage(
-                Component.text("✓ Tous les pseudos sont désormais CACHÉS (Anonymat actif).", NamedTextColor.RED));
+                Component.text("v Tous les pseudos sont désormais CACHÉS (Anonymat actif).", NamedTextColor.RED));
     }
 
     @Override

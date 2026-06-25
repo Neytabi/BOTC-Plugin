@@ -39,7 +39,7 @@ public class MortCommand implements SubCommand {
     @Override
     public void execute(Player player, String[] args) {
         net.kyori.adventure.title.Title title = net.kyori.adventure.title.Title.title(
-                Component.text("💀 ANNONCE DES MORTS 💀", NamedTextColor.RED).decorate(TextDecoration.BOLD),
+                Component.text(" ANNONCE DES MORTS ", NamedTextColor.RED).decorate(TextDecoration.BOLD),
                 Component.text("Écoutez attentivement le Conteur...", NamedTextColor.GRAY));
 
         for (Player p : Bukkit.getOnlinePlayers()) {
@@ -54,7 +54,7 @@ public class MortCommand implements SubCommand {
                 .decorate(TextDecoration.BOLD));
         Bukkit.broadcast(Component.text("=============================================", NamedTextColor.RED));
 
-        player.sendMessage(Component.text("➔ Prochaine étape : ", NamedTextColor.AQUA)
+        player.sendMessage(Component.text("-> Prochaine étape : ", NamedTextColor.AQUA)
                 .append(Component.text("Temps libre", NamedTextColor.YELLOW).decorate(TextDecoration.BOLD))
                 .append(Component.text(" [CLIQUE POUR EXECUTER]", NamedTextColor.GREEN))
                 .clickEvent(net.kyori.adventure.text.event.ClickEvent.runCommand("/botc tempslibre")));

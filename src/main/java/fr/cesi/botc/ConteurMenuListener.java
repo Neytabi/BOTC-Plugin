@@ -37,7 +37,7 @@ public class ConteurMenuListener implements Listener {
         int slot = event.getSlot();
 
         // ==========================================================
-        // 🎮 LIGNE 1 : SCRIPT DE JEU / GAMEPLAY (Slots 0 à 8)
+        //  LIGNE 1 : SCRIPT DE JEU / GAMEPLAY (Slots 0 à 8)
         // ==========================================================
         if (slot < 9) {
             switch (slot) {
@@ -74,7 +74,7 @@ public class ConteurMenuListener implements Listener {
                     }
                     admin.performCommand(IsAnyoneSeated ? "botc debout" : "botc assis");
                 }
-                case 6 -> { // 🏷️ ACTION : Alterner Pseudos globalement
+                case 6 -> { //  ACTION : Alterner Pseudos globalement
                     boolean currentlyHidden = main.isNameTagsHidden();
                     if (currentlyHidden) {
                         admin.performCommand("botc shownames");
@@ -83,7 +83,7 @@ public class ConteurMenuListener implements Listener {
                     }
                     new ConteurMenuView().openConteurMenu(admin, main);
                 }
-                case 7 -> { // 🌟 APPORT : JUKEBOX : Silence / Parole All Vocaux
+                case 7 -> { //  APPORT : JUKEBOX : Silence / Parole All Vocaux
                     admin.closeInventory();
                     if (event.isLeftClick()) {
                         admin.performCommand("botc silence");
@@ -91,7 +91,7 @@ public class ConteurMenuListener implements Listener {
                         admin.performCommand("botc paroleall");
                     }
                 }
-                case 8 -> { // 🌟 APPORT : MAP : Lancer ou Arrêter le scrutin de Preset Map
+                case 8 -> { //  APPORT : MAP : Lancer ou Arrêter le scrutin de Preset Map
                     admin.closeInventory();
                     if (event.isLeftClick()) {
                         admin.performCommand("botc mapvote start");
@@ -102,7 +102,7 @@ public class ConteurMenuListener implements Listener {
             }
         }
         // ==========================================================
-        // 🛠️ LIGNE 2 : BARRE DE SETUP ET CONFIGURATION (Slots 9 à 17)
+        //  LIGNE 2 : BARRE DE SETUP ET CONFIGURATION (Slots 9 à 17)
         // ==========================================================
         else if (slot >= 9 && slot <= 17) {
             int relativeSlot = slot - 9;
@@ -134,7 +134,7 @@ public class ConteurMenuListener implements Listener {
                         main.getConfig().set(main.getPresetPath("death"), null);
                         main.saveConfig();
                         admin.sendMessage(Component.text(
-                                "🗑️ Estrade d'exécution supprimée. Les condamnés mourront désormais sur place !",
+                                " Estrade d'exécution supprimée. Les condamnés mourront désormais sur place !",
                                 NamedTextColor.YELLOW));
                         admin.playSound(admin.getLocation(), org.bukkit.Sound.ENTITY_ITEM_BREAK, 0.5f, 1.0f);
                         new ConteurMenuView().openConteurMenu(admin, main);

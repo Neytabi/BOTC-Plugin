@@ -73,10 +73,10 @@ public class RoleSelectionListener implements Listener {
     }
 
     private void sendSecretRoleMessage(Player target, String roleName, String description) {
-        // 🌟 AJOUT : On affiche la BossBar permanente en haut de son écran !
+        //  AJOUT : On affiche la BossBar permanente en haut de son écran !
         main.rafraichirRoleBossBar(target, roleName);
         net.kyori.adventure.title.Title roleTitle = net.kyori.adventure.title.Title.title(
-                Component.text("🎭 TON RÔLE SECRET 🎭", NamedTextColor.LIGHT_PURPLE).decorate(TextDecoration.BOLD),
+                Component.text(" TON RÔLE SECRET ", NamedTextColor.LIGHT_PURPLE).decorate(TextDecoration.BOLD),
                 Component.text("Tu es le : " + roleName, NamedTextColor.GOLD).decorate(TextDecoration.BOLD)
         );
 

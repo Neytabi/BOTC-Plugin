@@ -72,7 +72,7 @@ public class ConteurMenuView {
         }
         inv.setItem(5, chairItem);
 
-        // 🌟 APPORT : Bouton 7 : Visibilité des Pseudos (Slot 6)
+        //  APPORT : Bouton 7 : Visibilité des Pseudos (Slot 6)
         ItemStack nameTagsItem = new ItemStack(Material.NAME_TAG);
         ItemMeta ntMeta = nameTagsItem.getItemMeta();
         if (ntMeta != null) {
@@ -80,7 +80,7 @@ public class ConteurMenuView {
             boolean hidden = nightTeam != null && !nightTeam.getEntries().isEmpty();
             String status = hidden ? "CACHÉS (Anonymat)" : "VISIBLES";
 
-            ntMeta.displayName(Component.text("🏷️ Visibilité Pseudos : " + status, NamedTextColor.YELLOW).decorate(TextDecoration.BOLD));
+            ntMeta.displayName(Component.text(" Visibilité Pseudos : " + status, NamedTextColor.YELLOW).decorate(TextDecoration.BOLD));
             ntMeta.lore(List.of(
                     Component.text("CLIC : Basculer l'affichage des nametags", NamedTextColor.GRAY),
                     Component.text("pour masquer ou afficher les noms en jeu.", NamedTextColor.GRAY)
@@ -89,11 +89,11 @@ public class ConteurMenuView {
         }
         inv.setItem(6, nameTagsItem);
 
-        // 🌟 APPORT : Bouton 8 : Coupe-parole Vocal Proximité SVC (Slot 7)
+        //  APPORT : Bouton 8 : Coupe-parole Vocal Proximité SVC (Slot 7)
         ItemStack muteItem = new ItemStack(Material.JUKEBOX);
         ItemMeta mGlobalMeta = muteItem.getItemMeta();
         if (mGlobalMeta != null) {
-            mGlobalMeta.displayName(Component.text("🎙️ Modération Vocale (SVC)", NamedTextColor.RED).decorate(TextDecoration.BOLD));
+            mGlobalMeta.displayName(Component.text(" Modération Vocale (SVC)", NamedTextColor.RED).decorate(TextDecoration.BOLD));
             mGlobalMeta.lore(List.of(
                     Component.text("CLIC GAUCHE : Réclamer le silence (/botc silence)", NamedTextColor.GRAY),
                     Component.text("CLIC DROIT : Réactiver les micros (/botc paroleall)", NamedTextColor.GRAY)
@@ -102,11 +102,11 @@ public class ConteurMenuView {
         }
         inv.setItem(7, muteItem);
 
-        // 🌟 APPORT : Bouton 9 : Système de Scrutin / Vote de Map (Slot 8)
+        //  APPORT : Bouton 9 : Système de Scrutin / Vote de Map (Slot 8)
         ItemStack voteMapItem = new ItemStack(Material.MAP);
         ItemMeta vmMeta = voteMapItem.getItemMeta();
         if (vmMeta != null) {
-            vmMeta.displayName(Component.text("🗳️ Lancer un Vote de Map", NamedTextColor.LIGHT_PURPLE).decorate(TextDecoration.BOLD));
+            vmMeta.displayName(Component.text(" Lancer un Vote de Map", NamedTextColor.LIGHT_PURPLE).decorate(TextDecoration.BOLD));
             vmMeta.lore(List.of(
                     Component.text("CLIC GAUCHE : Ouvrir le vote aux joueurs", NamedTextColor.GRAY),
                     Component.text("CLIC DROIT : Clôturer et charger la map gagnante", NamedTextColor.GRAY)
@@ -117,11 +117,11 @@ public class ConteurMenuView {
 
 
         // ==========================================================
-        // 🛠️ BARRE DE SETUP ET CONFIGURATION (Dernière ligne du Menu)
+        //  BARRE DE SETUP ET CONFIGURATION (Dernière ligne du Menu)
         // ==========================================================
         int baseSlot = inv.getSize() - 9; // Calcule automatiquement le début de la ligne du bas (Slot 9)
 
-        // Slot +0 : 🗺️ Menu des Presets Maps
+        // Slot +0 :  Menu des Presets Maps
         ItemStack btnPreset = new ItemStack(Material.FILLED_MAP);
         var pMeta = btnPreset.getItemMeta();
         if (pMeta != null) {
@@ -138,7 +138,7 @@ public class ConteurMenuView {
         if (sMeta != null) { sMeta.displayName(Component.text(" ")); separator.setItemMeta(sMeta); }
         inv.setItem(baseSlot + 1, separator);
 
-        // Slot +2 : 🏛️ Enregistrer le centre du Tribunal
+        // Slot +2 :  Enregistrer le centre du Tribunal
         ItemStack btnTribunal = new ItemStack(Material.BEACON);
         var tribMeta = btnTribunal.getItemMeta();
         if (tribMeta != null) {
@@ -149,7 +149,7 @@ public class ConteurMenuView {
         }
         inv.setItem(baseSlot + 2, btnTribunal);
 
-        // Slot +3 : 🪑 Ajouter une Chaise
+        // Slot +3 :  Ajouter une Chaise
         ItemStack btnChair = new ItemStack(Material.OAK_STAIRS);
         var setupChairMeta = btnChair.getItemMeta();
         if (setupChairMeta != null) {
@@ -160,7 +160,7 @@ public class ConteurMenuView {
         }
         inv.setItem(baseSlot + 3, btnChair);
 
-        // Slot +4 : 🚪 Ajouter une Chambre
+        // Slot +4 :  Ajouter une Chambre
         ItemStack btnRoom = new ItemStack(Material.IRON_DOOR);
         var rMeta = btnRoom.getItemMeta();
         if (rMeta != null) {
@@ -172,7 +172,7 @@ public class ConteurMenuView {
         }
         inv.setItem(baseSlot + 4, btnRoom);
 
-        // Slot +5 : 💀 Enregistrer ou Supprimer l'Estrade de Mort
+        // Slot +5 :  Enregistrer ou Supprimer l'Estrade de Mort
         ItemStack btnDeath = new ItemStack(Material.WITHER_SKELETON_SKULL);
         var dMeta = btnDeath.getItemMeta();
         if (dMeta != null) {
@@ -185,14 +185,14 @@ public class ConteurMenuView {
         }
         inv.setItem(baseSlot + 5, btnDeath);
 
-        // 🏷️ Visibilité des Pseudos (Slot 6) - Version Sécurisée sans doublon
+        //  Visibilité des Pseudos (Slot 6) - Version Sécurisée sans doublon
         ItemStack nameTagsButton = new ItemStack(Material.NAME_TAG);
         ItemMeta nameTagsMeta = nameTagsButton.getItemMeta();
         if (nameTagsMeta != null) {
             boolean hidden = main.isNameTagsHidden();
             String status = hidden ? "CACHÉS (Anonymat Actif)" : "VISIBLES";
 
-            nameTagsMeta.displayName(Component.text("🏷️ Visibilité Pseudos : ", NamedTextColor.YELLOW)
+            nameTagsMeta.displayName(Component.text(" Visibilité Pseudos : ", NamedTextColor.YELLOW)
                     .append(Component.text(status, hidden ? NamedTextColor.RED : NamedTextColor.GREEN).decorate(TextDecoration.BOLD)));
             nameTagsMeta.lore(List.of(
                     Component.text("CLIC : Basculer l'affichage des nametags", NamedTextColor.GRAY),
@@ -202,7 +202,7 @@ public class ConteurMenuView {
         }
         inv.setItem(6, nameTagsButton);
 
-        // Slot +7 : ✨ Outils de vérification et de Nettoyage (Blaze Powder)
+        // Slot +7 :  Outils de vérification et de Nettoyage (Blaze Powder)
         ItemStack btnTest = new ItemStack(Material.BLAZE_POWDER);
         var testMeta = btnTest.getItemMeta();
         if (testMeta != null) {
@@ -217,7 +217,7 @@ public class ConteurMenuView {
         }
         inv.setItem(baseSlot + 7, btnTest);
 
-        // Slot +8 : 🔄 Bouton de Reset global de partie
+        // Slot +8 :  Bouton de Reset global de partie
         ItemStack btnReset = new ItemStack(Material.BARRIER);
         var resetMeta = btnReset.getItemMeta();
         if (resetMeta != null) {

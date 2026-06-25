@@ -38,7 +38,7 @@ public class GrimoireListener implements Listener {
         int slot = event.getSlot();
 
         // ==========================================================
-        // ⚡ ACTION 1 : CLIC SUR L'ENDER PEARL (Slot 45 - Flash TP)
+        //  ACTION 1 : CLIC SUR L'ENDER PEARL (Slot 45 - Flash TP)
         // ==========================================================
         if (slot == 45) {
             admin.closeInventory();
@@ -56,22 +56,22 @@ public class GrimoireListener implements Listener {
                     org.bukkit.Location loc = new org.bukkit.Location(world, x, y, z, admin.getLocation().getYaw(), admin.getLocation().getPitch());
                     admin.teleport(loc);
                     admin.playSound(admin.getLocation(), org.bukkit.Sound.ENTITY_ENDERMAN_TELEPORT, 1.0f, 1.0f);
-                    admin.sendMessage(Component.text("✨ Flash ! Tu as été rapatrié au centre du Tribunal.", NamedTextColor.GREEN));
+                    admin.sendMessage(Component.text(" Flash ! Tu as été rapatrié au centre du Tribunal.", NamedTextColor.GREEN));
                 }
             } else {
-                admin.sendMessage(Component.text("❌ Le tribunal n'est pas encore configuré sur cette map ! Cliquez sur la Balise de votre menu principal.", NamedTextColor.RED));
+                admin.sendMessage(Component.text("x Le tribunal n'est pas encore configuré sur cette map ! Cliquez sur la Balise de votre menu principal.", NamedTextColor.RED));
             }
             return;
         }
 
         // ==========================================================
-        // 🪓 ACTION 2 : CLIC SUR UNE TÊTE DE JOUEUR
+        //  ACTION 2 : CLIC SUR UNE TÊTE DE JOUEUR
         // ==========================================================
         if (clickedItem.getType() == Material.PLAYER_HEAD) {
             SkullMeta meta = (SkullMeta) clickedItem.getItemMeta();
             if (meta == null || meta.getOwningPlayer() == null) return;
 
-            // 🌟 A. SOUS-LOGIQUE : LE SHIFT-CLIC (Téléportation directe sur le joueur)
+            //  A. SOUS-LOGIQUE : LE SHIFT-CLIC (Téléportation directe sur le joueur)
             if (event.isShiftClick()) {
                 Player targetPlayer = meta.getOwningPlayer().getPlayer();
 
@@ -79,14 +79,14 @@ public class GrimoireListener implements Listener {
                     admin.closeInventory();
                     admin.teleport(targetPlayer.getLocation());
                     admin.playSound(admin.getLocation(), org.bukkit.Sound.ENTITY_ENDERMAN_TELEPORT, 0.8f, 1.2f);
-                    admin.sendMessage(Component.text("✨ Téléportation réussie auprès de " + targetPlayer.getName() + " !", NamedTextColor.GREEN));
+                    admin.sendMessage(Component.text(" Téléportation réussie auprès de " + targetPlayer.getName() + " !", NamedTextColor.GREEN));
                 } else {
-                    admin.sendMessage(Component.text("❌ Ce joueur s'est déconnecté du serveur.", NamedTextColor.RED));
+                    admin.sendMessage(Component.text("x Ce joueur s'est déconnecté du serveur.", NamedTextColor.RED));
                 }
                 return; // On stoppe la méthode ici pour éviter d'ouvrir le sous-menu d'action !
             }
 
-            // 🌟 B. SOUS-LOGIQUE : CLIC CLASSIQUE (Ouverture du menu d'attribution de rôle / exécution)
+            //  B. SOUS-LOGIQUE : CLIC CLASSIQUE (Ouverture du menu d'attribution de rôle / exécution)
             UUID targetUUID = meta.getOwningPlayer().getUniqueId();
             BotcPlayer targetBotc = main.getPlayersMap().get(targetUUID);
 

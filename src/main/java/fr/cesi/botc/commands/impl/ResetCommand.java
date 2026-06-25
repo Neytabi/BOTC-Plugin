@@ -44,7 +44,7 @@ public class ResetCommand implements SubCommand {
         main.resetGame();
 
         player.sendMessage(Component.text(
-                "✓ La partie a été réinitialisée ! Tous les inventaires ont été synchronisés avec les objets de connexion.",
+                "v La partie a été réinitialisée ! Tous les inventaires ont été synchronisés avec les objets de connexion.",
                 NamedTextColor.GREEN));
     }
 

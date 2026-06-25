@@ -49,8 +49,8 @@ public class VcUnmuteCommand implements SubCommand {
         if (target != null) {
             main.getVcMutedPlayers().remove(target.getUniqueId());
             target.sendMessage(
-                    Component.text("🗣️ Le Conteur t'autorise de nouveau à parler.", NamedTextColor.GREEN));
-            player.sendMessage(Component.text("✓ Micro de " + target.getName() + " réactivé via l'API.",
+                    Component.text(" Le Conteur t'autorise de nouveau à parler.", NamedTextColor.GREEN));
+            player.sendMessage(Component.text("v Micro de " + target.getName() + " réactivé via l'API.",
                     NamedTextColor.GREEN));
         } else {
             player.sendMessage(Component.text("Joueur introuvable.", NamedTextColor.RED));
