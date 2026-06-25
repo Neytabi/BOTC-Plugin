@@ -17,7 +17,7 @@ Développé par **Neytabi** et **Pill0N_**.
 - **Presets multi-maps** : Créez et sauvegardez la configuration de plusieurs maps.
 
 ## 🛠️ Prérequis
-1. Un serveur **PaperMC** (version 1.20 ou supérieure, testé en 1.21).
+1. Un serveur **PaperMC** (version 1.20 ou supérieure, testé en 1.21.1).
 2. Le plugin **[Simple Voice Chat](https://modrinth.com/plugin/simple-voice-chat)** installé sur le serveur (API requise pour la gestion des mutes vocaux).
 
 ## 📥 Installation
