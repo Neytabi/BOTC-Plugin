@@ -1,0 +1,13 @@
+# Configuration par défaut de BOTC
+
+# Le preset actif (par défaut "default")
+active_preset: default
+
+# Mode d'éclair pour les exécutions (player ou local)
+lightning:
+  mode: player
+
+presets:
+  default:
+    chairs: []
+    rooms: []

@@ -10,8 +10,33 @@
     <packaging>jar</packaging>
 
     <name>botc-plugins</name>
+    <description>Plugin Minecraft pour Blood on the Clocktower (BOTC), simplifiant la gestion des parties pour le Conteur.</description>
+    <url>https://github.com/Neytabi/BOTC-Plugins</url>
 
-    <properties>
+    <developers>
+        <developer>
+            <id>Neytabi</id>
+            <name>Neytabi</name>
+            <roles>
+                <role>Lead Developer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>Pill0N_</id>
+            <name>Pill0N_</name>
+            <roles>
+                <role>Contributor</role>
+            </roles>
+        </developer>
+    </developers>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>http://www.opensource.org/licenses/mit-license.php</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>    <properties>
         <java.version>21</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>

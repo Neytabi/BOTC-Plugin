@@ -2,6 +2,8 @@ name: BotcPlugin
 version: ${project.version}
 main: fr.cesi.botc.Botc
 api-version: 1.20
+description: "Plugin Minecraft simplifiant la vie du MJ pour Blood on the Clocktower"
+authors: [Neytabi, Pill0N_]
 softdepend: [voicechat]
 commands:
   botc:
