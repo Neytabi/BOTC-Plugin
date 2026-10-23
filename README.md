@@ -1,196 +1,197 @@
-# 🩸 Blood on the Clocktower - Plugin Minecraft (BOTC)
+# 🩸 Blood on the Clocktower - Minecraft Plugin (BOTC)
 
 ![Modrinth Version](https://img.shields.io/badge/Modrinth-v2.0--stable-green?style=for-the-badge&logo=modrinth)
 ![PaperMC](https://img.shields.io/badge/PaperMC-1.20%20%7C%201.21-blue?style=for-the-badge&logo=papermc)
 ![Java Version](https://img.shields.io/badge/Java-21-orange?style=for-the-badge&logo=openjdk)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)
 
-Un plugin Minecraft complet et immersif pour jouer à **Blood on the Clocktower (BOTC)**, développé sur **PaperMC**. Conçu sur-mesure pour simplifier drastiquement la tâche du **Maître du Jeu (Conteur)** grâce à un système complet d'interfaces graphiques (GUI), d'automatismes jour/nuit et d'intégrations vocales avancées.
+A complete and immersive Minecraft plugin to play **Blood on the Clocktower (BOTC)**, built for **PaperMC**. Custom-designed to drastically simplify the **Storyteller's (GM)** tasks through interactive GUIs, automated Day/Night cycles, and advanced voice chat integrations.
 
-> 🛠️ **Développeurs** : [Neytabi](https://github.com/Neytabi) (Lead Developer) & [Pill0N_](https://github.com/Pill0N_) (Contributor)  
-> 📜 **Licence** : Open-Source sous licence MIT
+> 🛠️ **Developers**: [Neytabi](https://github.com/Neytabi) (Lead Developer) & [Pill0N_](https://github.com/Pill0N_) (Contributor)  
+> 📜 **License**: Open-Source under the MIT License
 
 ---
 
-## 📌 Sommaire
-- [📋 Prérequis & Versions](#-prérequis--versions)
-- [🔊 Intégration Vocale (Simple Voice Chat & Sound Physics)](#-intégration-vocale-simple-voice-chat--sound-physics-remastered)
-- [📖 Le Système de Grimoires & Registres (Interactivity Zero-Commandes)](#-le-système-de-grimoires--registres)
-- [✨ Fonctionnalités Majeures](#-fonctionnalités-majeures)
-- [🗺️ Support Multi-Map & Presets de Jeu](#-support-multi-map--presets-de-jeu)
-- [⌨️ Guide des Commandes](#️-guide-des-commandes)
-- [⚙️ Installation & Premier Démarrage](#️-installation--premier-démarrage)
+## 📌 Summary
+- [📋 Prerequisites & Versions](#-prerequisites--versions)
+- [🔊 Voice Integration (Simple Voice Chat & Sound Physics)](#-voice-integration-simple-voice-chat--sound-physics-remastered)
+- [📖 Grimoire & Registry System (Zero-Command Interactivity)](#-grimoire--registry-system-zero-command-interactivity)
+- [✨ Core Features](#-core-features)
+- [🗺️ Multi-Map Support & Presets](#%EF%B8%8F-multi-map-support--presets)
+- [⌨️ Command Guide](#%EF%B8%8F-command-guide)
+- [⚙️ Installation & Quick Start](#%EF%B8%8F-installation--quick-start)
 - [🤝 Open Source & Contributions](#-open-source--contributions)
 
 ---
 
-## 📋 Prérequis & Versions
+## 📋 Prerequisites & Versions
 
-| Élément | Version / Requis | Note |
+| Element | Version / Requirement | Note |
 | :--- | :--- | :--- |
-| **Serveur Minecraft** | **PaperMC** `1.20.x` à `1.21.x` (Testé en `1.21.1`) | Spigot/CraftBukkit non recommandés (nécessite l'API Paper / Adventure) |
-| **Java** | **Java 21** | Nécessaire pour la compilation et l'exécution du serveur |
-| **Plugin Vocale (Serveur)** | **[Simple Voice Chat](https://modrinth.com/plugin/simple-voice-chat)** `v2.5.0+` | **Requis** pour la modération vocale, les salons automatiques et les mutes |
-| **Mod Audio (Clients)** | **[Sound Physics Remastered](https://modrinth.com/mod/sound-physics-remastered)** | **FORTEMENT RECOMMANDÉ** (Bloque la traversée du son à travers les murs) |
+| **Minecraft Server** | **PaperMC** `1.20.x` to `1.21.x` (Tested on `1.21.1`) | Spigot/CraftBukkit not recommended (requires Paper / Adventure API) |
+| **Java** | **Java 21** | Required to compile and run the server |
+| **Voice Plugin (Server)** | **[Simple Voice Chat](https://modrinth.com/plugin/simple-voice-chat)** `v2.5.0+` | **Required** for voice moderation, automated channels, and muting |
+| **Audio Mod (Clients)** | **[Sound Physics Remastered](https://modrinth.com/mod/sound-physics-remastered)** | **HIGHLY RECOMMENDED** (Blocks voice traversal through walls) |
 
 ---
 
-## 🔊 Intégration Vocale (Simple Voice Chat & Sound Physics Remastered)
+## 🔊 Voice Integration (Simple Voice Chat & Sound Physics Remastered)
 
-### 🎙️ Intégration Native avec Simple Voice Chat API
-Le plugin intercepte directement les paquets audio au niveau du réseau (`MicrophonePacketEvent`) grâce à l'API de Simple Voice Chat :
-- **Mute Global de Silence** (`/botc silence`) : Bloque l'émission du micro de tous les villageois instantanément lors des annonces du Conteur.
-- **Gestion des Morts & Fantômes** : Mute/Unmute à la volée.
-- **Salons de Tribunal Automatiques** : Lors de la phase assis (`/botc assis`), les joueurs sont automatiquement regroupés dans un canal vocal dédié tout en préservant le contrôle du Conteur.
-- **Accès Prioritaire MJ (OP)** : Les Conteurs (OPs) contournent systématiquement les mutes et conservent une voix prioritaire.
-- **Résilience aux Reloads (Fix PlugMan)** : Le plugin intègre un mécanisme de reconnexion par réflexion pour restaurer l'API vocale en cas de rechargement à chaud.
+### 🎙️ Native Integration with Simple Voice Chat API
+The plugin intercepts audio packets directly at the network level (`MicrophonePacketEvent`) using the Simple Voice Chat API:
+- **Global Silence Mute** (`/botc silence`): Instantly mutes all players' microphones during Storyteller announcements.
+- **Dead & Ghost Management**: Dynamic muting/unmuting on the fly.
+- **Automated Tribunal Channels**: During the sitting phase (`/botc assis`), players are automatically grouped into a dedicated voice channel while preserving Storyteller control.
+- **Storyteller Priority Access (OP)**: Storytellers (OPs) systematically bypass mutes and retain priority voice access.
+- **Reload Resilience (PlugMan Fix)**: Includes a reflection reconnect mechanism to restore the voice API following hot reloads.
 
-### 🔇 Pourquoi installer *Sound Physics Remastered* côté Client ?
-Dans Blood on the Clocktower, la nuit est une phase cruciale où chaque joueur rejoint sa chambre individuelle. En vanilla avec Simple Voice Chat, la voix de proximité calcule les distances en ligne droite, ce qui signifie que **les joueurs peuvent s'entendre chuchoter à travers les cloisons et murs des chambres**.
+### 🔇 Why install *Sound Physics Remastered* on the Client side?
+In Blood on the Clocktower, night is a critical phase where every player retreats to their individual room. In vanilla Simple Voice Chat, proximity audio calculates distances in a straight line, meaning **players can hear each other whispering through bedroom walls**.
 
-> ⚠️ **IMPORTANT : La nécessité de Sound Physics Remastered**  
-> En demandant aux joueurs d'installer le mod client **[Sound Physics Remastered](https://modrinth.com/mod/sound-physics-remastered)** (Fabric/NeoForge/Forge) :
-> 1. Le son est calculé selon la géométrie des blocs et l'épaisseur des murs.
-> 2. Les murs absorbent et bloquent l'atténuation sonore : **aucun chuchotement ne traverse les portes et cloisons fermées des chambres**.
-> 3. L'ambiance acoustique devient totalement réaliste et garantit le secret absolu des réunions nocturnes et chuchotements.
-
----
-
-## 📖 Le Système de Grimoires & Registres
-
-Pour que la partie soit fluide, **ni le Conteur ni les Joueurs n'ont besoin de retenir des commandes complexes**. Tout est pilotable via des objets interactifs dans l'inventaire.
-
-```
-       CONTEUR (MJ)                                   JOUEURS
- 🔮 Le Grimoire du Conteur                     📕 Registre du Tribunal
-  ├── Têtes de tous les joueurs                 ├── Lever la main (Vote OUI)
-  ├── Statuts (Vivant / Mort / Jetons)          ├── Nommer un suspect (Accusation)
-  ├── Clic : Menu d'actions (Rôles/Exec)        ├── Rappel du Rôle Secret
-  ├── Shift+Clic : TP sur le joueur             ├── Poser une question privée au MJ
-  └── Outils : Flash-TP, Nametags, Setup        └── Demander la parole (Fantômes)
-```
-
-### 🔮 Pour le Conteur (MJ) : *Le Grimoire du Conteur*
-À sa connexion ou lors d'un réarmement (`/botc reset`), le MJ reçoit un **Livre Enchanté** nommé **"📖 Le Grimoire du Conteur"**.
-En faisant un clic droit avec le livre en main :
-1. **Menu Principal GUI** : Accès en 1 clic au cycle Jour/Nuit, annonces des morts, rassemblement sur chaises, modération vocale, visibilité des pseudos et lancement de votes de map.
-2. **Vue du Grimoire (`GrimoireView`)** : Un double coffre interactif affichant la tête de chaque joueur (dans l'ordre exact de leur placement autour de la table de jeu).
-   - **Clic Gauche** : Ouvre le sous-menu d'action (`ActionMenuView`) pour assigner un rôle secret, tuer/ressusciter le joueur ou lui retirer/rendre son jeton de vote fantôme.
-   - **Shift + Clic** : Téléporte instantanément le Conteur derrière le joueur sélectionné.
-   - **Perle de l'Ender (Slot 45)** : Flash-TP le Conteur au centre du Tribunal.
-   - **Nametag (Slot 46)** : Alterne l'anonymat/la visibilité des pseudos au-dessus des têtes.
-
-### 📕 Pour les Joueurs : *Le Registre du Tribunal & Le Livre des Rôles*
-Les joueurs reçoivent deux livres à leur arrivée :
-1. **"Livre des rôles" (Written Book)** : Le résumé complet de tous les rôles du scénario (Demons, Sbires, Citadins, Étrangers) ainsi que l'ordre officiel de réveil pour la Première Nuit et les Nuits suivantes.
-2. **"Registre du Tribunal" (Book)** : Une interface interactive à 9 slots (`PlayerRegistryView`) :
-   - 🟢 **Lever la main (Voter OUI)** : Enregistre le vote sur l'accusation en cours (gère automatiquement la consommation de l'unique jeton de vote de fantôme).
-   - 📜 **Nommer un suspect** : Ouvre un registre (`NominationView`) répertoriant les joueurs vivants pour lancer une accusation publique (inclut la gestion automatique des pouvoirs de la **Vierge** et de l'**Ivrogne**).
-   - 📖 **Rappel du Rôle Secret** : Affiche le rôle attribué par le MJ et sa description (affiche le faux rôle si le joueur est l'Ivrogne !).
-   - 🪶 **Poser une question** : Permet au joueur de taper une question dans le chat qui sera transmise **exclusivement en privé au Conteur**.
-   - 📄 **Demander la parole** : Permet aux fantômes d'envoyer une alerte cliquable `[ACCORDER]` aux Conteurs pour prendre la parole au Conseil.
+> ⚠️ **IMPORTANT: The necessity of Sound Physics Remastered**  
+> By asking players to install the client mod **[Sound Physics Remastered](https://modrinth.com/mod/sound-physics-remastered)** (Fabric/NeoForge/Forge):
+> 1. Sound calculations account for block geometry and wall thickness.
+> 2. Walls absorb and block sound attenuation: **no whispers cross closed doors or bedroom partitions**.
+> 3. The acoustic atmosphere becomes fully realistic, guaranteeing total secrecy for night discussions and whispers.
 
 ---
 
-## ✨ Fonctionnalités Majeures
+## 📖 Grimoire & Registry System (Zero-Command Interactivity)
 
-- 🌗 **Cycle Jour / Nuit Animé & Guidé** :
-  - Transition fluide du ciel (mouvement du soleil accéléré à 60 FPS avec battements de tambour atmosphériques).
-  - **Boussole / GPS 3D Particulaire** : À la tombée de la nuit, chaque joueur est guidé par une flèche de particules lumineuses vers sa chambre attribuée. Au lever du jour, la flèche guide tout le monde vers le Tribunal.
-  - **Système de Têtes sur Portes** : La nuit, la tête de chaque joueur apparaît automatiquement sur la porte de sa chambre.
-- 🪑 **Tribunal & Chaises Invisibles Securisées** :
-  - Placement automatique des joueurs sur des chaises invisibles (`botc_chair`) ordonnées autour du cercle de discussion.
-  - **Verrou anti-démontage** : Empêche les joueurs de se lever pendant les débats officiels.
-  - **Reconnexion Sécurisée** : Si un joueur plante ou se déconnecte, il est automatiquement remis sur son siège dès sa re-connexion.
-- 👑 **Système de Rôles & BossBar Réelle vs Fictive** :
-  - Attribution des rôles en 1 clic via des menus thématiques (Laine Bleue = Citadins, Jaune = Étrangers, Orange = Sbires, Rouge = Démons).
-  - **Gestion de l'Ivrogne (Drunk)** : Le Conteur peut attribuer un rôle en Clic Droit pour créer un Ivrogne (le Conteur voit son vrai rôle "Ivrogne" dans le Grimoire, mais le joueur voit un vrai rôle de Citadin sur son écran et dans sa BossBar !).
-  - **Transfert Automatique de la Femme Écarlate** : Si le Diablotin meurt au vote alors qu'il reste 5 vivants ou plus, la Femme Écarlate hérite automatiquement du rôle de Diablotin avec alerte privée.
-  - **BossBar Permanente** : Affichage d'un bandeau violet/or discret en haut de l'écran rappelant le rôle secret de chaque joueur.
-- ⚡ **Animations d'Exécution & Éclair** :
-  - Morts théâtrales avec sons de Wither, particules de fumée noire et tête avec casque Barrière.
-  - Mode d'éclair configurable (`player` pour frapper le joueur, ou `local` pour frapper l'estrade d'exécution).
-- 🏷️ **Gestion de l'Anonymat (Nametags)** :
-  - Masquage global des pseudos via les équipes de Scoreboard pour empêcher de repérer des joueurs à travers les murs la nuit.
+To keep the game smooth, **neither the Storyteller nor the Players need to memorize complex commands**. Everything is controllable via interactive inventory items.
 
----
 
-## 🗺️ Support Multi-Map & Presets de Jeu
-
-Le plugin supporte un nombre illimité de cartes et d'arènes de jeu sauvegardées indépendamment dans la configuration.
-
-- **Création Facile** : Créez des presets (`/botc preset create <nom>`) directement depuis le jeu ou via le chat interactif (Enclume du menu).
-- **Sauvegarde Indépendante** : Chaque preset conserve ses propres positions de chaises, de chambres, du tribunal et de l'estrade d'exécution.
-- **🗳️ Scrutin & Élection de Map (`/botc mapvote`)** :
-  - Le Conteur peut lancer un vote interactif de 30 secondes dans le chat (`/botc mapvote start`).
-  - Les joueurs cliquent sur l'arène de leur choix.
-  - À la fin du décompte sonore, la map ayant récolté le plus de voix est automatiquement chargée par le plugin !
-
----
-
-## ⌨️ Guide des Commandes
-
-Toutes les commandes s'articulent autour de la commande racine `/botc` :
-
-### 🧙‍♂️ Commandes Conteur (OP)
-
-| Commande | Description |
+| 🧙‍♂️ STORYTELLER (GM) | 🧑‍🌾 PLAYERS |
 | :--- | :--- |
-| `/botc setup` / `/botc admin` | Ouvre le menu d'administration et de configuration principal |
-| `/botc start` / `/botc reset` | Réinitialise la partie (ressuscite les joueurs, donne les livres, réinitialise les rôles et jetons) |
-| `/botc jour` | Déclenche le matin (animation céleste + boussole vers le Tribunal) |
-| `/botc nuit` | Déclenche la nuit (animation céleste + boussole vers les chambres + têtes sur portes) |
-| `/botc tempslibre` | Libère les mouvements et la parole des joueurs |
-| `/botc conseil` | Affiche la boussole vers la salle du conseil |
-| `/botc assis` | Assied tous les joueurs sur leur siège attribué et crée le groupe vocal |
-| `/botc debout` | Libère les joueurs de leurs sièges |
-| `/botc silence` | Mute les micros de tous les villageois via l'API SVC |
-| `/botc paroleall` | Rend la parole vocale à tous les joueurs |
-| `/botc grantparole <joueur>` | Accorde la parole à un joueur spécifique |
-| `/botc vcmute <joueur>` | Mute un joueur spécifique dans le vocal |
-| `/botc vcunmute <joueur>` | Unmute un joueur spécifique dans le vocal |
-| `/botc execute <joueur>` | Exécute officiellement un condamné (animations + estrade) |
-| `/botc mort` | Annonce la liste des morts de la journée avec effet sonore |
-| `/botc hidenames` | Cache les pseudos (Nametags) au-dessus des têtes |
-| `/botc shownames` | Réaffiche les pseudos (Nametags) |
-| `/botc mapvote start` | Lancer une élection de map de 30s dans le chat |
-| `/botc mapvote stop` | Clôturer immédiatement l'élection de map et charger la gagnante |
-| `/botc preset <select/create/delete/list>` | Gestion des presets de maps |
-| `/botc settribunal` | Définit votre position actuelle comme le centre du Tribunal |
-| `/botc addchair` | Enregistre une nouvelle chaise à votre position |
-| `/botc delchairs` | Supprime toutes les chaises du preset actif |
-| `/botc showchairs` | Affiche les chaises du preset actif avec des particules |
-| `/botc addroom` | Enregistre une porte de chambre à votre position |
-| `/botc delrooms` | Supprime toutes les chambres du preset actif |
-| `/botc showrooms` | Affiche les chambres du preset actif avec des particules |
-| `/botc setplayerdeath` | Enregistre votre position comme estrade d'exécution |
-| `/botc setlightning <player\|local>` | Définit le mode d'éclair d'exécution |
+| **🔮 The Storyteller's Grimoire** | **📕 Tribunal Registry** |
+| • Player heads & seating order | • Raise hand (Vote YES) |
+| • Statuses (Alive / Dead / Tokens) | • Nominate a suspect (Accusation) |
+| • Click: Action Menu (Roles/Exec) | • Secret Role Reminder |
+| • Shift+Click: Teleport to player | • Ask GM a private question |
+| • Tools: Flash-TP, Nametags, Setup | • Request speech time (Ghosts) |
 
-### 🧑‍🌾 Commandes Joueurs (Tous)
 
-| Commande | Description |
-| :--- | :--- |
-| `/botc help` | Affiche l'aide en jeu |
-| `/botc voteoui` | Lève la main pour voter OUI à l'accusation en cours |
-| `/botc mapvote choose <map>` | Vote pour une carte lors d'un scrutin ouvert |
+### 🔮 For the Storyteller (GM): *The Storyteller's Grimoire*
+Upon joining or resetting (`/botc reset`), the GM receives an **Enchanted Book** named **"📖 The Storyteller's Grimoire"**.
+Right-clicking with the book in hand opens:
+1. **Main GUI Menu**: 1-click access to the Day/Night cycle, death announcements, seating gather, voice moderation, nametag visibility, and map votes.
+2. **Grimoire View (`GrimoireView`)**: An interactive double chest UI displaying the head of each player (in their exact seating order around the table).
+   - **Left Click**: Opens the action submenu (`ActionMenuView`) to assign secret roles, kill/revive players, or manage ghost vote tokens.
+   - **Shift + Click**: Instantly teleports the Storyteller behind the selected player.
+   - **Ender Pearl (Slot 45)**: Flash-teleports the Storyteller to the center of the Tribunal.
+   - **Nametag (Slot 46)**: Toggles player nametag anonymity/visibility above their heads.
+
+### 📕 For Players: *The Tribunal Registry & Role Book*
+Players receive two books upon arrival:
+1. **"Role Book" (Written Book)**: A complete summary of all script roles (Demons, Minions, Townsfolk, Outsiders) along with the official wake order for the First Night and subsequent Nights.
+2. **"Tribunal Registry" (Book)**: An interactive 9-slot menu (`PlayerRegistryView`):
+   - 🟢 **Raise Hand (Vote YES)**: Registers a vote for the active nomination (automatically handles ghost vote token consumption).
+   - 📜 **Nominate a Suspect**: Opens a registry (`NominationView`) listing living players to launch a public accusation (includes automated handling for **Virgin** and **Drunk** abilities).
+   - 📖 **Secret Role Reminder**: Displays the GM-assigned role and its description (displays the false role if the player is the Drunk!).
+   - 🪶 **Ask a Question**: Allows the player to type a question in chat that is transmitted **exclusively in private to the Storyteller**.
+   - 📄 **Request Speech**: Allows ghosts to send a clickable `[GRANT]` alert to Storytellers to speak at the Council.
 
 ---
 
-## ⚙️ Installation & Premier Démarrage
+## ✨ Core Features
 
-1. Téléchargez le fichier `botc-plugin-2.0-stable.jar`.
-2. Déposez le fichier `.jar` dans le dossier `plugins/` de votre serveur **PaperMC** (1.20 ou 1.21).
-3. Assurez-vous d'avoir installé **[Simple Voice Chat](https://modrinth.com/plugin/simple-voice-chat)** dans le dossier `plugins/`.
-4. Démarrez votre serveur. Le fichier de configuration `plugins/BotcPlugin/config.yml` sera généré automatiquement.
-5. *(Optionnel mais fortement recommandé)* Incitez vos joueurs à installer le mod **[Sound Physics Remastered](https://modrinth.com/mod/sound-physics-remastered)** sur leur client Fabric/Forge pour un blocage parfait du son à travers les murs.
+- 🌗 **Animated & Guided Day / Night Cycle**:
+  - Smooth sky transitions (accelerated 60 FPS sun movement with atmospheric drumbeats).
+  - **3D Particle Compass / GPS**: At nightfall, every player is guided by a glowing particle arrow toward their assigned room. At daybreak, the arrow guides everyone back to the Tribunal.
+  - **Door Head System**: At night, each player's head automatically appears on their bedroom door.
+- 🪑 **Secure Invisible Chairs & Tribunal**:
+  - Automatic seating of players onto invisible seats (`botc_chair`) ordered around the discussion circle.
+  - **Anti-Dismount Lock**: Prevents players from standing up during official debates.
+  - **Secure Reconnection**: If a player crashes or disconnects, they are automatically placed back onto their chair upon reconnecting.
+- 👑 **Role System & Real vs Fake BossBar**:
+  - 1-click role assignment via themed menus (Blue Wool = Townsfolk, Yellow = Outsiders, Orange = Minions, Red = Demons).
+  - **Drunk Management**: The Storyteller can right-click assign a role to create a Drunk (the GM sees their true "Drunk" role in the Grimoire, but the player sees a real Townsfolk role on their screen and BossBar!).
+  - **Automatic Scarlet Woman Transfer**: If the Imp dies during a vote while 5 or more players remain alive, the Scarlet Woman automatically inherits the Imp role with a private alert.
+  - **Permanent BossBar**: A subtle purple/gold banner at the top of the screen reminding each player of their secret role.
+- ⚡ **Execution Animations & Lightning**:
+  - Dramatic deaths with Wither sounds, dark smoke particles, and a Barrier helmet head.
+  - Configurable lightning modes (`player` to strike the player, or `local` to strike the execution platform).
+- 🏷️ **Anonymity Management (Nametags)**:
+  - Global Scoreboard team-based nametag hiding to prevent players from spotting each other through walls at night.
+
+---
+
+## 🗺️ Multi-Map Support & Game Presets
+
+The plugin supports an unlimited number of maps and game arenas saved independently in the configuration.
+
+- **Easy Creation**: Create presets (`/botc preset create <name>`) directly in-game or via interactive chat (Anvil menu).
+- **Independent Saves**: Each preset retains its own chair positions, room locations, tribunal center, and execution platform.
+- **🗳️ In-Chat Map Voting (`/botc mapvote`)**:
+  - The Storyteller can launch a 30-second interactive vote in chat (`/botc mapvote start`).
+  - Players click on the arena of their choice.
+  - At the end of the sound countdown, the map with the most votes is automatically loaded by the plugin!
+
+---
+
+## ⌨️ Command Guide
+
+All commands run through the root command `/botc`:
+
+### 🧙‍♂️ Storyteller Commands (OP)
+
+| Command | Description |
+| :--- | :--- |
+| `/botc setup` / `/botc admin` | Opens the main administration and configuration menu |
+| `/botc start` / `/botc reset` | Resets the game (revives players, issues books, resets roles and tokens) |
+| `/botc jour` | Triggers morning (celestial animation + compass pointing to Tribunal) |
+| `/botc nuit` | Triggers night (celestial animation + compass pointing to rooms + door heads) |
+| `/botc tempslibre` | Frees player movements and voice chat |
+| `/botc conseil` | Displays the compass pointing to the council room |
+| `/botc assis` | Sits all players on their assigned seats and creates the voice channel |
+| `/botc debout` | Frees players from their seats |
+| `/botc silence` | Mutes all villagers' microphones via the SVC API |
+| `/botc paroleall` | Restores voice speech permissions to all players |
+| `/botc grantparole <player>` | Grants speech time to a specific player |
+| `/botc vcmute <player>` | Mutes a specific player in voice chat |
+| `/botc vcunmute <player>` | Unmutes a specific player in voice chat |
+| `/botc execute <player>` | Officially executes a condemned player (animations + platform) |
+| `/botc mort` | Announces the list of daily deaths with a sound effect |
+| `/botc hidenames` | Hides player nametags above their heads |
+| `/botc shownames` | Restores player nametags |
+| `/botc mapvote start` | Starts a 30s map election in chat |
+| `/botc mapvote stop` | Immediately closes the map election and loads the winner |
+| `/botc preset <select/create/delete/list>` | Manages map presets |
+| `/botc settribunal` | Sets your current position as the center of the Tribunal |
+| `/botc addchair` | Registers a new chair at your current position |
+| `/botc delchairs` | Deletes all chairs for the active preset |
+| `/botc showchairs` | Displays chairs for the active preset with particles |
+| `/botc addroom` | Registers a bedroom door at your current position |
+| `/botc delrooms` | Deletes all rooms for the active preset |
+| `/botc showrooms` | Displays rooms for the active preset with particles |
+| `/botc setplayerdeath` | Registers your position as the execution platform |
+| `/botc setlightning <player\|local>` | Sets the execution lightning mode |
+
+### 🧑‍🌾 Player Commands (Everyone)
+
+| Command | Description |
+| :--- | :--- |
+| `/botc help` | Displays in-game help |
+| `/botc voteoui` | Raises hand to vote YES on the active nomination |
+| `/botc mapvote choose <map>` | Votes for a map during an active election |
+
+---
+
+## ⚙️ Installation & Quick Start
+
+1. Download the file `botc-plugin-2.0-stable.jar`.
+2. Drop the `.jar` file into your **PaperMC** server's `plugins/` directory (1.20 or 1.21).
+3. Make sure **[Simple Voice Chat](https://modrinth.com/plugin/simple-voice-chat)** is installed in the `plugins/` folder.
+4. Start your server. The configuration file `plugins/BotcPlugin/config.yml` will be generated automatically.
+5. *(Optional but highly recommended)* Encourage your players to install the **[Sound Physics Remastered](https://modrinth.com/mod/sound-physics-remastered)** mod on their Fabric/Forge client for perfect sound occlusion through walls.
 
 ---
 
 ## 🤝 Open Source & Contributions
 
-Ce projet est **100% open-source** distribué sous la licence **MIT**.  
-Vous êtes libres de l'utiliser, de le modifier ou de contribuer au code source !
+This project is **100% open-source** distributed under the **MIT License**.  
+You are free to use it, modify it, or contribute to the source code!
 
-- 📦 **Code Source GitHub** : [https://github.com/Neytabi/BOTC-Plugin](https://github.com/Neytabi/BOTC-Plugin)
-- 🐛 **Signaler un bug / Proposer une idée** : [GitHub Issues](https://github.com/Neytabi/BOTC-Plugin/issues)
-- 🤝 **Pull Requests** : Les contributions sont les bienvenues !
+- 📦 **GitHub Source Code**: [https://github.com/Neytabi/BOTC-Plugin](https://github.com/Neytabi/BOTC-Plugin)
+- 🐛 **Report a Bug / Suggest an Idea**: [GitHub Issues](https://github.com/Neytabi/BOTC-Plugin/issues)
+- 🤝 **Pull Requests**: Contributions are welcome!
