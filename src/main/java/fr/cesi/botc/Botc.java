@@ -286,11 +286,9 @@ public final class Botc extends JavaPlugin {
     }
 
     public void executePlayer(BotcPlayer targetBotc, org.bukkit.command.CommandSender admin) {
-        targetBotc.setAlive(false);
-
+        long vivantsRestants = playersMap.values().stream().filter(bp -> bp != null && bp.isAlive()).count();
+        targetBotc.setAlive(false); 
         if (targetBotc.getRealRole().equalsIgnoreCase("Diablotin")) {
-            long vivantsRestants = playersMap.values().stream().filter(bp -> bp != null && bp.isAlive()).count();
-
             if (vivantsRestants >= 5) {
                 BotcPlayer scarletWoman = null;
                 for (BotcPlayer bp : playersMap.values()) {
