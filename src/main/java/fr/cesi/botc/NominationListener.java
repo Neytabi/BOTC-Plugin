@@ -44,6 +44,12 @@ public class NominationListener implements Listener {
         UUID accuserUUID = accuser.getUniqueId();
         UUID targetUUID = meta.getOwningPlayer().getUniqueId();
 
+        if (main.getHasNominatedToday().contains(accuserUUID)) {
+            accuser.closeInventory();
+            accuser.sendMessage(Component.text("x Tu as déjà lancé une accusation aujourd'hui ! (Une seule par jour)", NamedTextColor.RED));
+            return;
+        }
+
         // Vérification des limites de nomination (la Vierge est immunisée à la limite quotidienne)
         BotcPlayer targetBP = main.getPlayersMap().get(targetUUID);
         boolean isVierge = targetBP != null && targetBP.getDisplayedRole().equalsIgnoreCase("Vierge");
@@ -61,7 +67,9 @@ public class NominationListener implements Listener {
         if (!isVierge) {
             main.getHasBeenNominatedToday().add(targetUUID);
         }
-
+        
+        main.getHasNominatedToday().add(accuserUUID);
+        
         Bukkit.broadcast(Component.text("----------------------------------------", NamedTextColor.GRAY));
         Bukkit.broadcast(Component.text("ACCUSATION FORMELLE !", NamedTextColor.GOLD).decorate(TextDecoration.BOLD));
         Bukkit.broadcast(Component.text(accuser.getName(), NamedTextColor.YELLOW)
