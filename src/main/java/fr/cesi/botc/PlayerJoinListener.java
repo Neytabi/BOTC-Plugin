@@ -91,6 +91,10 @@ public class PlayerJoinListener implements Listener {
 
                         player.teleport(chairLoc);
 
+                        chairLoc.getNearbyEntities(0.5, 1.0, 0.5).stream()
+                            .filter(e -> e instanceof Horse && e.getScoreboardTags().contains("botc_chair"))
+                            .forEach(org.bukkit.entity.Entity::remove);
+                        
                         Horse chair = w.spawn(chairLoc, Horse.class, horse -> {
                             horse.setGravity(false);
                             horse.setSilent(true);
