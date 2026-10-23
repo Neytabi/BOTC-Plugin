@@ -36,12 +36,14 @@ public class GameChatListener implements Listener {
                     .append(Component.text(player.getName() + " : ", NamedTextColor.YELLOW))
                     .append(Component.text(PlainTextComponentSerializer.plainText().serialize(event.message()), NamedTextColor.WHITE));
 
-            for (Player op : Bukkit.getOnlinePlayers()) {
-                if (op.isOp()) {
-                    op.sendMessage(log);
-                    op.playSound(op.getLocation(), org.bukkit.Sound.ENTITY_CHICKEN_EGG, 0.6f, 1.2f);
+            Bukkit.getScheduler().runTask(main, () -> {
+                for (Player op : Bukkit.getOnlinePlayers()) {
+                    if (op.isOp()) {
+                        op.sendMessage(log);
+                        op.playSound(op.getLocation(), org.bukkit.Sound.ENTITY_CHICKEN_EGG, 0.6f, 1.2f);
+                    }
                 }
-            }
+            });
             player.sendMessage(Component.text("Votre question a été transmise en privé aux Conteurs.", NamedTextColor.GREEN));
             return;
         }
