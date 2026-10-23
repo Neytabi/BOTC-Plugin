@@ -303,6 +303,7 @@ public final class Botc extends JavaPlugin {
 
                     Player pScarlet = Bukkit.getPlayer(scarletWoman.getPlayerUUID());
                     if (pScarlet != null) {
+                        main.rafraichirRoleBossBar(pScarlet, "Diablotin");
                         pScarlet.sendMessage(Component.text("=====================================", NamedTextColor.DARK_RED));
                         pScarlet.sendMessage(Component.text("LA FEMME ECARLATE S'EVEILLE !", NamedTextColor.GOLD).decorate(TextDecoration.BOLD));
                         pScarlet.sendMessage(Component.text("Le Diablotin est mort. Tu deviens le nouveau DIABLOTIN !", NamedTextColor.RED));
