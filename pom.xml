@@ -6,7 +6,7 @@
 
     <groupId>fr.cesi</groupId>
     <artifactId>botc-plugin</artifactId>
-    <version>2.0-stable</version>
+    <version>1.0-beta</version>
     <packaging>jar</packaging>
 
     <name>botc-plugin</name>
@@ -47,7 +47,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.13.0</version>
+                <version>3.14.0</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
@@ -56,7 +56,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.5.3</version>
+                <version>3.6.2</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -97,7 +97,8 @@
         <dependency>
             <groupId>de.maxhenkel.voicechat</groupId>
             <artifactId>voicechat-api</artifactId>
-            <version>2.5.0</version> <scope>provided</scope>
+            <version>2.6.25</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>
