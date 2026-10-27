@@ -104,7 +104,7 @@ public class ConteurMenuListener implements Listener {
         // ==========================================================
         //  LIGNE 2 : BARRE DE SETUP ET CONFIGURATION (Slots 9 à 17)
         // ==========================================================
-        else if (slot >= 9 && slot <= 17) {
+        else if (slot <= 17) {
             int relativeSlot = slot - 9;
 
             switch (relativeSlot) {

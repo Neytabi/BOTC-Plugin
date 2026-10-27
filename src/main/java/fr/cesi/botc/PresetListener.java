@@ -54,7 +54,7 @@ public class PresetListener implements Listener {
             if (meta == null) return;
 
             String displayName = plainText(meta.displayName());
-            String presetName = displayName.replace("", "").trim().toLowerCase();
+            String presetName = displayName.trim().toLowerCase();
 
             // CLIC DROIT -> SUPPRIMER
             if (event.isRightClick()) {

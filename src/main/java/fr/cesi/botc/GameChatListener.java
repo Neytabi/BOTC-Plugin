@@ -59,7 +59,10 @@ public class GameChatListener implements Listener {
         ItemStack item = event.getItem();
         if (item == null || !item.hasItemMeta()) return;
 
-        String itemName = PlainTextComponentSerializer.plainText().serialize(item.getItemMeta().displayName());
+        Component displayNameComponent = item.getItemMeta().displayName();
+        if (displayNameComponent == null) return;
+
+        String itemName = PlainTextComponentSerializer.plainText().serialize(displayNameComponent);
 
         // Interaction : Bouton de question secrète
         if (itemName.contains("Poser une Question")) {

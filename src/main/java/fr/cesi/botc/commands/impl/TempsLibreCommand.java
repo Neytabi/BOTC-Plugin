@@ -1,6 +1,5 @@
 package fr.cesi.botc.commands.impl;
 
-import fr.cesi.botc.Botc;
 import fr.cesi.botc.commands.SubCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -13,7 +12,7 @@ import java.util.List;
 
 public class TempsLibreCommand implements SubCommand {
 
-    public TempsLibreCommand(Botc main) {
+    public TempsLibreCommand() {
     }
 
     @Override

@@ -43,7 +43,7 @@ public class PlayerJoinListener implements Listener {
                 player.getInventory().addItem(livreMJ);
             }
         } else {
-            //  Objet des Joueurs (Livre Normal) -> AJOUTÉ ICI !
+            // Objet des Joueurs (Livre Normal) -> AJOUTÉ ICI !
             org.bukkit.inventory.ItemStack registreJoueur = new org.bukkit.inventory.ItemStack(
                     org.bukkit.Material.BOOK);
             org.bukkit.inventory.meta.ItemMeta meta = registreJoueur.getItemMeta();
@@ -59,7 +59,7 @@ public class PlayerJoinListener implements Listener {
         }
 
         // =========================================================================
-        //  AJOUT : RE-FIXATION AUTOMATIQUE SUR LA CHAISE APRÈS UN CRASH
+        // AJOUT : RE-FIXATION AUTOMATIQUE SUR LA CHAISE APRÈS UN CRASH
         // =========================================================================
         BotcPlayer bp = main.getPlayersMap().get(player.getUniqueId());
         if (main.isSeatsAssigned() && bp != null && bp.getChairIndex() != -1 && !player.isOp()) {
@@ -69,7 +69,9 @@ public class PlayerJoinListener implements Listener {
                 // On vérifie si le reste du village est actuellement assis
                 boolean villageEstAssis = false;
                 for (Player onlineP : Bukkit.getOnlinePlayers()) {
-                    if (onlineP.isInsideVehicle() && onlineP.getVehicle().getScoreboardTags().contains("botc_chair")) {
+                    org.bukkit.entity.Entity vehicle = onlineP.getVehicle();
+                    if (onlineP.isInsideVehicle() && vehicle != null
+                            && vehicle.getScoreboardTags().contains("botc_chair")) {
                         villageEstAssis = true;
                         break;
                     }
@@ -92,10 +94,10 @@ public class PlayerJoinListener implements Listener {
                         player.teleport(chairLoc);
 
                         chairLoc.getNearbyEntities(0.5, 1.0, 0.5).stream()
-                            .filter(e -> e instanceof Horse && e.getScoreboardTags().contains("botc_chair"))
-                            .forEach(org.bukkit.entity.Entity::remove);
-                        
-                        Horse chair = w.spawn(chairLoc, Horse.class, horse -> {
+                                .filter(e -> e instanceof Horse && e.getScoreboardTags().contains("botc_chair"))
+                                .forEach(org.bukkit.entity.Entity::remove);
+
+                        Horse chair = w.spawn(chairLoc, Horse.class, (org.bukkit.entity.Horse horse) -> {
                             horse.setGravity(false);
                             horse.setSilent(true);
                             horse.setInvulnerable(true);

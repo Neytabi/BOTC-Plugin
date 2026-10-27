@@ -45,9 +45,7 @@ public class PlayerRegistryListener implements Listener {
                 } else if (clicked.getType() == Material.LIME_WOOL) {
                     main.getVoteManager().registerVote(player);
 
-                    Bukkit.getScheduler().runTask(main, () -> {
-                        new PlayerRegistryView().openRegistryMenu(player, main);
-                    });
+                    Bukkit.getScheduler().runTask(main, () -> new PlayerRegistryView().openRegistryMenu(player, main));
                     player.playSound(player.getLocation(), org.bukkit.Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 1.0f);
                 }
                 break;

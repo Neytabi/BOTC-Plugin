@@ -15,7 +15,9 @@ public final class Botc extends JavaPlugin {
 
     private final java.util.Set<java.util.UUID> vcMutedPlayers = new java.util.HashSet<>();
 
-    public java.util.Set<java.util.UUID> getVcMutedPlayers() { return vcMutedPlayers; }
+    public java.util.Set<java.util.UUID> getVcMutedPlayers() {
+        return vcMutedPlayers;
+    }
 
     private final HashMap<UUID, BotcPlayer> playersMap = new HashMap<>();
     private VoteManager voteManager;
@@ -26,43 +28,94 @@ public final class Botc extends JavaPlugin {
     private final java.util.HashMap<java.util.UUID, Boolean> isAskingQuestion = new java.util.HashMap<>();
     private boolean isCouncilOpen = false;
 
-    //  SÉCURISATION DU STATUT DES MENUS ET DU VOTE DE MAP
+    // SÉCURISATION DU STATUT DES MENUS ET DU VOTE DE MAP
     private boolean nameTagsHidden = false;
     private boolean isMapVoteOpen = false;
     private final java.util.HashMap<java.util.UUID, String> mapVotes = new java.util.HashMap<>();
     private org.bukkit.scheduler.BukkitTask mapVoteTask = null;
 
-    public boolean isNameTagsHidden() { return nameTagsHidden; }
-    public void setNameTagsHidden(boolean hidden) { this.nameTagsHidden = hidden; }
-    public boolean isMapVoteOpen() { return isMapVoteOpen; }
-    public void setMapVoteOpen(boolean open) { this.isMapVoteOpen = open; }
-    public java.util.HashMap<java.util.UUID, String> getMapVotes() { return mapVotes; }
-    public org.bukkit.scheduler.BukkitTask getMapVoteTask() { return mapVoteTask; }
-    public void setMapVoteTask(org.bukkit.scheduler.BukkitTask task) { this.mapVoteTask = task; }
+    public boolean isNameTagsHidden() {
+        return nameTagsHidden;
+    }
 
-    public java.util.List<java.util.UUID> getHasNominatedToday() { return hasNominatedToday; }
-    public java.util.List<java.util.UUID> getHasBeenNominatedToday() { return hasBeenNominatedToday; }
-    public java.util.HashMap<java.util.UUID, Boolean> getIsAskingQuestion() { return isAskingQuestion; }
-    public boolean isCouncilOpen() { return isCouncilOpen; }
-    public void setCouncilOpen(boolean open) { this.isCouncilOpen = open; }
+    public void setNameTagsHidden(boolean hidden) {
+        this.nameTagsHidden = hidden;
+    }
+
+    public boolean isMapVoteOpen() {
+        return isMapVoteOpen;
+    }
+
+    public void setMapVoteOpen(boolean open) {
+        this.isMapVoteOpen = open;
+    }
+
+    public java.util.HashMap<java.util.UUID, String> getMapVotes() {
+        return mapVotes;
+    }
+
+    public org.bukkit.scheduler.BukkitTask getMapVoteTask() {
+        return mapVoteTask;
+    }
+
+    public void setMapVoteTask(org.bukkit.scheduler.BukkitTask task) {
+        this.mapVoteTask = task;
+    }
+
+    public java.util.List<java.util.UUID> getHasNominatedToday() {
+        return hasNominatedToday;
+    }
+
+    public java.util.List<java.util.UUID> getHasBeenNominatedToday() {
+        return hasBeenNominatedToday;
+    }
+
+    public java.util.HashMap<java.util.UUID, Boolean> getIsAskingQuestion() {
+        return isAskingQuestion;
+    }
+
+    public boolean isCouncilOpen() {
+        return isCouncilOpen;
+    }
+
+    public void setCouncilOpen(boolean open) {
+        this.isCouncilOpen = open;
+    }
 
     private boolean seatsAssigned = false;
-    public boolean isSeatsAssigned() { return seatsAssigned; }
-    public void setSeatsAssigned(boolean assigned) { this.seatsAssigned = assigned; }
 
-    public boolean isNight() { return isNight; }
+    public boolean isSeatsAssigned() {
+        return seatsAssigned;
+    }
+
+    public void setSeatsAssigned(boolean assigned) {
+        this.seatsAssigned = assigned;
+    }
+
+    public boolean isNight() {
+        return isNight;
+    }
+
     private String activePreset = "default";
 
-    public String getActivePreset() { return activePreset; }
+    public String getActivePreset() {
+        return activePreset;
+    }
+
     public void setActivePreset(String preset) {
         this.activePreset = preset;
         getConfig().set("active_preset", preset);
         saveConfig();
     }
+
     public String getPresetPath(String subPath) {
         return "presets." + activePreset + "." + subPath;
     }
-    public void setNight(boolean night) { this.isNight = night; }
+
+    public void setNight(boolean night) {
+        this.isNight = night;
+    }
+
     private final HashMap<UUID, BossBar> activeBossBars = new HashMap<>();
 
     @Override
@@ -74,7 +127,10 @@ public final class Botc extends JavaPlugin {
         this.activePreset = getConfig().getString("active_preset", "default");
         // 1. FORCER LA CRÉATION DU DOSSIER ET DE LA CONFIG
         if (!getDataFolder().exists()) {
-            getDataFolder().mkdir();
+            boolean created = getDataFolder().mkdirs();
+            if (!created) {
+                getLogger().warning("Impossible de créer le dossier de données du plugin !");
+            }
         }
 
         // 2. ENREGISTREMENT DE LA COMMANDE ET DE SON AUTO-COMPLÉTION
@@ -91,7 +147,8 @@ public final class Botc extends JavaPlugin {
         if (team == null) {
             team = sb.registerNewTeam("botc_night");
         }
-        team.setOption(org.bukkit.scoreboard.Team.Option.NAME_TAG_VISIBILITY, org.bukkit.scoreboard.Team.OptionStatus.NEVER);
+        team.setOption(org.bukkit.scoreboard.Team.Option.NAME_TAG_VISIBILITY,
+                org.bukkit.scoreboard.Team.OptionStatus.NEVER);
 
         // 4. CONFIGURATION PAR DÉFAUT
         getConfig().options().copyDefaults(true);
@@ -124,13 +181,14 @@ public final class Botc extends JavaPlugin {
         }
 
         // 7. LIAISON SIMPLE VOICE CHAT API + CORRECTEUR APÈS UN UN RELOAD PLUGMAN
-        de.maxhenkel.voicechat.api.BukkitVoicechatService service = getServer().getServicesManager().load(de.maxhenkel.voicechat.api.BukkitVoicechatService.class);
+        de.maxhenkel.voicechat.api.BukkitVoicechatService service = getServer().getServicesManager()
+                .load(de.maxhenkel.voicechat.api.BukkitVoicechatService.class);
         if (service != null) {
             this.voicechatPlugin = new BotcVoicechatPlugin();
             service.registerPlugin(this.voicechatPlugin);
             getLogger().info("Liaison initiale avec Simple Voice Chat API réussie !");
 
-            // ---  LE FIX DE FORCAGE POUR PLUGMAN  ---
+            // --- LE FIX DE FORCAGE POUR PLUGMAN ---
             try {
                 de.maxhenkel.voicechat.api.VoicechatApi foundApi = null;
 
@@ -147,7 +205,8 @@ public final class Botc extends JavaPlugin {
                     // Si elle se cache dans une sous-collection de plugins déjà enregistrés
                     if (val instanceof java.util.Collection<?> collection) {
                         for (Object obj : collection) {
-                            if (obj == null) continue;
+                            if (obj == null)
+                                continue;
                             for (java.lang.reflect.Field f2 : obj.getClass().getDeclaredFields()) {
                                 f2.setAccessible(true);
                                 Object maybeApi = f2.get(obj);
@@ -156,16 +215,20 @@ public final class Botc extends JavaPlugin {
                                     break;
                                 }
                             }
-                            if (foundApi != null) break;
+                            if (foundApi != null)
+                                break;
                         }
                     }
-                    if (foundApi != null) break;
+                    if (foundApi != null)
+                        break;
                 }
 
-                // Si on a localisé l'API en mémoire, on la ré-injecte de force dans ton plugin tout neuf
+                // Si on a localisé l'API en mémoire, on la ré-injecte de force dans ton plugin
+                // tout neuf
                 if (foundApi != null) {
                     for (java.lang.reflect.Field field : this.voicechatPlugin.getClass().getDeclaredFields()) {
-                        if (field.getType().isAssignableFrom(foundApi.getClass()) || field.getType().getName().contains("Voicechat")) {
+                        if (field.getType().isAssignableFrom(foundApi.getClass())
+                                || field.getType().getName().contains("Voicechat")) {
                             field.setAccessible(true);
                             field.set(this.voicechatPlugin, foundApi);
                             getLogger().info(" [PLUGMAN REPAIR] Connexion au serveur vocal restaurée avec succès !");
@@ -215,10 +278,11 @@ public final class Botc extends JavaPlugin {
         this.seatsAssigned = false;
         this.isCouncilOpen = false;
 
-        //  On vide simplement la liste des mutes, le BotcVoicechatPlugin s'occupe du reste.
+        // On vide simplement la liste des mutes, le BotcVoicechatPlugin s'occupe du
+        // reste.
         this.vcMutedPlayers.clear();
 
-        //  CORRECTION MULTI-MAP : On utilise getPresetPath("rooms")
+        // CORRECTION MULTI-MAP : On utilise getPresetPath("rooms")
         List<String> roomsStr = getConfig().getStringList(getPresetPath("rooms"));
         for (String roomStr : roomsStr) {
             String[] parts = roomStr.split(",");
@@ -241,10 +305,11 @@ public final class Botc extends JavaPlugin {
                 p.getInventory().setHelmet(new org.bukkit.inventory.ItemStack(org.bukkit.Material.AIR));
                 p.setGameMode(org.bukkit.GameMode.SURVIVAL);
 
-                //  SYNCHRONISATION PARFAITE AVEC PLAYERJOINLISTENER
+                // SYNCHRONISATION PARFAITE AVEC PLAYERJOINLISTENER
                 p.getInventory().clear();
                 if (p.isOp()) {
-                    org.bukkit.inventory.ItemStack livreMJ = new org.bukkit.inventory.ItemStack(org.bukkit.Material.ENCHANTED_BOOK);
+                    org.bukkit.inventory.ItemStack livreMJ = new org.bukkit.inventory.ItemStack(
+                            org.bukkit.Material.ENCHANTED_BOOK);
                     org.bukkit.inventory.meta.ItemMeta meta = livreMJ.getItemMeta();
                     if (meta != null) {
                         meta.displayName(Component.text(" Le Grimoire du Conteur", NamedTextColor.DARK_PURPLE));
@@ -252,7 +317,8 @@ public final class Botc extends JavaPlugin {
                     }
                     p.getInventory().setItem(0, livreMJ);
                 } else {
-                    org.bukkit.inventory.ItemStack registreJoueur = new org.bukkit.inventory.ItemStack(org.bukkit.Material.BOOK);
+                    org.bukkit.inventory.ItemStack registreJoueur = new org.bukkit.inventory.ItemStack(
+                            org.bukkit.Material.BOOK);
                     org.bukkit.inventory.meta.ItemMeta meta = registreJoueur.getItemMeta();
                     if (meta != null) {
                         meta.displayName(Component.text(" Registre du Tribunal", NamedTextColor.DARK_GREEN));
@@ -262,32 +328,41 @@ public final class Botc extends JavaPlugin {
                 }
             }
         }
-        org.bukkit.Bukkit.broadcast(net.kyori.adventure.text.Component.text("[BOTC] Le Conteur a reinitialise la partie. Tout le monde est vivant et les jetons de vote sont rendus !", net.kyori.adventure.text.format.NamedTextColor.GOLD));
+        org.bukkit.Bukkit.broadcast(net.kyori.adventure.text.Component.text(
+                "[BOTC] Le Conteur a reinitialise la partie. Tout le monde est vivant et les jetons de vote sont rendus !",
+                net.kyori.adventure.text.format.NamedTextColor.GOLD));
     }
 
     public void prononcerMort(org.bukkit.entity.Player victim) {
-        if (victim == null || !victim.isOnline()) return;
+        if (victim == null || !victim.isOnline())
+            return;
 
         net.kyori.adventure.title.Title deathTitle = net.kyori.adventure.title.Title.title(
                 Component.text(" TU ES MORT ", net.kyori.adventure.text.format.NamedTextColor.DARK_RED)
                         .decorate(net.kyori.adventure.text.format.TextDecoration.BOLD),
-                Component.text("Tu deviens un fantôme. Il te reste 1 ultime vote.", net.kyori.adventure.text.format.NamedTextColor.GRAY)
-        );
+                Component.text("Tu deviens un fantôme. Il te reste 1 ultime vote.",
+                        net.kyori.adventure.text.format.NamedTextColor.GRAY));
 
         victim.showTitle(deathTitle);
         victim.playSound(victim.getLocation(), org.bukkit.Sound.ENTITY_WITHER_DEATH, 0.7f, 0.5f);
         victim.getWorld().strikeLightningEffect(victim.getLocation());
 
-        victim.sendMessage(Component.text("=============================================", net.kyori.adventure.text.format.NamedTextColor.DARK_RED));
-        victim.sendMessage(Component.text(" BIENVENUE DANS L'AU-DELÀ", net.kyori.adventure.text.format.NamedTextColor.RED).decorate(net.kyori.adventure.text.format.TextDecoration.BOLD));
-        victim.sendMessage(Component.text("- Tu n'as plus de rôle actif et tu ne peux plus nommer de suspect.", net.kyori.adventure.text.format.NamedTextColor.GRAY));
-        victim.sendMessage(Component.text("- Ton bouton de vote dans ton Registre est encore actif pour UN SEUL vote.", net.kyori.adventure.text.format.NamedTextColor.YELLOW));
-        victim.sendMessage(Component.text("=============================================", net.kyori.adventure.text.format.NamedTextColor.DARK_RED));
+        victim.sendMessage(Component.text("=============================================",
+                net.kyori.adventure.text.format.NamedTextColor.DARK_RED));
+        victim.sendMessage(
+                Component.text(" BIENVENUE DANS L'AU-DELÀ", net.kyori.adventure.text.format.NamedTextColor.RED)
+                        .decorate(net.kyori.adventure.text.format.TextDecoration.BOLD));
+        victim.sendMessage(Component.text("- Tu n'as plus de rôle actif et tu ne peux plus nommer de suspect.",
+                net.kyori.adventure.text.format.NamedTextColor.GRAY));
+        victim.sendMessage(Component.text("- Ton bouton de vote dans ton Registre est encore actif pour UN SEUL vote.",
+                net.kyori.adventure.text.format.NamedTextColor.YELLOW));
+        victim.sendMessage(Component.text("=============================================",
+                net.kyori.adventure.text.format.NamedTextColor.DARK_RED));
     }
 
     public void executePlayer(BotcPlayer targetBotc, org.bukkit.command.CommandSender admin) {
         long vivantsRestants = playersMap.values().stream().filter(bp -> bp != null && bp.isAlive()).count();
-        targetBotc.setAlive(false); 
+        targetBotc.setAlive(false);
         if (targetBotc.getRealRole().equalsIgnoreCase("Diablotin")) {
             if (vivantsRestants >= 5) {
                 BotcPlayer scarletWoman = null;
@@ -299,24 +374,33 @@ public final class Botc extends JavaPlugin {
                 }
 
                 if (scarletWoman != null) {
-                    scarletWoman.setRole("Diablotin", "Tu as herite du role de Diablotin suite a la mort de ton maitre !");
+                    scarletWoman.setRole("Diablotin",
+                            "Tu as herite du role de Diablotin suite a la mort de ton maitre !");
 
                     Player pScarlet = Bukkit.getPlayer(scarletWoman.getPlayerUUID());
                     if (pScarlet != null) {
-                        main.rafraichirRoleBossBar(pScarlet, "Diablotin");
-                        pScarlet.sendMessage(Component.text("=====================================", NamedTextColor.DARK_RED));
-                        pScarlet.sendMessage(Component.text("LA FEMME ECARLATE S'EVEILLE !", NamedTextColor.GOLD).decorate(TextDecoration.BOLD));
-                        pScarlet.sendMessage(Component.text("Le Diablotin est mort. Tu deviens le nouveau DIABLOTIN !", NamedTextColor.RED));
-                        pScarlet.sendMessage(Component.text("=====================================", NamedTextColor.DARK_RED));
+                        rafraichirRoleBossBar(pScarlet, "Diablotin");
+                        pScarlet.sendMessage(
+                                Component.text("=====================================", NamedTextColor.DARK_RED));
+                        pScarlet.sendMessage(Component.text("LA FEMME ECARLATE S'EVEILLE !", NamedTextColor.GOLD)
+                                .decorate(TextDecoration.BOLD));
+                        pScarlet.sendMessage(Component.text("Le Diablotin est mort. Tu deviens le nouveau DIABLOTIN !",
+                                NamedTextColor.RED));
+                        pScarlet.sendMessage(
+                                Component.text("=====================================", NamedTextColor.DARK_RED));
                     }
                     if (admin != null) {
-                        admin.sendMessage(Component.text("[PROTEGE] Le Diablotin est mort, mais la Femme Ecarlate a pris sa place automatiquement !", NamedTextColor.GOLD));
+                        admin.sendMessage(Component.text(
+                                "[PROTEGE] Le Diablotin est mort, mais la Femme Ecarlate a pris sa place automatiquement !",
+                                NamedTextColor.GOLD));
                     }
                 }
             }
         }
 
-        Bukkit.broadcast(Component.text("[BOTC] Une ombre plane sur le village... " + targetBotc.getPlayerName() + " est mort.", NamedTextColor.RED));
+        Bukkit.broadcast(
+                Component.text("[BOTC] Une ombre plane sur le village... " + targetBotc.getPlayerName() + " est mort.",
+                        NamedTextColor.RED));
 
         final Player pTarget = Bukkit.getPlayer(targetBotc.getPlayerUUID());
 
@@ -355,7 +439,8 @@ public final class Botc extends JavaPlugin {
             }
 
             pTarget.getInventory().setHelmet(new org.bukkit.inventory.ItemStack(org.bukkit.Material.BARRIER));
-            pTarget.getWorld().spawnParticle(org.bukkit.Particle.LARGE_SMOKE, pTarget.getLocation().add(0, 1, 0), 30, 0.5, 0.5, 0.5, 0.05);
+            pTarget.getWorld().spawnParticle(org.bukkit.Particle.LARGE_SMOKE, pTarget.getLocation().add(0, 1, 0), 30,
+                    0.5, 0.5, 0.5, 0.05);
 
             Bukkit.getScheduler().runTaskLater(this, () -> {
                 prononcerMort(pTarget);
@@ -366,6 +451,7 @@ public final class Botc extends JavaPlugin {
             }, 60L);
         }
     }
+
     public void rafraichirRoleBossBar(Player player, String roleName) {
         // Si le joueur a déjà une ancienne BossBar de rôle, on la cache
         if (activeBossBars.containsKey(player.getUniqueId())) {
@@ -378,8 +464,7 @@ public final class Botc extends JavaPlugin {
                         .append(Component.text(roleName, NamedTextColor.GOLD).decorate(TextDecoration.BOLD)),
                 1.0f, // Remplie à 100%
                 BossBar.Color.PURPLE,
-                BossBar.Overlay.PROGRESS
-        );
+                BossBar.Overlay.PROGRESS);
 
         player.showBossBar(roleBar);
         activeBossBars.put(player.getUniqueId(), roleBar);

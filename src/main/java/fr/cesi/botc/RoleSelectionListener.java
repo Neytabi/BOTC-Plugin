@@ -32,7 +32,10 @@ public class RoleSelectionListener implements Listener {
         ItemStack clicked = event.getCurrentItem();
         if (clicked == null || clicked.getItemMeta() == null) return;
 
-        String roleName = PlainTextComponentSerializer.plainText().serialize(clicked.getItemMeta().displayName());
+        Component displayNameComponent = clicked.getItemMeta().displayName();
+        if (displayNameComponent == null) return;
+
+        String roleName = PlainTextComponentSerializer.plainText().serialize(displayNameComponent);
         String targetName = title.replace("Assigner Rôle : ", "").trim();
 
         // Récupération de la description de l'item cliqué

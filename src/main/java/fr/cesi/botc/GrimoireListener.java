@@ -45,7 +45,7 @@ public class GrimoireListener implements Listener {
 
             // On va chercher le point central du Tribunal indexé sur le PRESET ACTUEL
             if (main.getConfig().contains(main.getPresetPath("tribunal.x"))) {
-                String worldName = main.getConfig().getString(main.getPresetPath("tribunal.world"));
+                String worldName = main.getConfig().getString(main.getPresetPath("tribunal.world"), "world");
                 double x = main.getConfig().getDouble(main.getPresetPath("tribunal.x"));
                 double y = main.getConfig().getDouble(main.getPresetPath("tribunal.y"));
                 double z = main.getConfig().getDouble(main.getPresetPath("tribunal.z"));

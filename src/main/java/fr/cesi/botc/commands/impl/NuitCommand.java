@@ -60,7 +60,7 @@ public class NuitCommand implements SubCommand {
                     this.cancel();
 
                     // APPEL DU GAMEPLAY DE NUIT (Une fois le soleil couché)
-                    lancerMecaniquesNuit(player);
+                    lancerMecaniquesNuit();
                     return;
                 }
 
@@ -84,7 +84,7 @@ public class NuitCommand implements SubCommand {
                 .clickEvent(net.kyori.adventure.text.event.ClickEvent.runCommand("/botc jour")));
     }
 
-    private void lancerMecaniquesNuit(Player player) {
+    private void lancerMecaniquesNuit() {
         org.bukkit.scoreboard.Team nightTeam = Bukkit.getScoreboardManager().getMainScoreboard().getTeam("botc_night");
         List<String> roomsStr = main.getConfig().getStringList(main.getPresetPath("rooms"));
 

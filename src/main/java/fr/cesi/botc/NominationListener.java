@@ -60,7 +60,10 @@ public class NominationListener implements Listener {
             return;
         }
 
-        String targetName = PlainTextComponentSerializer.plainText().serialize(meta.displayName());
+        Component displayNameComponent = meta.displayName();
+        if (displayNameComponent == null) return;
+
+        String targetName = PlainTextComponentSerializer.plainText().serialize(displayNameComponent);
         accuser.closeInventory();
 
         // Enregistrement du verrou de nomination unique pour le joueur cible (sauf Vierge)
@@ -86,8 +89,8 @@ public class NominationListener implements Listener {
         // Logique spécifique à la Vierge
         if (isVierge) {
             BotcPlayer accuserBP = main.getPlayersMap().get(accuserUUID);
-            
-            boolean viergeIvre = targetBP != null && targetBP.getRealRole().equalsIgnoreCase("Ivrogne");
+
+            boolean viergeIvre = targetBP.getRealRole().equalsIgnoreCase("Ivrogne");
             boolean accuserIvre = accuserBP != null && accuserBP.getRealRole().equalsIgnoreCase("Ivrogne");
             
             if (!viergeIvre && !accuserIvre) {

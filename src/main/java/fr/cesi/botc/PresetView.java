@@ -41,8 +41,14 @@ public class PresetView {
         // Récupération dynamique de la liste des presets existants
         List<String> presetNames = new ArrayList<>();
         presetNames.add("default");
-        if (main.getConfig().getConfigurationSection("presets") != null) {
-            Set<String> keys = main.getConfig().getConfigurationSection("presets").getKeys(false);
+
+        // 1. On stocke la section dans une variable
+        org.bukkit.configuration.ConfigurationSection presetsSection = main.getConfig().getConfigurationSection("presets");
+
+        // 2. On vérifie proprement si elle n'est pas nulle
+        if (presetsSection != null) {
+            // 3. On appelle getKeys() en toute sécurité sur notre variable vérifiée
+            Set<String> keys = presetsSection.getKeys(false);
             for (String key : keys) {
                 if (!key.equalsIgnoreCase("default")) {
                     presetNames.add(key);

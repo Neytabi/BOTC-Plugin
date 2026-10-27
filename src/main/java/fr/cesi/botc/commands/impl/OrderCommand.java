@@ -55,7 +55,7 @@ public class OrderCommand implements SubCommand {
         // On récupère et trie les joueurs selon leur index de chaise
         java.util.List<BotcPlayer> orderedPlayers = new java.util.ArrayList<>(main.getPlayersMap().values());
         orderedPlayers.removeIf(bp -> bp.getChairIndex() == -1);
-        orderedPlayers.sort(java.util.Comparator.comparingInt(bp -> bp.getChairIndex()));
+        orderedPlayers.sort(java.util.Comparator.comparingInt(BotcPlayer::getChairIndex));
 
         if (orderedPlayers.isEmpty()) {
             player.sendMessage(

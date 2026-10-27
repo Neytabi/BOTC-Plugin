@@ -6,10 +6,13 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MapVoteCommand implements SubCommand {
 
@@ -68,8 +71,9 @@ public class MapVoteCommand implements SubCommand {
             Bukkit.broadcast(
                     Component.text("Cliquez sur l'arène de votre choix pour voter :", NamedTextColor.LIGHT_PURPLE));
 
-            if (main.getConfig().getConfigurationSection("presets") != null) {
-                for (String presetKey : main.getConfig().getConfigurationSection("presets").getKeys(false)) {
+            ConfigurationSection presetsSection = main.getConfig().getConfigurationSection("presets");
+            if (presetsSection != null) {
+                for (String presetKey : presetsSection.getKeys(false)) {
                     Component voteButton = Component.text("  Map: ", NamedTextColor.GRAY)
                             .append(Component.text(presetKey, NamedTextColor.AQUA).decorate(TextDecoration.BOLD))
                             .append(Component.text(" [CLIQUE POUR VOTER]", NamedTextColor.GREEN)
@@ -158,23 +162,27 @@ public class MapVoteCommand implements SubCommand {
                 return;
             }
 
-            java.util.HashMap<String, Integer> tally = new java.util.HashMap<>();
+            Map<String, Integer> tally = new HashMap<>();
             for (String voteMap : main.getMapVotes().values()) {
                 tally.put(voteMap, tally.getOrDefault(voteMap, 0) + 1);
             }
 
-            String winner = tally.entrySet().stream()
-                    .max(java.util.Map.Entry.comparingByValue())
-                    .get().getKey();
+            Map.Entry<String, Integer> maxEntry = tally.entrySet().stream()
+                    .max(Map.Entry.comparingByValue())
+                    .orElse(null);
+
+            if (maxEntry == null) {
+                return;
+            }
+
+            String winner = maxEntry.getKey();
 
             Bukkit.broadcast(Component.text("=========================================", NamedTextColor.GOLD));
             Bukkit.broadcast(
                     Component.text(" LE SCRUTIN EST CLOS !", NamedTextColor.GOLD).decorate(TextDecoration.BOLD));
 
-            tally.forEach((mapName, totalVotes) -> {
-                Bukkit.broadcast(Component.text(" - " + mapName + " : ", NamedTextColor.GRAY)
-                        .append(Component.text(totalVotes + " Vote(s)", NamedTextColor.AQUA)));
-            });
+            tally.forEach((mapName, totalVotes) -> Bukkit.broadcast(Component.text(" - " + mapName + " : ", NamedTextColor.GRAY)
+                    .append(Component.text(totalVotes + " Vote(s)", NamedTextColor.AQUA))));
 
             Bukkit.broadcast(
                     Component.text(" LA MAP GAGNANTE EST : " + winner.toUpperCase() + " !", NamedTextColor.GREEN)
