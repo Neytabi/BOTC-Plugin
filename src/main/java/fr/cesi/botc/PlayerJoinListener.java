@@ -95,7 +95,7 @@ public class PlayerJoinListener implements Listener {
 
                         chairLoc.getNearbyEntities(0.5, 1.0, 0.5).stream()
                                 .filter(e -> e instanceof Horse && e.getScoreboardTags().contains("botc_chair"))
-                                .forEach(org.bukkit.entity.Entity::remove);
+                                .forEach(e -> e.remove());
 
                         Horse chair = w.spawn(chairLoc, Horse.class, (org.bukkit.entity.Horse horse) -> {
                             horse.setGravity(false);
@@ -122,6 +122,13 @@ public class PlayerJoinListener implements Listener {
                     }
                 }
             }
+        }
+
+        // =========================================================================
+        // RESTAURATION DE LA BOSSBAR DE RÔLE EN CAS DE RECONNEXION
+        // =========================================================================
+        if (bp != null && !player.isOp() && !bp.getDisplayedRole().equalsIgnoreCase("Citadin (Sans rôle)")) {
+            main.rafraichirRoleBossBar(player, bp.getDisplayedRole());
         }
 
         // --- MESSAGE D'ACCUEIL POUR TOUS LES JOUEURS ---

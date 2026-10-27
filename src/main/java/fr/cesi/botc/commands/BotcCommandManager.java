@@ -50,7 +50,7 @@ public class BotcCommandManager implements CommandExecutor, TabCompleter {
         // Voix, Audio & Visuel (Lot 3)
         registerCommand(new SilenceCommand(main));
         registerCommand(new ParoleAllCommand(main));
-        registerCommand(new GrantParoleCommand());
+        registerCommand(new GrantParoleCommand(main));
         registerCommand(new VcMuteCommand(main));
         registerCommand(new VcUnmuteCommand(main));
         registerCommand(new OrderCommand(main));

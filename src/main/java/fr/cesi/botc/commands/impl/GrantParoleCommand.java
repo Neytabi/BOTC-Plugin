@@ -1,5 +1,6 @@
 package fr.cesi.botc.commands.impl;
 
+import fr.cesi.botc.Botc;
 import fr.cesi.botc.commands.SubCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -12,7 +13,10 @@ import java.util.List;
 
 public class GrantParoleCommand implements SubCommand {
 
-    public GrantParoleCommand() {
+    private final Botc main;
+
+    public GrantParoleCommand(Botc main) {
+        this.main = main;
     }
 
     @Override
@@ -44,6 +48,7 @@ public class GrantParoleCommand implements SubCommand {
 
         Player target = Bukkit.getPlayer(args[1]);
         if (target != null) {
+            main.getVcMutedPlayers().remove(target.getUniqueId());
             Bukkit.broadcast(Component
                     .text("Silence ! Le Conteur accorde officiellement la parole à " + target.getName() + ".",
                             NamedTextColor.GREEN)

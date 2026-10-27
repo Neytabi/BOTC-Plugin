@@ -282,6 +282,22 @@ public final class Botc extends JavaPlugin {
         // reste.
         this.vcMutedPlayers.clear();
 
+        // NETTOYAGE DES CHAISES INVISIBLES (Chevaux tagués botc_chair)
+        for (org.bukkit.entity.Player onlineP : Bukkit.getOnlinePlayers()) {
+            org.bukkit.entity.Entity vehicle = onlineP.getVehicle();
+            if (vehicle != null && vehicle.getScoreboardTags().contains("botc_chair")) {
+                vehicle.removePassenger(onlineP);
+                vehicle.remove();
+            }
+        }
+        for (org.bukkit.World world : Bukkit.getWorlds()) {
+            for (org.bukkit.entity.Entity entity : world.getEntitiesByClass(org.bukkit.entity.Horse.class)) {
+                if (entity.getScoreboardTags().contains("botc_chair")) {
+                    entity.remove();
+                }
+            }
+        }
+
         // CORRECTION MULTI-MAP : On utilise getPresetPath("rooms")
         List<String> roomsStr = getConfig().getStringList(getPresetPath("rooms"));
         for (String roomStr : roomsStr) {
@@ -410,26 +426,26 @@ public final class Botc extends JavaPlugin {
                 ancienneChamberChair.removePassenger(pTarget);
             }
 
-            if (getConfig().contains("death.x")) {
-                org.bukkit.World w = Bukkit.getWorld(getConfig().getString("death.world", "world"));
-                double x = getConfig().getDouble("death.x");
-                double y = getConfig().getDouble("death.y");
-                double z = getConfig().getDouble("death.z");
-                float yaw = (float) getConfig().getDouble("death.yaw");
-                float pitch = (float) getConfig().getDouble("death.pitch");
+            if (getConfig().contains(getPresetPath("death.x"))) {
+                org.bukkit.World w = Bukkit.getWorld(getConfig().getString(getPresetPath("death.world"), "world"));
+                double x = getConfig().getDouble(getPresetPath("death.x"));
+                double y = getConfig().getDouble(getPresetPath("death.y"));
+                double z = getConfig().getDouble(getPresetPath("death.z"));
+                float yaw = (float) getConfig().getDouble(getPresetPath("death.yaw"));
+                float pitch = (float) getConfig().getDouble(getPresetPath("death.pitch"));
 
                 if (w != null) {
                     pTarget.teleport(new org.bukkit.Location(w, x, y, z, yaw, pitch));
                 }
             }
 
-            String lightMode = getConfig().getString("lightning.mode", "player");
+            String lightMode = getConfig().getString(getPresetPath("lightning.mode"), "player");
 
-            if (lightMode.equalsIgnoreCase("local") && getConfig().contains("lightning.x")) {
-                org.bukkit.World world = Bukkit.getWorld(getConfig().getString("lightning.world", "world"));
-                double lx = getConfig().getDouble("lightning.x");
-                double ly = getConfig().getDouble("lightning.y");
-                double lz = getConfig().getDouble("lightning.z");
+            if (lightMode.equalsIgnoreCase("local") && getConfig().contains(getPresetPath("lightning.x"))) {
+                org.bukkit.World world = Bukkit.getWorld(getConfig().getString(getPresetPath("lightning.world"), "world"));
+                double lx = getConfig().getDouble(getPresetPath("lightning.x"));
+                double ly = getConfig().getDouble(getPresetPath("lightning.y"));
+                double lz = getConfig().getDouble(getPresetPath("lightning.z"));
 
                 if (world != null) {
                     world.strikeLightningEffect(new org.bukkit.Location(world, lx, ly, lz));

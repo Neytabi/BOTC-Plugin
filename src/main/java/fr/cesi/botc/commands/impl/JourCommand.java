@@ -42,6 +42,8 @@ public class JourCommand implements SubCommand {
     @Override
     public void execute(Player player, String[] args) {
         main.setNight(false);
+        main.getHasNominatedToday().clear();
+        main.getHasBeenNominatedToday().clear();
 
         player.getWorld().setGameRule(org.bukkit.GameRule.DO_DAYLIGHT_CYCLE, true);
 

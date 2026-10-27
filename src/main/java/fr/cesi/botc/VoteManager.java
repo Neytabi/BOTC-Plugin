@@ -95,7 +95,8 @@ public class VoteManager {
 
         Bukkit.broadcast(Component.text("---------------------------------------------", NamedTextColor.GOLD));
         Bukkit.broadcast(Component.text("[BOTC] Fin du temps reglementaire ! Le vote est clos.", NamedTextColor.YELLOW));
-        Bukkit.broadcast(Component.text("Resultat pour " + accusedPlayer.getPlayerName() + " : " + voters.size() + " votes OUI.", NamedTextColor.AQUA));
+        String targetName = accusedPlayer != null ? accusedPlayer.getPlayerName() : "l'accuse";
+        Bukkit.broadcast(Component.text("Resultat pour " + targetName + " : " + voters.size() + " votes OUI.", NamedTextColor.AQUA));
         Bukkit.broadcast(Component.text("Conteur, a toi de trancher si la majorite est atteinte !", NamedTextColor.LIGHT_PURPLE));
         Bukkit.broadcast(Component.text("---------------------------------------------", NamedTextColor.GOLD));
 
