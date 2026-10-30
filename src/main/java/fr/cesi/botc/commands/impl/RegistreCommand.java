@@ -46,3 +46,4 @@ public class RegistreCommand implements SubCommand {
         return new ArrayList<>();
     }
 }
+

@@ -56,3 +56,4 @@ public class NominationCommand implements SubCommand {
         return new ArrayList<>();
     }
 }
+

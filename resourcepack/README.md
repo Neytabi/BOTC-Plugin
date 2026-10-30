@@ -32,3 +32,4 @@ Pour appliquer automatiquement le pack aux joueurs :
 1. Compresser le contenu du dossier `resourcepack` en un fichier `.zip`.
 2. L'héberger sur un lien direct (ex: MCPacks, Dropbox en `dl=1` ou serveur web).
 3. Renseigner l'URL dans `server.properties` (`resource-pack=...`) ou le distribuer via `player.setResourcePack(...)`.
+

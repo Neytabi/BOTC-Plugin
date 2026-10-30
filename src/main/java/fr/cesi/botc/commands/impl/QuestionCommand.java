@@ -50,3 +50,4 @@ public class QuestionCommand implements SubCommand {
         return new ArrayList<>();
     }
 }
+
