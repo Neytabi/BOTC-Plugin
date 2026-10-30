@@ -1,0 +1,40 @@
+{
+  "providers": [
+    {
+      "type": "bitmap",
+      "file": "botc:gui/grimoire_bg.png",
+      "ascent": 14,
+      "height": 220,
+      "chars": [
+        "\uE001"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "botc:gui/action_menu_bg.png",
+      "ascent": 14,
+      "height": 130,
+      "chars": [
+        "\uE002"
+      ]
+    },
+    {
+      "type": "space",
+      "advances": {
+        "\uF801": -1,
+        "\uF802": -2,
+        "\uF803": -3,
+        "\uF804": -4,
+        "\uF805": -5,
+        "\uF806": -6,
+        "\uF807": -7,
+        "\uF808": -8,
+        "\uF809": -16,
+        "\uF80A": -32,
+        "\uF80B": -64,
+        "\uF80C": -128,
+        "\uF80D": -256
+      }
+    }
+  ]
+}

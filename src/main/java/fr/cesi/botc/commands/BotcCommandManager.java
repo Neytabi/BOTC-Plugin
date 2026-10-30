@@ -28,6 +28,10 @@ public class BotcCommandManager implements CommandExecutor, TabCompleter {
 
         // Commandes de base
         registerCommand(new VoteOuiCommand(main));
+        registerCommand(new NominationCommand(main));
+        registerCommand(new QuestionCommand(main));
+        registerCommand(new DemandeParoleCommand(main));
+        registerCommand(new RegistreCommand(main));
         registerCommand(new HelpCommand());
         registerCommand(new MapVoteCommand(main));
         registerCommand(new ExecuteCommand(main));

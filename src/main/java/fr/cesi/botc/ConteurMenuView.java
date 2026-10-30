@@ -185,22 +185,24 @@ public class ConteurMenuView {
         }
         inv.setItem(baseSlot + 5, btnDeath);
 
-        //  Visibilité des Pseudos (Slot 6) - Version Sécurisée sans doublon
-        ItemStack nameTagsButton = new ItemStack(Material.NAME_TAG);
-        ItemMeta nameTagsMeta = nameTagsButton.getItemMeta();
-        if (nameTagsMeta != null) {
-            boolean hidden = main.isNameTagsHidden();
-            String status = hidden ? "CACHÉS (Anonymat Actif)" : "VISIBLES";
+        // Slot +6 :  Mode de l'Éclair (Slot 15)
+        ItemStack lightningItem = new ItemStack(Material.LIGHTNING_ROD);
+        ItemMeta lMeta = lightningItem.getItemMeta();
+        if (lMeta != null) {
+            String currentMode = main.getConfig().getString(main.getPresetPath("lightning.mode"), "player");
+            boolean isLocal = currentMode.equalsIgnoreCase("local");
+            String modeStr = isLocal ? "TRIBUNAL (Fixe)" : "SUR LE CONDAMNÉ";
 
-            nameTagsMeta.displayName(Component.text(" Visibilité Pseudos : ", NamedTextColor.YELLOW)
-                    .append(Component.text(status, hidden ? NamedTextColor.RED : NamedTextColor.GREEN).decorate(TextDecoration.BOLD)));
-            nameTagsMeta.lore(List.of(
-                    Component.text("CLIC : Basculer l'affichage des nametags", NamedTextColor.GRAY),
-                    Component.text("pour masquer ou afficher les noms en jeu.", NamedTextColor.GRAY)
+            lMeta.displayName(Component.text("Mode de l'Éclair : ", NamedTextColor.YELLOW)
+                    .append(Component.text(modeStr, isLocal ? NamedTextColor.AQUA : NamedTextColor.GOLD).decorate(TextDecoration.BOLD)));
+            lMeta.lore(List.of(
+                    Component.text("CLIC : Alterner l'emplacement de l'éclair d'exécution.", NamedTextColor.GRAY),
+                    Component.text("• Sur le condamné : Frappe là où meurt le joueur.", NamedTextColor.GRAY),
+                    Component.text("• Tribunal : Frappe aux coordonnées enregistrées.", NamedTextColor.GRAY)
             ));
-            nameTagsButton.setItemMeta(nameTagsMeta);
+            lightningItem.setItemMeta(lMeta);
         }
-        inv.setItem(6, nameTagsButton);
+        inv.setItem(baseSlot + 6, lightningItem);
 
         // Slot +7 :  Outils de vérification et de Nettoyage (Blaze Powder)
         ItemStack btnTest = new ItemStack(Material.BLAZE_POWDER);

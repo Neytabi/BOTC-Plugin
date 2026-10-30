@@ -24,15 +24,15 @@ public class GameChatListener implements Listener {
     public void onPlayerChat(AsyncChatEvent event) {
         Player player = event.getPlayer();
 
-        // Les admins ont toujours le droit de parler dans le chat
+        // Les admins (Conteurs) ont toujours le droit de parler dans le chat
         if (player.isOp()) return;
 
-        // Si le joueur a cliqué sur la plume dans son livre, on dévie son message
+        // 1. Traitement de la question secrète au Conteur
         if (main.getIsAskingQuestion().getOrDefault(player.getUniqueId(), false)) {
             event.setCancelled(true);
             main.getIsAskingQuestion().remove(player.getUniqueId()); // On désactive le mode question
 
-            Component log = Component.text("[QUESTION SECRETE] ", NamedTextColor.LIGHT_PURPLE).decorate(TextDecoration.BOLD)
+            Component log = Component.text("[QUESTION SECRÈTE] ", NamedTextColor.LIGHT_PURPLE).decorate(TextDecoration.BOLD)
                     .append(Component.text(player.getName() + " : ", NamedTextColor.YELLOW))
                     .append(Component.text(PlainTextComponentSerializer.plainText().serialize(event.message()), NamedTextColor.WHITE));
 
@@ -44,13 +44,17 @@ public class GameChatListener implements Listener {
                     }
                 }
             });
-            player.sendMessage(Component.text("Votre question a été transmise en privé aux Conteurs.", NamedTextColor.GREEN));
+            player.sendMessage(Component.text(" Votre question a été transmise en privé aux Conteurs.", NamedTextColor.GREEN));
             return;
         }
 
-        // Blocage général du chat pour forcer le vocal de proximité
+        // 2. Blocage contextuel du chat (Nuit vs Jour)
         event.setCancelled(true);
-        player.sendMessage(Component.text("Le chat public est désactivé. Ouvrez votre livre pour poser une question au Conteur.", NamedTextColor.RED));
+        if (main.isNight()) {
+            player.sendMessage(Component.text(" C'est la nuit ! Le village dort, interdiction de parler dans le chat.", NamedTextColor.RED));
+        } else {
+            player.sendMessage(Component.text(" Le chat public est désactivé. Exprimez-vous en vocal ou ouvrez votre Registre pour poser une question au Conteur.", NamedTextColor.RED));
+        }
     }
 
     @EventHandler

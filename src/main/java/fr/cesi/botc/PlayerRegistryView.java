@@ -1,145 +1,106 @@
 package fr.cesi.botc;
 
+import net.kyori.adventure.inventory.Book;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class PlayerRegistryView {
 
     public void openRegistryMenu(Player player, Botc main) {
-        Component title = Component.text("Registre du Tribunal", NamedTextColor.DARK_GREEN);
-        Inventory inv = Bukkit.createInventory(null, 9, title);
-
         BotcPlayer bp = main.getPlayersMap().get(player.getUniqueId());
 
-        // ==========================================
-        //  GESTION DU BOUTON VOTE (Slot 0)
-        // ==========================================
-        ItemStack vote;
-        ItemMeta vMeta;
+        boolean isAlive = bp == null || bp.isAlive();
+        boolean hasGhostVote = bp != null && bp.hasGhostVote();
+        String roleName = (bp != null && bp.getDisplayedRole() != null && !bp.getDisplayedRole().isEmpty())
+                ? bp.getDisplayedRole() : "Citadin (Sans rôle)";
+        String roleDesc = (bp != null && bp.getRoleDescription() != null && !bp.getRoleDescription().isEmpty())
+                ? bp.getRoleDescription() : "Aucun pouvoir secret pour l'instant.";
 
-        if (bp != null && !bp.isAlive() && !bp.hasGhostVote()) {
-            vote = new ItemStack(Material.RED_WOOL);
-            vMeta = vote.getItemMeta();
-            if (vMeta != null) {
-                vMeta.displayName(Component.text("x VOTE IMPOSSIBLE", NamedTextColor.RED));
-                List<Component> lore = new ArrayList<>();
-                lore.add(Component.text("Tu es mort et ton unique jeton de", NamedTextColor.GRAY));
-                lore.add(Component.text("vote fantôme a déjà été consommé.", NamedTextColor.GRAY));
-                vMeta.lore(lore);
-                vote.setItemMeta(vMeta);
-            }
+        // ================= PAGE 1 : IDENTITÉ & RÔLE =================
+        Component page1 = Component.text()
+                .append(Component.text(" REGISTRE DU TRIBUNAL\n", NamedTextColor.DARK_RED, TextDecoration.BOLD))
+                .append(Component.text(" Ravenswood Bluff \n", NamedTextColor.DARK_GRAY, TextDecoration.ITALIC))
+                .append(Component.text("-------------------\n", NamedTextColor.GRAY))
+                .append(Component.text("Citoyen : ", NamedTextColor.BLACK))
+                .append(Component.text(player.getName() + "\n", NamedTextColor.DARK_BLUE, TextDecoration.BOLD))
+                .append(Component.text("État : ", NamedTextColor.BLACK))
+                .append(isAlive 
+                        ? Component.text("VIVANT\n", NamedTextColor.DARK_GREEN, TextDecoration.BOLD) 
+                        : Component.text("MORT (Fantôme)\n", NamedTextColor.DARK_RED, TextDecoration.BOLD))
+                .append(Component.text("Vote fantôme : ", NamedTextColor.BLACK))
+                .append(isAlive
+                        ? Component.text("Actif\n", NamedTextColor.DARK_GREEN)
+                        : (hasGhostVote 
+                                ? Component.text("DISPONIBLE (1x)\n", NamedTextColor.GOLD, TextDecoration.BOLD)
+                                : Component.text("UTILISÉ\n", NamedTextColor.DARK_GRAY, TextDecoration.STRIKETHROUGH)))
+                .append(Component.text("-------------------\n", NamedTextColor.GRAY))
+                .append(Component.text("RÔLE SECRET :\n", NamedTextColor.DARK_PURPLE, TextDecoration.BOLD))
+                .append(Component.text("» " + roleName + "\n", NamedTextColor.GOLD, TextDecoration.BOLD))
+                .append(Component.text(roleDesc + "\n\n", NamedTextColor.BLACK))
+                .append(Component.text("[ ✉ Poser une Question ]", NamedTextColor.DARK_AQUA, TextDecoration.UNDERLINED)
+                        .clickEvent(ClickEvent.runCommand("/botc question"))
+                        .hoverEvent(HoverEvent.showText(Component.text("Poser une question secrète au Conteur", NamedTextColor.GRAY))))
+                .build();
+
+        // ================= PAGE 2 : ACTIONS AU TRIBUNAL =================
+        TextComponent.Builder page2Builder = Component.text()
+                .append(Component.text(" ACTIONS DU CONSEIL\n", NamedTextColor.DARK_GREEN, TextDecoration.BOLD))
+                .append(Component.text("-------------------\n", NamedTextColor.GRAY));
+
+        // 1. Bouton de Vote
+        if (isAlive || hasGhostVote) {
+            page2Builder.append(Component.text("LEVER LA MAIN :\n", NamedTextColor.BLACK, TextDecoration.BOLD))
+                    .append(Component.text(" [ ✋ VOTER OUI ]\n", NamedTextColor.DARK_GREEN, TextDecoration.BOLD)
+                            .clickEvent(ClickEvent.runCommand("/botc voteoui"))
+                            .hoverEvent(HoverEvent.showText(Component.text(
+                                    isAlive ? "Clique pour voter OUI à l'accusation en cours" : "ATTENTION : C'est ton DERNIER vote !", 
+                                    isAlive ? NamedTextColor.GREEN : NamedTextColor.RED))))
+                    .append(Component.text(isAlive ? "Vote illimité tant que vivant.\n\n" : "Consomme ton ultime jeton !\n\n", NamedTextColor.DARK_GRAY, TextDecoration.ITALIC));
         } else {
-            vote = new ItemStack(Material.LIME_WOOL);
-            vMeta = vote.getItemMeta();
-            if (vMeta != null) {
-                vMeta.displayName(Component.text(" LEVER LA MAIN (Voter OUI)", NamedTextColor.GREEN));
-                List<Component> lore = new ArrayList<>();
-                if (bp != null && !bp.isAlive()) {
-                    lore.add(Component.text(" ATTENTION : C'est ton DERNIER vote fantôme !", NamedTextColor.YELLOW));
-                } else {
-                    lore.add(Component.text("Clique pour voter OUI à l'accusation en cours.", NamedTextColor.GRAY));
-                }
-                vMeta.lore(lore);
-                vote.setItemMeta(vMeta);
-            }
+            page2Builder.append(Component.text("VOTE IMPOSSIBLE :\n", NamedTextColor.BLACK, TextDecoration.BOLD))
+                    .append(Component.text(" [ ✕ VOTE ÉPUISÉ ]\n", NamedTextColor.DARK_RED, TextDecoration.BOLD)
+                            .hoverEvent(HoverEvent.showText(Component.text("Tu as déjà utilisé ton vote de fantôme !", NamedTextColor.RED))))
+                    .append(Component.text("Ton vote a déjà été utilisé.\n\n", NamedTextColor.DARK_GRAY, TextDecoration.ITALIC));
         }
-        inv.setItem(0, vote);
 
-        // ==========================================
-        //  GESTION DU BOUTON NOMINATION (Slot 2)
-        // ==========================================
-        ItemStack accuse;
-        ItemMeta aMeta;
-
-        if (bp != null && !bp.isAlive()) {
-            accuse = new ItemStack(Material.BOOK);
-            aMeta = accuse.getItemMeta();
-            if (aMeta != null) {
-                aMeta.displayName(Component.text("x NOMINATION IMPOSSIBLE", NamedTextColor.RED));
-                List<Component> lore = new ArrayList<>();
-                lore.add(Component.text("Tu es un fantôme. Les morts ne peuvent", NamedTextColor.GRAY));
-                lore.add(Component.text("plus lancer d'accusations au Tribunal.", NamedTextColor.GRAY));
-                aMeta.lore(lore);
-                accuse.setItemMeta(aMeta);
-            }
+        // 2. Bouton de Nomination
+        if (isAlive) {
+            page2Builder.append(Component.text("ACCUSATION :\n", NamedTextColor.BLACK, TextDecoration.BOLD))
+                    .append(Component.text(" [ ⚖ NOMMER UN SUSPECT ]\n", NamedTextColor.GOLD, TextDecoration.BOLD)
+                            .clickEvent(ClickEvent.runCommand("/botc nomination"))
+                            .hoverEvent(HoverEvent.showText(Component.text("Ouvrir la liste pour envoyer quelqu'un à l'échafaud", NamedTextColor.YELLOW))))
+                    .append(Component.text("Une accusation max par jour.\n\n", NamedTextColor.DARK_GRAY, TextDecoration.ITALIC));
         } else {
-            accuse = new ItemStack(Material.WRITABLE_BOOK);
-            aMeta = accuse.getItemMeta();
-            if (aMeta != null) {
-                aMeta.displayName(Component.text(" NOMMER UN SUSPECT", NamedTextColor.GOLD));
-                List<Component> lore = new ArrayList<>();
-                lore.add(Component.text("Clique pour ouvrir le registre des suspects", NamedTextColor.GRAY));
-                lore.add(Component.text("et envoyer quelqu'un à l'échafaud.", NamedTextColor.GRAY));
-                aMeta.lore(lore);
-                accuse.setItemMeta(aMeta);
-            }
+            page2Builder.append(Component.text("ACCUSATION :\n", NamedTextColor.DARK_GRAY, TextDecoration.BOLD))
+                    .append(Component.text(" Les morts ne peuvent plus désigner de suspect.\n\n", NamedTextColor.DARK_GRAY, TextDecoration.ITALIC));
         }
-        inv.setItem(2, accuse);
 
-        // ==========================================
-        //  RAPPEL DU RÔLE SECRET (Slot 4 - Centre)
-        // ==========================================
-        ItemStack roleInfo = new ItemStack(Material.ENCHANTED_BOOK);
-        ItemMeta rMeta = roleInfo.getItemMeta();
-        if (rMeta != null) {
-            rMeta.displayName(Component.text(" TON RÔLE ACTUEL", NamedTextColor.LIGHT_PURPLE).decorate(TextDecoration.BOLD));
-            List<Component> rLore = new ArrayList<>();
-
-            if (bp != null && bp.getDisplayedRole() != null && !bp.getDisplayedRole().isEmpty()) {
-                rLore.add(Component.text("Tu incarnes : ", NamedTextColor.WHITE)
-                        .append(Component.text(bp.getDisplayedRole(), NamedTextColor.GOLD).decorate(TextDecoration.BOLD)));
-                rLore.add(Component.text("-----------------------------------", NamedTextColor.GRAY));
-                rLore.add(Component.text(bp.getRoleDescription(), NamedTextColor.GRAY));
-            } else {
-                rLore.add(Component.text("Aucun rôle ne t'a été attribué", NamedTextColor.RED));
-                rLore.add(Component.text("par le Conteur pour le moment.", NamedTextColor.GRAY));
-            }
-
-            rMeta.lore(rLore);
-            roleInfo.setItemMeta(rMeta);
+        // 3. Demande de Parole (pour les fantômes)
+        if (!isAlive) {
+            page2Builder.append(Component.text("INTERVENTION :\n", NamedTextColor.BLACK, TextDecoration.BOLD))
+                    .append(Component.text(" [ 🗣 DEMANDER LA PAROLE ]\n", NamedTextColor.DARK_PURPLE, TextDecoration.BOLD)
+                            .clickEvent(ClickEvent.runCommand("/botc demandeparole"))
+                            .hoverEvent(HoverEvent.showText(Component.text("Demander poliment la parole au Conteur", NamedTextColor.LIGHT_PURPLE))))
+                    .append(Component.text("Avertit les Conteurs dans le chat.\n", NamedTextColor.DARK_GRAY, TextDecoration.ITALIC));
         }
-        inv.setItem(4, roleInfo);
 
-        // ==========================================
-        //  GESTION DU BOUTON QUESTION (Slot 6)
-        // ==========================================
-        ItemStack question = new ItemStack(Material.FEATHER);
-        ItemMeta qMeta = question.getItemMeta();
-        if (qMeta != null) {
-            qMeta.displayName(Component.text(" POSER UNE QUESTION", NamedTextColor.AQUA));
-            List<Component> qLore = new ArrayList<>();
-            qLore.add(Component.text("Clique pour envoyer une question privée", NamedTextColor.GRAY));
-            qLore.add(Component.text("aux Conteurs directement depuis le chat.", NamedTextColor.GRAY));
-            qMeta.lore(qLore);
-            question.setItemMeta(qMeta);
-        }
-        inv.setItem(6, question);
+        Component page2 = page2Builder.build();
 
-        // ==========================================
-        //  GESTION DU BOUTON PAROLE (Slot 8)
-        // ==========================================
-        ItemStack parole = new ItemStack(Material.PAPER);
-        ItemMeta pMeta = parole.getItemMeta();
-        if (pMeta != null) {
-            pMeta.displayName(Component.text(" DEMANDER LA PAROLE", NamedTextColor.GREEN));
-            List<Component> pLore = new ArrayList<>();
-            pLore.add(Component.text("Bouton réservé aux fantômes pour", NamedTextColor.GRAY));
-            pLore.add(Component.text("demander une intervention au Conseil.", NamedTextColor.GRAY));
-            pMeta.lore(pLore);
-            parole.setItemMeta(pMeta);
-        }
-        inv.setItem(8, parole);
+        Book book = Book.book(
+                Component.text("Registre du Tribunal"),
+                Component.text("Le Conteur"),
+                List.of(page1, page2)
+        );
 
-        player.openInventory(inv);
+        player.openBook(book);
+        player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.8f, 1.0f);
     }
 }
