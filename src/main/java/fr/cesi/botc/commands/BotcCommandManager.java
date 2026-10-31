@@ -102,8 +102,8 @@ public class BotcCommandManager implements CommandExecutor, TabCompleter {
             }
             try {
                 target.execute(player, args);
-            } catch (Exception e) {
-                player.sendMessage(Component.text("Erreur lors de l'exécution de la commande.", NamedTextColor.RED));
+            } catch (Throwable e) {
+                player.sendMessage(Component.text("Erreur lors de l'exécution de la commande : " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")", NamedTextColor.RED));
                 main.getLogger().log(Level.SEVERE, "Erreur lors de l'execution de la sous-commande /botc " + subName, e);
             }
             return true;
