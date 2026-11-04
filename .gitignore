@@ -10,3 +10,4 @@
 
 # Fichiers système
 .DS_Store
+.aider*
