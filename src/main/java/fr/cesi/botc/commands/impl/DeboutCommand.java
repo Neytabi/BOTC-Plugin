@@ -42,10 +42,11 @@ public class DeboutCommand implements SubCommand {
     @Override
     public void execute(Player player, String[] args) {
         main.setCouncilOpen(false);
+        main.setTribunalGroup(null);
         org.bukkit.scoreboard.Team nightTeam = Bukkit.getScoreboardManager().getMainScoreboard()
                 .getTeam("botc_night");
 
-        // --- DÉCONNEXION DU GROUPE VOCAL (VERSION DIAGNOSTIC) ---
+        // --- DÉCONNEXION DU GROUPE VOCAL ---
         if (main.getVoicechatPlugin() != null && main.getVoicechatPlugin().getVoicechatApi() != null) {
             de.maxhenkel.voicechat.api.VoicechatServerApi voiceApi = main.getVoicechatPlugin().getVoicechatApi();
 
@@ -58,6 +59,9 @@ public class DeboutCommand implements SubCommand {
             }
         }
 
+        // Libère tous les joueurs et détruit tous les chevaux (y compris orphelins)
+        main.cleanupAllChairs();
+
         net.kyori.adventure.title.Title deboutTitle = net.kyori.adventure.title.Title.title(
                 Component.text("! LEVEZ-VOUS !", NamedTextColor.GREEN).decorate(TextDecoration.BOLD),
                 Component.text("Vous pouvez quitter votre siège.", NamedTextColor.GRAY));
@@ -68,13 +72,6 @@ public class DeboutCommand implements SubCommand {
 
             if (p.isOp())
                 continue;
-
-            // Si le joueur est dans un véhicule tagué "botc_chair"
-            if (p.getVehicle() != null && p.getVehicle().getScoreboardTags().contains("botc_chair")) {
-                org.bukkit.entity.Entity chair = p.getVehicle();
-                chair.removePassenger(p); // On libère le joueur
-                chair.remove(); // On détruit le wagon invisible instantanément
-            }
 
             if (nightTeam != null) {
                 nightTeam.addEntry(p.getName());

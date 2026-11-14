@@ -25,6 +25,10 @@ public class ChatBlockerListener implements Listener {
     public void onPlayerDismount(org.bukkit.event.entity.EntityDismountEvent event) {
         // Si l'entité qui essaie de descendre est bien un joueur
         if (event.getEntity() instanceof org.bukkit.entity.Player player) {
+            // Ne jamais bloquer le démontage lors d'une déconnexion ou hors phase assise
+            if (!player.isOnline() || !main.isPlayersSeated()) {
+                return;
+            }
 
             // Et si le véhicule possède notre tag de chaise BOTC
             if (event.getDismounted().getScoreboardTags().contains("botc_chair")) {

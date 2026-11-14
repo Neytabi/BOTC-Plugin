@@ -4,7 +4,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Horse;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -62,65 +61,36 @@ public class PlayerJoinListener implements Listener {
         // AJOUT : RE-FIXATION AUTOMATIQUE SUR LA CHAISE APRÈS UN CRASH
         // =========================================================================
         BotcPlayer bp = main.getPlayersMap().get(player.getUniqueId());
-        if (main.isSeatsAssigned() && bp != null && bp.getChairIndex() != -1 && !player.isOp()) {
+        if (main.isPlayersSeated() && main.isSeatsAssigned() && bp != null && bp.getChairIndex() != -1
+                && !player.isOp()) {
             List<String> chairsStr = main.getConfig().getStringList(main.getPresetPath("chairs"));
 
             if (bp.getChairIndex() < chairsStr.size()) {
-                // On vérifie si le reste du village est actuellement assis
-                boolean villageEstAssis = false;
-                for (Player onlineP : Bukkit.getOnlinePlayers()) {
-                    org.bukkit.entity.Entity vehicle = onlineP.getVehicle();
-                    if (onlineP.isInsideVehicle() && vehicle != null
-                            && vehicle.getScoreboardTags().contains("botc_chair")) {
-                        villageEstAssis = true;
-                        break;
-                    }
+                var nightTeam = Bukkit.getScoreboardManager().getMainScoreboard().getTeam("botc_night");
+                if (nightTeam != null && nightTeam.hasEntry(player.getName())) {
+                    nightTeam.removeEntry(player.getName());
                 }
 
-                // Si la partie est en cours et que les gens sont assis, on le remet sur son
-                // cheval
-                if (villageEstAssis) {
-                    String[] parts = chairsStr.get(bp.getChairIndex()).split(",");
-                    org.bukkit.World w = Bukkit.getWorld(parts[0]);
-                    if (w != null) {
-                        double x = Double.parseDouble(parts[1]);
-                        double y = Double.parseDouble(parts[2]);
-                        double z = Double.parseDouble(parts[3]);
-                        float yaw = Float.parseFloat(parts[4]);
+                main.spawnChairForPlayer(player, bp.getChairIndex(), true);
 
-                        org.bukkit.Location chairLoc = new org.bukkit.Location(w, x, y, z, yaw, 0);
-                        org.bukkit.Location horseLoc = chairLoc.clone().add(0, -1.0, 0); // Alignement hauteur corrigé
-
-                        player.teleport(chairLoc);
-
-                        chairLoc.getNearbyEntities(0.5, 1.0, 0.5).stream()
-                                .filter(e -> e instanceof Horse && e.getScoreboardTags().contains("botc_chair"))
-                                .forEach(e -> e.remove());
-
-                        Horse chair = w.spawn(chairLoc, Horse.class, (org.bukkit.entity.Horse horse) -> {
-                            horse.setGravity(false);
-                            horse.setSilent(true);
-                            horse.setInvulnerable(true);
-                            horse.setAI(false);
-                            horse.setTamed(true);
-                            horse.setPersistent(false);
-                            horse.addScoreboardTag("botc_chair");
-                            horse.addPotionEffect(
-                                    new org.bukkit.potion.PotionEffect(org.bukkit.potion.PotionEffectType.INVISIBILITY,
-                                            Integer.MAX_VALUE, 0, false, false));
-                        });
-
-                        chair.teleport(horseLoc);
-                        var chairTeam = Bukkit.getScoreboardManager().getMainScoreboard().getTeam("botc_chairs");
-                        if (chairTeam != null) {
-                            chairTeam.addEntry(chair.getUniqueId().toString());
+                // Réintégration au groupe vocal du Tribunal une fois la connexion vocale prête
+                Bukkit.getScheduler().runTaskLater(main, () -> {
+                    if (!player.isOnline() || !main.isPlayersSeated()) {
+                        return;
+                    }
+                    if (main.getVoicechatPlugin() != null && main.getVoicechatPlugin().getVoicechatApi() != null
+                            && main.getTribunalGroup() != null) {
+                        var connection = main.getVoicechatPlugin().getVoicechatApi()
+                                .getConnectionOf(player.getUniqueId());
+                        if (connection != null) {
+                            connection.setGroup(main.getTribunalGroup());
                         }
-                        chair.addPassenger(player);
-                        player.sendMessage(
-                                Component.text("v Tu as été replacé automatiquement sur ton siège après ton crash.",
-                                        NamedTextColor.GREEN));
                     }
-                }
+                }, 20L);
+
+                player.sendMessage(
+                        Component.text("v Tu as été replacé automatiquement sur ton siège après ton crash.",
+                                NamedTextColor.GREEN));
             }
         }
 
@@ -148,6 +118,9 @@ public class PlayerJoinListener implements Listener {
 
     @org.bukkit.event.EventHandler
     public void onPlayerQuit(org.bukkit.event.player.PlayerQuitEvent event) {
-        // Laissé vide volontairement pour garder les profils actifs en cas de crash !
+        Player player = event.getPlayer();
+        BotcPlayer bp = main.getPlayersMap().get(player.getUniqueId());
+        // Supprime le cheval physique orphelin tout en conservant le BotcPlayer en mémoire
+        main.removeChairForPlayer(player, bp);
     }
 }

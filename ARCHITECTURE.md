@@ -54,6 +54,5 @@
 ## 5. Points de vigilance (Audit rapide)
 1. **Couplage fort** : Forte dépendance au singleton `Botc.getInstance()` dans les commandes et écouteurs.
 2. **Duplication de code** : Logique de guidage par particules GPS répétée dans les commandes de phase (`Jour`, `Nuit`, `Conseil`).
-3. **Synchronisation d'état** : Risque de désynchronisation entre les entités physiques (chevaux/chaises) et la liste logique `BotcPlayer` lors de déconnexions.
-4. **Gestion des threads** : Utilisation de tâches asynchrones/synchrones pour les animations nécessitant une attention sur la concurrence.
-5. **Complexité des GUIs** : Multiplicité des inventaires interactifs (`Grimoire`, `ActionMenu`) gérant des états modifiables en direct.
+3. **Gestion des threads** : Utilisation de tâches asynchrones/synchrones pour les animations nécessitant une attention sur la concurrence.
+4. **Complexité des GUIs** : Multiplicité des inventaires interactifs (`Grimoire`, `ActionMenu`) gérant des états modifiables en direct.

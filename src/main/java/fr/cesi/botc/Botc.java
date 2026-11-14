@@ -83,6 +83,8 @@ public final class Botc extends JavaPlugin {
     }
 
     private boolean seatsAssigned = false;
+    private boolean playersSeated = false;
+    private de.maxhenkel.voicechat.api.Group tribunalGroup = null;
 
     public boolean isSeatsAssigned() {
         return seatsAssigned;
@@ -90,6 +92,22 @@ public final class Botc extends JavaPlugin {
 
     public void setSeatsAssigned(boolean assigned) {
         this.seatsAssigned = assigned;
+    }
+
+    public boolean isPlayersSeated() {
+        return playersSeated;
+    }
+
+    public void setPlayersSeated(boolean seated) {
+        this.playersSeated = seated;
+    }
+
+    public de.maxhenkel.voicechat.api.Group getTribunalGroup() {
+        return tribunalGroup;
+    }
+
+    public void setTribunalGroup(de.maxhenkel.voicechat.api.Group tribunalGroup) {
+        this.tribunalGroup = tribunalGroup;
     }
 
     public boolean isNight() {
@@ -242,11 +260,15 @@ public final class Botc extends JavaPlugin {
             // -------------------------------------------
         }
 
+        // Nettoyage préventif des chevaux orphelins issus d'une session précédente
+        cleanupAllChairs();
+
         getLogger().info("Le plugin BOTC s'est correctement lance !");
     }
 
     @Override
     public void onDisable() {
+        cleanupAllChairs();
         playersMap.clear();
     }
 
@@ -283,20 +305,7 @@ public final class Botc extends JavaPlugin {
         this.vcMutedPlayers.clear();
 
         // NETTOYAGE DES CHAISES INVISIBLES (Chevaux tagués botc_chair)
-        for (org.bukkit.entity.Player onlineP : Bukkit.getOnlinePlayers()) {
-            org.bukkit.entity.Entity vehicle = onlineP.getVehicle();
-            if (vehicle != null && vehicle.getScoreboardTags().contains("botc_chair")) {
-                vehicle.removePassenger(onlineP);
-                vehicle.remove();
-            }
-        }
-        for (org.bukkit.World world : Bukkit.getWorlds()) {
-            for (org.bukkit.entity.Entity entity : world.getEntitiesByClass(org.bukkit.entity.Horse.class)) {
-                if (entity.getScoreboardTags().contains("botc_chair")) {
-                    entity.remove();
-                }
-            }
-        }
+        cleanupAllChairs();
 
         // CORRECTION MULTI-MAP : On utilise getPresetPath("rooms")
         List<String> roomsStr = getConfig().getStringList(getPresetPath("rooms"));
@@ -421,10 +430,7 @@ public final class Botc extends JavaPlugin {
         final Player pTarget = Bukkit.getPlayer(targetBotc.getPlayerUUID());
 
         if (pTarget != null) {
-            final org.bukkit.entity.Entity ancienneChamberChair = pTarget.getVehicle();
-            if (ancienneChamberChair != null) {
-                ancienneChamberChair.removePassenger(pTarget);
-            }
+            removeChairForPlayer(pTarget, targetBotc);
 
             if (getConfig().contains(getPresetPath("death.x"))) {
                 org.bukkit.World w = Bukkit.getWorld(getConfig().getString(getPresetPath("death.world"), "world"));
@@ -495,5 +501,132 @@ public final class Botc extends JavaPlugin {
             }
         }
         activeBossBars.clear();
+    }
+
+    public void cleanupAllChairs() {
+        this.playersSeated = false;
+        this.tribunalGroup = null;
+        for (Player onlineP : Bukkit.getOnlinePlayers()) {
+            org.bukkit.entity.Entity vehicle = onlineP.getVehicle();
+            if (vehicle != null && vehicle.getScoreboardTags().contains("botc_chair")) {
+                vehicle.removeScoreboardTag("botc_chair");
+                vehicle.removePassenger(onlineP);
+                vehicle.remove();
+            }
+        }
+        for (org.bukkit.World world : Bukkit.getWorlds()) {
+            for (org.bukkit.entity.Horse horse : world.getEntitiesByClass(org.bukkit.entity.Horse.class)) {
+                if (horse.getScoreboardTags().contains("botc_chair")) {
+                    horse.removeScoreboardTag("botc_chair");
+                    new java.util.ArrayList<>(horse.getPassengers()).forEach(horse::removePassenger);
+                    horse.remove();
+                }
+            }
+        }
+    }
+
+    public void removeChairForPlayer(Player player, BotcPlayer bp) {
+        if (player != null) {
+            org.bukkit.entity.Entity vehicle = player.getVehicle();
+            if (vehicle != null && vehicle.getScoreboardTags().contains("botc_chair")) {
+                vehicle.removeScoreboardTag("botc_chair");
+                vehicle.removePassenger(player);
+                vehicle.remove();
+            }
+        }
+        if (bp != null && bp.getChairIndex() != -1) {
+            List<String> chairsStr = getConfig().getStringList(getPresetPath("chairs"));
+            if (bp.getChairIndex() >= 0 && bp.getChairIndex() < chairsStr.size()) {
+                String[] parts = chairsStr.get(bp.getChairIndex()).split(",");
+                if (parts.length >= 4) {
+                    org.bukkit.World w = Bukkit.getWorld(parts[0]);
+                    if (w != null) {
+                        double x = Double.parseDouble(parts[1]);
+                        double y = Double.parseDouble(parts[2]);
+                        double z = Double.parseDouble(parts[3]);
+                        org.bukkit.Location horseLoc = new org.bukkit.Location(w, x, y - 1.0, z);
+                        horseLoc.getNearbyEntities(1.5, 2.0, 1.5).stream()
+                                .filter(e -> e instanceof org.bukkit.entity.Horse
+                                        && e.getScoreboardTags().contains("botc_chair")
+                                        && e.getPassengers().isEmpty())
+                                .forEach(e -> {
+                                    e.removeScoreboardTag("botc_chair");
+                                    e.remove();
+                                });
+                    }
+                }
+            }
+        }
+    }
+
+    public void spawnChairForPlayer(Player player, int chairIndex, boolean delayedMount) {
+        List<String> chairsStr = getConfig().getStringList(getPresetPath("chairs"));
+        if (chairIndex < 0 || chairIndex >= chairsStr.size()) {
+            return;
+        }
+        String[] parts = chairsStr.get(chairIndex).split(",");
+        if (parts.length < 5) {
+            return;
+        }
+        org.bukkit.World w = Bukkit.getWorld(parts[0]);
+        if (w == null) {
+            return;
+        }
+
+        double x = Double.parseDouble(parts[1]);
+        double y = Double.parseDouble(parts[2]);
+        double z = Double.parseDouble(parts[3]);
+        float yaw = Float.parseFloat(parts[4]);
+
+        org.bukkit.Location chairLoc = new org.bukkit.Location(w, x, y, z, yaw, 0);
+        org.bukkit.Location horseLoc = chairLoc.clone().add(0, -1.0, 0);
+
+        removeChairForPlayer(player, null);
+
+        horseLoc.getNearbyEntities(1.5, 2.0, 1.5).stream()
+                .filter(e -> e instanceof org.bukkit.entity.Horse && e.getScoreboardTags().contains("botc_chair"))
+                .forEach(e -> {
+                    e.removeScoreboardTag("botc_chair");
+                    new java.util.ArrayList<>(e.getPassengers()).forEach(e::removePassenger);
+                    e.remove();
+                });
+
+        org.bukkit.scoreboard.Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
+        org.bukkit.scoreboard.Team chairTeam = scoreboard.getTeam("botc_chairs");
+        if (chairTeam == null) {
+            chairTeam = scoreboard.registerNewTeam("botc_chairs");
+            chairTeam.setOption(org.bukkit.scoreboard.Team.Option.COLLISION_RULE,
+                    org.bukkit.scoreboard.Team.OptionStatus.NEVER);
+        }
+
+        player.teleport(chairLoc);
+
+        org.bukkit.entity.Horse chair = w.spawn(chairLoc, org.bukkit.entity.Horse.class, horse -> {
+            horse.setGravity(false);
+            horse.setSilent(true);
+            horse.setInvulnerable(true);
+            horse.setAI(false);
+            horse.setTamed(true);
+            horse.setPersistent(false);
+            horse.addScoreboardTag("botc_chair");
+            horse.addPotionEffect(new org.bukkit.potion.PotionEffect(
+                    org.bukkit.potion.PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 0, false, false));
+        });
+
+        chair.teleport(horseLoc);
+        chairTeam.addEntry(chair.getUniqueId().toString());
+
+        if (delayedMount) {
+            Bukkit.getScheduler().runTaskLater(this, () -> {
+                if (player.isOnline() && chair.isValid()) {
+                    chair.addPassenger(player);
+                } else if (chair.isValid()) {
+                    chair.removeScoreboardTag("botc_chair");
+                    chair.remove();
+                }
+            }, 1L);
+        } else {
+            chair.addPassenger(player);
+        }
     }
 }

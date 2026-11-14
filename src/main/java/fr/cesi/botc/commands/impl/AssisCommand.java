@@ -92,11 +92,15 @@ public class AssisCommand implements SubCommand {
         // --- INITIALISATION DU GROUPE VOCAL SIMPLE VOICE CHAT ---
         if (main.getVoicechatPlugin() != null && main.getVoicechatPlugin().getVoicechatApi() != null) {
             de.maxhenkel.voicechat.api.VoicechatServerApi voiceApi = main.getVoicechatPlugin().getVoicechatApi();
-            de.maxhenkel.voicechat.api.Group tribunalGroup = voiceApi.groupBuilder()
-                    .setName(" Tribunal")
-                    .setPersistent(false)
-                    .setType(de.maxhenkel.voicechat.api.Group.Type.NORMAL)
-                    .build();
+            de.maxhenkel.voicechat.api.Group tribunalGroup = main.getTribunalGroup();
+            if (tribunalGroup == null) {
+                tribunalGroup = voiceApi.groupBuilder()
+                        .setName(" Tribunal")
+                        .setPersistent(false)
+                        .setType(de.maxhenkel.voicechat.api.Group.Type.NORMAL)
+                        .build();
+                main.setTribunalGroup(tribunalGroup);
+            }
 
             for (Player p : Bukkit.getOnlinePlayers()) {
                 de.maxhenkel.voicechat.api.VoicechatConnection connection = voiceApi
@@ -107,14 +111,8 @@ public class AssisCommand implements SubCommand {
         }
 
         // --- PLACEMENT PHYSIQUE SUR LES CHAISES FIXES ---
+        main.setPlayersSeated(true);
         org.bukkit.scoreboard.Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
-        org.bukkit.scoreboard.Team chairTeam = scoreboard.getTeam("botc_chairs");
-        if (chairTeam == null) {
-            chairTeam = scoreboard.registerNewTeam("botc_chairs");
-            chairTeam.setOption(org.bukkit.scoreboard.Team.Option.COLLISION_RULE,
-                    org.bukkit.scoreboard.Team.OptionStatus.NEVER);
-        }
-
         org.bukkit.scoreboard.Team nightTeam = scoreboard.getTeam("botc_night");
 
         net.kyori.adventure.title.Title assisTitle = net.kyori.adventure.title.Title.title(
@@ -140,35 +138,7 @@ public class AssisCommand implements SubCommand {
                 nightTeam.removeEntry(p.getName());
             }
 
-            String[] parts = chairsStr.get(indexChaise).split(",");
-            org.bukkit.World w = Bukkit.getWorld(parts[0]);
-            if (w != null) {
-                double x = Double.parseDouble(parts[1]);
-                double y = Double.parseDouble(parts[2]);
-                double z = Double.parseDouble(parts[3]);
-                float yaw = Float.parseFloat(parts[4]);
-
-                org.bukkit.Location chairLoc = new org.bukkit.Location(w, x, y, z, yaw, 0);
-                org.bukkit.Location horseLoc = chairLoc.clone().add(0, -1.0, 0);
-
-                p.teleport(chairLoc);
-
-                org.bukkit.entity.Horse chair = w.spawn(chairLoc, org.bukkit.entity.Horse.class, horse -> {
-                    horse.setGravity(false);
-                    horse.setSilent(true);
-                    horse.setInvulnerable(true);
-                    horse.setAI(false);
-                    horse.setTamed(true);
-                    horse.setPersistent(false);
-                    horse.addScoreboardTag("botc_chair");
-                    horse.addPotionEffect(new org.bukkit.potion.PotionEffect(
-                            org.bukkit.potion.PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 0, false, false));
-                });
-
-                chair.teleport(horseLoc);
-                chairTeam.addEntry(chair.getUniqueId().toString());
-                chair.addPassenger(p);
-            }
+            main.spawnChairForPlayer(p, indexChaise, false);
         }
 
         Bukkit.broadcast(
